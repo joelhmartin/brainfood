@@ -26,7 +26,7 @@ export function LoginForm() {
       }
     } catch (err) {
       addToast({
-        message: err.response?.data?.error?.message || "Login failed",
+        message: err.response?.data?.error?.message || err.message || "Login failed",
         type: "error",
       });
     }

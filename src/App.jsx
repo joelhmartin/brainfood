@@ -39,6 +39,7 @@ import { BlogPostPage } from "./pages/marketing/BlogPost.jsx";
 import { Navbar } from "./components/marketing/Navbar.jsx";
 import { Footer } from "./components/marketing/Footer.jsx";
 import { CONTENT } from "./config/site.js";
+import { BreakpointProvider } from "./hooks/useBreakpoint.jsx";
 
 /* Marketing layout: Navbar + page + Footer */
 function MarketingLayout() {
@@ -153,10 +154,12 @@ function OAuthCallback() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ToastProvider>
-        <AppRoutes />
-      </ToastProvider>
-    </BrowserRouter>
+    <BreakpointProvider>
+      <BrowserRouter>
+        <ToastProvider>
+          <AppRoutes />
+        </ToastProvider>
+      </BrowserRouter>
+    </BreakpointProvider>
   );
 }

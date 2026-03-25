@@ -1,6 +1,15 @@
 import { create } from "zustand";
-import api from "../config/api.js";
 import { getPermissionsForRole } from "@my-app/shared";
+
+/**
+ * Account store — offline mode with a mock account for the admin.
+ */
+
+const MOCK_ACCOUNT = {
+  accountId: "acct_1",
+  accountName: "Brain Food Recovery Services",
+  role: "owner",
+};
 
 export const useAccountStore = create((set, get) => ({
   accounts: [],
@@ -9,23 +18,10 @@ export const useAccountStore = create((set, get) => ({
 
   fetchAccounts: async () => {
     set({ isLoading: true });
-    try {
-      const { data } = await api.get("/user/me/accounts");
-      const accounts = data.data;
-      set({ accounts, isLoading: false });
-
-      // Restore active account from sessionStorage or default to first
-      const savedId = sessionStorage.getItem("activeAccountId");
-      const saved = accounts.find((a) => a.accountId === savedId);
-      if (saved) {
-        set({ activeAccount: saved });
-      } else if (accounts.length > 0) {
-        set({ activeAccount: accounts[0] });
-        sessionStorage.setItem("activeAccountId", accounts[0].accountId);
-      }
-    } catch {
-      set({ accounts: [], isLoading: false });
-    }
+    // Mock: return one account for the logged-in admin
+    const accounts = [MOCK_ACCOUNT];
+    set({ accounts, activeAccount: MOCK_ACCOUNT, isLoading: false });
+    sessionStorage.setItem("activeAccountId", MOCK_ACCOUNT.accountId);
   },
 
   switchAccount: (accountId) => {
@@ -36,10 +32,8 @@ export const useAccountStore = create((set, get) => ({
     }
   },
 
-  createAccount: async ({ name, slug }) => {
-    const { data } = await api.post("/accounts", { name, slug });
-    await get().fetchAccounts();
-    return data.data;
+  createAccount: async () => {
+    throw new Error("Account creation disabled in offline mode");
   },
 
   getPermissions: () => {

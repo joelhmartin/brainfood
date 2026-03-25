@@ -18,6 +18,7 @@ import {
 import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
+import { Responsive } from "../../hooks/useBreakpoint.jsx";
 
 /* ── Scroll reveal helper ─────────────────────
    Uses IntersectionObserver instead of GSAP
@@ -100,11 +101,14 @@ function Hero() {
     >
       {/* Background */}
       <div className="absolute inset-0">
-        <img
-          src={TEAM.heroMain}
-          alt="Brain Food Recovery Services team"
-          className="w-full h-full object-cover object-center"
-        />
+
+        <Responsive>{(bp) =>
+          <img
+            src={bp.isMobile ? TEAM.heroMobile : TEAM.heroMain}
+            alt="Brain Food Recovery Services team"
+            className="w-full h-full object-cover object-center"
+          />
+        }</Responsive>
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
