@@ -17,6 +17,7 @@ import {
   Compass,
 } from "lucide-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
+import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,21 +65,32 @@ function Hero() {
       ref={heroRef}
       className="relative h-[100dvh] min-h-[640px] flex items-end overflow-hidden"
     >
-      {/* Background */}
+      {/* Background — Austin skyline base layer */}
       <div className="absolute inset-0">
         <img
-          src="/images/team-photos/full team hero 2.webp"
-          alt="Brain Food Recovery Services team"
+          src={AUSTIN.ladyBirdSunset}
+          alt="Austin, Texas — Lady Bird Lake at golden hour"
           className="w-full h-full object-cover object-center"
         />
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
-        <NoiseOverlay />
       </div>
 
+      {/* Team photo overlay — right-positioned, blends with city */}
+      <div className="absolute inset-0">
+        <img
+          src={TEAM.heroMain}
+          alt="Brain Food Recovery Services team"
+          className="w-full h-full object-cover object-right"
+          style={{ mixBlendMode: "luminosity", opacity: 0.55 }}
+        />
+      </div>
+
+      {/* Gradient overlays */}
+      <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent" />
+      <NoiseOverlay />
+
       {/* Content */}
-      <div className="relative z-10 section-pad pb-16 md:pb-28 max-w-4xl">
+      <div className="relative z-10 section-pad pb-16 md:pb-28 max-w-6xl">
         {/* Eyebrow */}
         <div data-hero-anim className="mb-6">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-mono tracking-wider">
@@ -187,7 +199,7 @@ function Mission() {
         <div data-mission-anim className="relative order-2 lg:order-1">
           <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl shadow-navy/10">
             <img
-              src="/images/team-photos/charles-justin-1.webp"
+              src={TEAM.charlesJustin1}
               alt="Brain Food Recovery Services co-founders"
               className="w-full h-full object-cover object-center"
             />
@@ -267,8 +279,7 @@ const SERVICE_TABS = [
       "Development of practical life skills",
       "Reconnection to community, purpose, and identity",
     ],
-    // Pexels — two people in a supportive conversation outdoors
-    image: "https://images.pexels.com/photos/5699517/pexels-photo-5699517.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    image: SERVICES.coaching,
     imageAlt: "Recovery coaching session",
   },
   {
@@ -287,8 +298,7 @@ const SERVICE_TABS = [
       "Increasing confidence and self-trust",
       "Reducing risk during vulnerable periods",
     ],
-    // Pexels — two people walking together outdoors
-    image: "https://images.pexels.com/photos/1456951/pexels-photo-1456951.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    image: SERVICES.soberCompanion,
     imageAlt: "Sober companion walking with client",
   },
   {
@@ -306,9 +316,9 @@ const SERVICE_TABS = [
       "Rebuilding social confidence and connection",
       "Identifying passions that bring meaning to daily life",
     ],
-    // Pexels — hiking/outdoors nature
-    image: "https://images.pexels.com/photos/1365425/pexels-photo-1365425.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
-    imageAlt: "Hiking in nature as part of recovery",
+    // Austin's Lady Bird Lake aerial — locally relevant outdoor experience
+    image: AUSTIN.ladyBirdAerial,
+    imageAlt: "Lady Bird Lake, Austin TX — outdoor experiential integration",
   },
   {
     id: "family",
@@ -323,8 +333,7 @@ const SERVICE_TABS = [
       "Reducing burnout, fear, and emotional overwhelm",
       "Learning how to support recovery without enabling",
     ],
-    // Pexels — family having a supportive conversation
-    image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    image: SERVICES.family,
     imageAlt: "Family coaching session",
   },
   {
@@ -341,8 +350,7 @@ const SERVICE_TABS = [
       "Attorneys and legal professionals",
       "Case managers and extended support networks",
     ],
-    // Pexels — professionals collaborating / meeting
-    image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    image: SERVICES.collaborative,
     imageAlt: "Collaborative care team meeting",
   },
 ];
@@ -534,8 +542,19 @@ function WhyBrainFood() {
   }, []);
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-navy">
-      <div className="text-center max-w-2xl mx-auto mb-14">
+    <section ref={ref} className="section-pad py-24 md:py-32 bg-navy relative overflow-hidden">
+      {/* Austin skyline bg — subtle atmospheric layer */}
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src={AUSTIN.skylineDusk}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover object-bottom opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-navy/60" />
+      </div>
+
+      <div className="text-center max-w-2xl mx-auto mb-14 relative">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/60 text-xs font-medium mb-5 tracking-wide">
           Our Approach
         </div>
@@ -550,7 +569,7 @@ function WhyBrainFood() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 relative">
         {WHY_ITEMS.map(({ icon: Icon, title, desc }) => (
           <div
             key={title}
@@ -616,35 +635,35 @@ function Team() {
           className="col-span-2 row-span-2 rounded-3xl overflow-hidden aspect-square md:aspect-auto"
         >
           <img
-            src="/images/team-photos/full team hero.webp"
+            src={TEAM.heroAlt}
             alt="Brain Food Recovery Services team"
             className="w-full h-full object-cover"
           />
         </div>
         <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
           <img
-            src="/images/team-photos/charles1.webp"
+            src={TEAM.charles1}
             alt="Charles"
             className="w-full h-full object-cover"
           />
         </div>
         <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
           <img
-            src="/images/team-photos/justin1.webp"
+            src={TEAM.justin1}
             alt="Justin"
             className="w-full h-full object-cover"
           />
         </div>
         <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
           <img
-            src="/images/team-photos/charles-justin-2.webp"
+            src={TEAM.charlesJustin2}
             alt="Charles and Justin"
             className="w-full h-full object-cover"
           />
         </div>
         <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
           <img
-            src="/images/team-photos/DSC04087.webp"
+            src={TEAM.dsc}
             alt="Team"
             className="w-full h-full object-cover"
           />
