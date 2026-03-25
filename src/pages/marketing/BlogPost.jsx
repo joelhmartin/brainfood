@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { usePostsStore } from "../../stores/posts.store.js";
 import { BUSINESS, CONTENT, blogUrl } from "../../config/site.js";
+import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -187,70 +188,83 @@ export function BlogPostPage() {
         </div>
       </section>
 
-      {/* Article */}
+      {/* Article + sidebar */}
       <section className="section-pad py-12 md:py-16">
-        <div className="max-w-3xl mx-auto">
-          {/* Meta bar */}
-          <div className="flex flex-wrap items-center gap-5 py-6 mb-8 border-b border-surface-300/40">
-            <span className="flex items-center gap-2 text-navy/50 text-sm">
-              <CalendarDays size={15} className="text-brand-500" />
-              {formatDate(post.date)}
-            </span>
-            <span className="flex items-center gap-2 text-navy/50 text-sm">
-              <Clock size={15} className="text-brand-500" />
-              {post.readTime} min read
-            </span>
-          </div>
-
-          {/* Body */}
-          <article>
-            <RenderBody text={post.body} />
-          </article>
-
-          {/* Tags */}
-          {post.tags?.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-surface-300/40">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Tag size={14} className="text-navy/30" />
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-full bg-surface-200 text-navy/50 text-xs font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+          {/* Main content */}
+          <div className="max-w-3xl">
+            {/* Meta bar */}
+            <div className="flex flex-wrap items-center gap-5 py-6 mb-8 border-b border-surface-300/40">
+              <span className="flex items-center gap-2 text-navy/50 text-sm">
+                <CalendarDays size={15} className="text-brand-500" />
+                {formatDate(post.date)}
+              </span>
+              <span className="flex items-center gap-2 text-navy/50 text-sm">
+                <Clock size={15} className="text-brand-500" />
+                {post.readTime} min read
+              </span>
             </div>
-          )}
 
-          {/* Bottom CTA */}
-          <div className="mt-12 bg-brand-500 rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
-            <h3 className="font-heading font-bold text-2xl text-white tracking-tight">
-              Need support?
-            </h3>
-            <p className="mt-2 text-white/70 text-sm max-w-md mx-auto">
-              {BUSINESS.name} offers personalized recovery coaching, mental
-              health coaching, and sober companion services.
-            </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 mt-5 px-6 py-3 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors"
-            >
-              Get in Touch
-              <ArrowRight size={14} />
-            </Link>
+            {/* Body */}
+            <article>
+              <RenderBody text={post.body} />
+            </article>
+
+            {/* Tags */}
+            {post.tags?.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-surface-300/40">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Tag size={14} className="text-navy/30" />
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-full bg-surface-200 text-navy/50 text-xs font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Bottom CTA */}
+            <div className="mt-12 bg-brand-500 rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
+              <h3 className="font-heading font-bold text-2xl text-white tracking-tight">
+                Need support?
+              </h3>
+              <p className="mt-2 text-white/70 text-sm max-w-md mx-auto">
+                {BUSINESS.name} offers personalized recovery coaching, mental
+                health coaching, and sober companion services.
+              </p>
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 mt-5 px-6 py-3 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors"
+              >
+                Get in Touch
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            {/* Back */}
+            <div className="mt-8">
+              <Link
+                to={CONTENT.blog.listPath}
+                className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
+              >
+                <ArrowLeft size={14} />
+                Back to Blog
+              </Link>
+            </div>
           </div>
 
-          {/* Back */}
-          <div className="mt-8">
-            <Link
-              to={CONTENT.blog.listPath}
-              className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
-            >
-              <ArrowLeft size={14} />
-              Back to Blog
-            </Link>
+          {/* Sidebar */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <ContentSidebar
+                title="Let's Talk Recovery"
+                subtitle="Have questions about our services or want to learn more? We'd love to hear from you."
+              />
+            </div>
           </div>
         </div>
       </section>

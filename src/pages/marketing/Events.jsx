@@ -5,6 +5,7 @@ import { CalendarDays, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
 import { AUSTIN } from "../../config/images.js";
 import { eventUrl } from "../../config/site.js";
+import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 
 /* ── Scroll reveal ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -162,21 +163,36 @@ export function EventsPage() {
       <EventsHero />
 
       <section ref={gridRef} className="section-pad py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
-          {events.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-navy/40 text-lg">No upcoming events right now.</p>
-              <p className="text-navy/30 text-sm mt-2">Check back soon!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => (
-                <div key={event.id} data-event-card>
-                  <EventCard event={event} />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+            {/* Main content */}
+            <div>
+              {events.length === 0 ? (
+                <div className="text-center py-20">
+                  <p className="text-navy/40 text-lg">No upcoming events right now.</p>
+                  <p className="text-navy/30 text-sm mt-2">Check back soon!</p>
                 </div>
-              ))}
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {events.map((event) => (
+                    <div key={event.id} data-event-card>
+                      <EventCard event={event} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Sidebar */}
+            <div className="hidden lg:block">
+              <div className="sticky top-24">
+                <ContentSidebar
+                  title="Join Us at an Event"
+                  subtitle="Interested in attending? Reach out and we'll save you a spot — or just show up. Everyone's welcome."
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </>

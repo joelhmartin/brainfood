@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { CalendarDays, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePostsStore } from "../../stores/posts.store.js";
 import { CONTENT, blogUrl, blogPageUrl } from "../../config/site.js";
+import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 
 /* ── Scroll reveal ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -295,9 +296,9 @@ export function BlogPage() {
       {/* Featured hero — only on page 1 */}
       {featured && <FeaturedPost post={featured} />}
 
-      {/* Blog grid */}
+      {/* Blog grid + sidebar */}
       <section ref={gridRef} className="section-pad py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Header + filter */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
             <div>
@@ -318,23 +319,36 @@ export function BlogPage() {
             />
           </div>
 
-          {/* Grid */}
-          {paginated.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-navy/40 text-lg">No posts found.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {paginated.map((post) => (
-                <div key={post.id} data-post-card>
-                  <PostCard post={post} />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+            {/* Main content */}
+            <div>
+              {paginated.length === 0 ? (
+                <div className="text-center py-16">
+                  <p className="text-navy/40 text-lg">No posts found.</p>
                 </div>
-              ))}
-            </div>
-          )}
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {paginated.map((post) => (
+                    <div key={post.id} data-post-card>
+                      <PostCard post={post} />
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {/* Pagination — only when not filtering by category */}
-          {!activeCategory && <Pagination currentPage={currentPage} totalPages={totalPages} />}
+              {!activeCategory && <Pagination currentPage={currentPage} totalPages={totalPages} />}
+            </div>
+
+            {/* Sidebar */}
+            <div className="hidden lg:block">
+              <div className="sticky top-24">
+                <ContentSidebar
+                  title="Let's Talk Recovery"
+                  subtitle="Have questions about our services or want to learn more? We'd love to hear from you."
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </>

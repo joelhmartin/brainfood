@@ -3,10 +3,12 @@ import { CheckCircle2 } from "lucide-react";
 import gsap from "gsap";
 
 /**
- * Reusable Tabs component with sticky tab bar.
- * Sticky boundary = tab bar + image area only (text content scrolls freely below).
+ * Reusable Tabs component.
+ * - Tab pills: always sticky (all screen sizes), sits below the navbar
+ * - Desktop: 2-col layout — image (sticky with pills) | text content (scrolls)
+ * - Mobile: stacked — pills (sticky) → image → text
  */
-export function Tabs({ tabs, className = "", stickyTop = "top-20" }) {
+export function Tabs({ tabs, className = "" }) {
   const [active, setActive] = useState(0);
   const contentRef = useRef(null);
 
@@ -33,30 +35,31 @@ export function Tabs({ tabs, className = "", stickyTop = "top-20" }) {
 
   return (
     <div className={className}>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16">
-        {/* ── Left column: sticky tabs + image ── */}
-        <div className="lg:col-span-2 order-1">
-          {/* This wrapper is the sticky boundary */}
-          <div className="lg:sticky lg:self-start" style={{ top: "5rem" }}>
-            {/* Tab pills */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {tabs.map((t, i) => (
-                <button
-                  key={t.id}
-                  onClick={() => handleTabChange(i)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
-                    active === i
-                      ? "bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20"
-                      : "bg-white text-navy/60 border-surface-300 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50"
-                  }`}
-                >
-                  {t.icon && <t.icon size={14} />}
-                  {t.label}
-                </button>
-              ))}
-            </div>
+      {/* ── Sticky tab pills — always sticky on all screens ── */}
+      <div className="sticky top-[72px] z-20 bg-surface-100 pt-4 pb-4 -mx-1 px-1">
+        <div className="flex flex-wrap gap-2">
+          {tabs.map((t, i) => (
+            <button
+              key={t.id}
+              onClick={() => handleTabChange(i)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
+                active === i
+                  ? "bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20"
+                  : "bg-white text-navy/60 border-surface-300 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50"
+              }`}
+            >
+              {t.icon && <t.icon size={14} />}
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            {/* Image */}
+      {/* ── Content: 2-col on desktop, stacked on mobile ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16 mt-6">
+        {/* Left: image — sticky on desktop only */}
+        <div className="lg:col-span-2 order-1">
+          <div className="lg:sticky lg:top-36">
             <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-xl shadow-navy/10">
               <img
                 src={tab.image}
@@ -68,7 +71,7 @@ export function Tabs({ tabs, className = "", stickyTop = "top-20" }) {
           </div>
         </div>
 
-        {/* ── Right column: text content (scrolls normally) ── */}
+        {/* Right: text content */}
         <div ref={contentRef} className="lg:col-span-3 order-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
             {tab.subtitle || tab.label}

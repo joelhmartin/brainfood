@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { CONTENT, eventUrl } from "../../config/site.js";
 import { CalendarDays, MapPin, Clock, ArrowLeft, Share2 } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
+import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -118,57 +119,70 @@ export function EventDetailPage() {
         </div>
       </section>
 
-      {/* Content */}
+      {/* Content + sidebar */}
       <section className="section-pad py-12 md:py-16">
-        <div className="max-w-4xl mx-auto">
-          {/* Meta bar */}
-          <div className="flex flex-wrap gap-6 py-6 mb-8 border-b border-surface-300/40">
-            <div className="flex items-center gap-2 text-navy/50 text-sm">
-              <CalendarDays size={16} className="text-brand-500" />
-              {formatDate(event.date)}
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+          {/* Main content */}
+          <div>
+            {/* Meta bar */}
+            <div className="flex flex-wrap gap-6 py-6 mb-8 border-b border-surface-300/40">
+              <div className="flex items-center gap-2 text-navy/50 text-sm">
+                <CalendarDays size={16} className="text-brand-500" />
+                {formatDate(event.date)}
+              </div>
+              <div className="flex items-center gap-2 text-navy/50 text-sm">
+                <Clock size={16} className="text-brand-500" />
+                {event.time}
+              </div>
+              <div className="flex items-center gap-2 text-navy/50 text-sm">
+                <MapPin size={16} className="text-brand-500" />
+                {event.location}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-navy/50 text-sm">
-              <Clock size={16} className="text-brand-500" />
-              {event.time}
+
+            {/* Body */}
+            <article className="max-w-none">
+              <RenderBody text={event.body} />
+            </article>
+
+            {/* Bottom CTA */}
+            <div className="mt-12 pt-8 border-t border-surface-300/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="font-heading font-bold text-lg text-navy">
+                  Interested in this event?
+                </p>
+                <p className="text-navy/50 text-sm">
+                  Reach out to us for more details or to reserve your spot.
+                </p>
+              </div>
+              <Link
+                to="/contact"
+                className="px-6 py-3 rounded-full bg-brand-500 text-white font-semibold text-sm hover:bg-brand-600 transition-colors"
+              >
+                Get in Touch
+              </Link>
             </div>
-            <div className="flex items-center gap-2 text-navy/50 text-sm">
-              <MapPin size={16} className="text-brand-500" />
-              {event.location}
+
+            {/* Back link */}
+            <div className="mt-8">
+              <Link
+                to={CONTENT.events.listPath}
+                className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
+              >
+                <ArrowLeft size={14} />
+                Back to All Events
+              </Link>
             </div>
           </div>
 
-          {/* Body */}
-          <article className="max-w-none">
-            <RenderBody text={event.body} />
-          </article>
-
-          {/* Bottom CTA */}
-          <div className="mt-12 pt-8 border-t border-surface-300/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <p className="font-heading font-bold text-lg text-navy">
-                Interested in this event?
-              </p>
-              <p className="text-navy/50 text-sm">
-                Reach out to us for more details or to reserve your spot.
-              </p>
+          {/* Sidebar */}
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <ContentSidebar
+                title="Join Us at an Event"
+                subtitle="Interested in attending? Reach out and we'll save you a spot — or just show up. Everyone's welcome."
+              />
             </div>
-            <Link
-              to="/contact"
-              className="px-6 py-3 rounded-full bg-brand-500 text-white font-semibold text-sm hover:bg-brand-600 transition-colors"
-            >
-              Get in Touch
-            </Link>
-          </div>
-
-          {/* Back link */}
-          <div className="mt-8">
-            <Link
-              to={CONTENT.events.listPath}
-              className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
-            >
-              <ArrowLeft size={14} />
-              Back to All Events
-            </Link>
           </div>
         </div>
       </section>
