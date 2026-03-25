@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Facebook, Instagram } from "lucide-react";
+import { ChevronDown, Facebook, Instagram } from "lucide-react";
 import gsap from "gsap";
 import LogoFull from "../../images/logoFull.jsx";
 
@@ -23,6 +23,35 @@ const SOCIALS = [
   { icon: Facebook,  href: "#", label: "Facebook" },
   { icon: Instagram, href: "#", label: "Instagram" },
 ];
+
+/* ─── Animated hamburger icon (3 bars → X) ─── */
+function HamburgerIcon({ open, scrolled }) {
+  const color = open
+    ? "bg-white"
+    : scrolled
+    ? "bg-navy"
+    : "bg-white";
+
+  return (
+    <div className="relative w-5 h-4 flex flex-col justify-between">
+      <span
+        className={`block h-[2px] w-full rounded-full transition-all duration-300 origin-center ${color} ${
+          open ? "translate-y-[7px] rotate-45" : ""
+        }`}
+      />
+      <span
+        className={`block h-[2px] w-full rounded-full transition-all duration-300 ${color} ${
+          open ? "opacity-0 scale-x-0" : "opacity-100"
+        }`}
+      />
+      <span
+        className={`block h-[2px] w-full rounded-full transition-all duration-300 origin-center ${color} ${
+          open ? "-translate-y-[7px] -rotate-45" : ""
+        }`}
+      />
+    </div>
+  );
+}
 
 /* ─── Desktop nav item (with optional dropdown) ─── */
 function NavItem({ link, scrolled, isActive }) {
@@ -79,52 +108,149 @@ function NavItem({ link, scrolled, isActive }) {
   );
 }
 
-/* ─── Mobile nav group (expandable) ─── */
-function MobileNavGroup({ link, isActive, onNavigate }) {
-  const [open, setOpen] = useState(false);
+/* ─── Full-screen mobile overlay ─── */
+function MobileOverlay({ open, onNavigate, isActive }) {
+  const overlayRef = useRef(null);
+  const linksRef = useRef(null);
+  const [expandedGroup, setExpandedGroup] = useState(null);
 
-  if (!link.children) {
-    return (
-      <Link
-        to={link.to}
-        onClick={onNavigate}
-        className={`px-4 py-3 rounded-2xl text-sm font-medium transition-colors ${
-          isActive
-            ? "bg-brand-500/10 text-brand-500"
-            : "text-navy/70 hover:text-navy hover:bg-surface-200/60"
-        }`}
-      >
-        {link.label}
-      </Link>
-    );
-  }
+  useEffect(() => {
+    if (!overlayRef.current) return;
+
+    if (open) {
+      // Lock body scroll
+      document.body.style.overflow = "hidden";
+
+      gsap.fromTo(
+        overlayRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35, ease: "power3.out" }
+      );
+
+      // Stagger links in
+      const items = linksRef.current?.querySelectorAll("[data-mobile-link]");
+      if (items?.length) {
+        gsap.fromTo(
+          items,
+          { opacity: 0, x: -30 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "power3.out",
+            delay: 0.15,
+          }
+        );
+      }
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  const handleNavigate = () => {
+    setExpandedGroup(null);
+    onNavigate();
+  };
 
   return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium text-navy/70 hover:text-navy hover:bg-surface-200/60 transition-colors"
-      >
-        {link.label}
-        <ChevronDown
-          size={14}
-          className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      {open && (
-        <div className="ml-4 border-l-2 border-surface-300/30 pl-2 mb-1">
-          {link.children.map((child) => (
-            <Link
-              key={child.label}
-              to={child.to}
-              onClick={onNavigate}
-              className="block px-4 py-2 rounded-xl text-sm text-navy/50 hover:text-brand-500 hover:bg-brand-50 transition-colors"
+    <div
+      ref={overlayRef}
+      className="fixed inset-0 z-40 bg-navy/95 backdrop-blur-lg flex flex-col"
+    >
+      {/* Spacer for navbar */}
+      <div className="h-24" />
+
+      {/* Links */}
+      <div ref={linksRef} className="flex-1 flex flex-col justify-center px-8 -mt-16">
+        {NAV_LINKS.map((link) => {
+          if (!link.children) {
+            return (
+              <Link
+                key={link.label}
+                to={link.to}
+                data-mobile-link
+                onClick={handleNavigate}
+                className={`block py-4 border-b border-white/10 text-2xl font-heading font-bold tracking-tight transition-colors ${
+                  isActive(link) ? "text-brand-400" : "text-white hover:text-brand-300"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          }
+
+          const isExpanded = expandedGroup === link.label;
+
+          return (
+            <div key={link.label} data-mobile-link>
+              <button
+                onClick={() => setExpandedGroup(isExpanded ? null : link.label)}
+                className="w-full flex items-center justify-between py-4 border-b border-white/10 text-2xl font-heading font-bold tracking-tight text-white hover:text-brand-300 transition-colors"
+              >
+                {link.label}
+                <ChevronDown
+                  size={20}
+                  className={`text-white/40 transition-transform duration-300 ${
+                    isExpanded ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="pl-4 py-2 space-y-1">
+                  {link.children.map((child) => (
+                    <Link
+                      key={child.label}
+                      to={child.to}
+                      onClick={handleNavigate}
+                      className="block py-2.5 text-base text-white/50 hover:text-brand-400 transition-colors"
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* CTA */}
+        <div data-mobile-link className="mt-10">
+          <Link
+            to="/contact"
+            onClick={handleNavigate}
+            className="inline-flex px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-600 transition-colors"
+          >
+            Get Started
+          </Link>
+        </div>
+
+        {/* Socials */}
+        <div data-mobile-link className="mt-8 flex items-center gap-4">
+          {SOCIALS.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/20 transition-all"
+              aria-label={s.label}
             >
-              {child.label}
-            </Link>
+              <s.icon size={16} />
+            </a>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -134,7 +260,6 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navRef = useRef(null);
-  const mobileMenuRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -145,17 +270,6 @@ export function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
-
-  useEffect(() => {
-    if (!mobileMenuRef.current) return;
-    if (mobileOpen) {
-      gsap.fromTo(
-        mobileMenuRef.current,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }
-      );
-    }
-  }, [mobileOpen]);
 
   const isActive = (link) => {
     if (link.to && location.pathname === link.to) return true;
@@ -168,7 +282,9 @@ export function Navbar() {
       {/* Social bar — fades out on scroll */}
       <div
         className={`fixed top-3 right-6 z-50 flex items-center gap-3 transition-all duration-500 ${
-          scrolled ? "opacity-0 -translate-y-full pointer-events-none" : "opacity-100"
+          scrolled || mobileOpen
+            ? "opacity-0 -translate-y-full pointer-events-none"
+            : "opacity-100"
         }`}
       >
         {SOCIALS.map((s) => (
@@ -185,11 +301,20 @@ export function Navbar() {
         ))}
       </div>
 
+      {/* Full-screen mobile overlay (behind nav bar) */}
+      <MobileOverlay
+        open={mobileOpen}
+        onNavigate={() => setMobileOpen(false)}
+        isActive={isActive}
+      />
+
       <nav
         ref={navRef}
         className={`fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-out
           ${
-            scrolled
+            mobileOpen
+              ? "top-4 bg-transparent border border-transparent"
+              : scrolled
               ? "top-4 bg-white/80 backdrop-blur-xl border border-surface-300/50 shadow-lg shadow-navy/5"
               : "top-8 bg-transparent border border-transparent"
           }
@@ -198,7 +323,10 @@ export function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center hover-lift flex-shrink-0">
-            <LogoFull className="h-10 w-auto" dark={scrolled} />
+            <LogoFull
+              className="h-10 w-auto"
+              dark={scrolled && !mobileOpen}
+            />
           </Link>
 
           {/* Desktop links */}
@@ -228,41 +356,13 @@ export function Navbar() {
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className={`lg:hidden p-2 rounded-full transition-colors duration-300 ${
-                scrolled ? "text-navy hover:bg-surface-200" : "text-white hover:bg-white/10"
-              }`}
+              className="lg:hidden p-2 rounded-full transition-colors duration-300"
               aria-label="Toggle menu"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              <HamburgerIcon open={mobileOpen} scrolled={scrolled} />
             </button>
           </div>
         </div>
-
-        {/* Mobile drawer */}
-        {mobileOpen && (
-          <div
-            ref={mobileMenuRef}
-            className="lg:hidden mt-3 py-3 px-1 bg-white rounded-3xl border border-surface-300/50 shadow-xl flex flex-col gap-0.5"
-          >
-            {NAV_LINKS.map((link) => (
-              <MobileNavGroup
-                key={link.label}
-                link={link}
-                isActive={isActive(link)}
-                onNavigate={() => setMobileOpen(false)}
-              />
-            ))}
-            <div className="mt-3 px-4 pb-2">
-              <Link
-                to="/contact"
-                onClick={() => setMobileOpen(false)}
-                className="block w-full text-center px-6 py-3 rounded-2xl bg-brand-500 text-white font-semibold text-sm hover:bg-brand-600 transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        )}
       </nav>
     </>
   );

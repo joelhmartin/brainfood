@@ -3,22 +3,10 @@ import { CheckCircle2 } from "lucide-react";
 import gsap from "gsap";
 
 /**
- * Reusable Tabs component for service/feature sections.
- *
- * tabs: Array<{
- *   id:          string
- *   label:       string          — pill button label
- *   icon?:       LucideIcon      — optional icon for pill
- *   title:       string          — content heading
- *   subtitle?:   string          — small badge above heading (defaults to label)
- *   description: string          — body copy
- *   items?:      string[]        — checklist below description
- *   image:       string          — image src (Pexels URL or local path)
- *   imageAlt?:   string          — img alt text
- * }>
- * className?: string
+ * Reusable Tabs component with sticky tab bar.
+ * Sticky boundary = tab bar + image area only (text content scrolls freely below).
  */
-export function Tabs({ tabs, className = "" }) {
+export function Tabs({ tabs, className = "", stickyTop = "top-20" }) {
   const [active, setActive] = useState(0);
   const contentRef = useRef(null);
 
@@ -45,32 +33,43 @@ export function Tabs({ tabs, className = "" }) {
 
   return (
     <div className={className}>
-      {/* ── Tab pill bar ── */}
-      <div className="flex flex-wrap gap-2 mb-10 md:mb-14">
-        {tabs.map((t, i) => (
-          <button
-            key={t.id}
-            onClick={() => handleTabChange(i)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
-              active === i
-                ? "bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20"
-                : "bg-white text-navy/60 border-surface-300 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50"
-            }`}
-          >
-            {t.icon && <t.icon size={14} />}
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16">
+        {/* ── Left column: sticky tabs + image ── */}
+        <div className="lg:col-span-2 order-1">
+          {/* This wrapper is the sticky boundary */}
+          <div className="lg:sticky lg:self-start" style={{ top: "5rem" }}>
+            {/* Tab pills */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {tabs.map((t, i) => (
+                <button
+                  key={t.id}
+                  onClick={() => handleTabChange(i)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
+                    active === i
+                      ? "bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20"
+                      : "bg-white text-navy/60 border-surface-300 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50"
+                  }`}
+                >
+                  {t.icon && <t.icon size={14} />}
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
-      {/* ── Content area ── */}
-      <div
-        ref={contentRef}
-        className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-16 items-center"
-      >
-        {/* Left: Text content — 3 of 5 cols */}
-        <div className="lg:col-span-3 order-2 lg:order-1">
-          {/* Badge */}
+            {/* Image */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-xl shadow-navy/10">
+              <img
+                src={tab.image}
+                alt={tab.imageAlt || tab.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent pointer-events-none" />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right column: text content (scrolls normally) ── */}
+        <div ref={contentRef} className="lg:col-span-3 order-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
             {tab.subtitle || tab.label}
           </div>
@@ -98,18 +97,6 @@ export function Tabs({ tabs, className = "" }) {
               ))}
             </ul>
           )}
-        </div>
-
-        {/* Right: Image — 2 of 5 cols */}
-        <div className="lg:col-span-2 order-1 lg:order-2">
-          <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-xl shadow-navy/10">
-            <img
-              src={tab.image}
-              alt={tab.imageAlt || tab.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent pointer-events-none" />
-          </div>
         </div>
       </div>
     </div>

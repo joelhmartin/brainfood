@@ -229,7 +229,7 @@ function Mission() {
             className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight mb-6"
           >
             We work in the real world—
-            <span className="font-drama italic text-brand-500">
+            <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
               {" "}side by side{" "}
             </span>
             with our clients.
@@ -375,7 +375,7 @@ function Services() {
           className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight max-w-xl"
         >
           Comprehensive, Real-World Support for{" "}
-          <span className="font-drama italic text-brand-500">
+          <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
             Recovery & Mental Wellness
           </span>
         </h2>
@@ -441,7 +441,7 @@ function WhoWeServe() {
         </div>
         <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
           Recovery is{" "}
-          <span className="font-drama italic text-brand-500">not linear</span>
+          <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">not linear</span>
           —and it's not one-size-fits-all.
         </h2>
       </div>
@@ -526,7 +526,7 @@ function WhyBrainFood() {
         </div>
         <h2 className="font-heading font-bold text-3xl md:text-4xl text-white tracking-tight leading-tight">
           Why{" "}
-          <span className="font-drama italic text-brand-400">
+          <span className="font-drama italic text-brand-400 text-4xl md:text-5xl">
             Brain Food Recovery Services
           </span>
         </h2>
@@ -578,7 +578,7 @@ function Team() {
         </div>
         <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
           A{" "}
-          <span className="font-drama italic text-brand-500">personal</span>{" "}
+          <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">personal</span>{" "}
           organization, deeply committed to your growth.
         </h2>
         <p className="mt-4 text-navy/55 text-base leading-relaxed">
@@ -649,7 +649,7 @@ function CTA() {
             className="font-heading font-bold text-3xl md:text-5xl text-white tracking-tight leading-tight max-w-2xl mx-auto"
           >
             Ready to start your recovery{" "}
-            <span className="font-drama italic">journey?</span>
+            <span className="font-drama italic text-4xl md:text-6xl">journey?</span>
           </h2>
           <p
             data-cta-anim

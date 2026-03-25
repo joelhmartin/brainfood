@@ -152,7 +152,7 @@ function OurStory() {
             className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight mb-6"
           >
             We work in the{" "}
-            <span className="font-drama italic text-brand-500">
+            <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
               real world
             </span>
             —side by side with our clients.
@@ -266,7 +266,7 @@ function Philosophy() {
             >
               Compassionate truth,
               <br />
-              <span className="font-drama italic text-brand-400">
+              <span className="font-drama italic text-brand-400 text-4xl md:text-5xl">
                 delivered with care.
               </span>
             </h2>
@@ -340,7 +340,7 @@ function Values() {
           </div>
           <h2 className="font-heading font-bold text-3xl md:text-4xl tracking-tight">
             What drives{" "}
-            <span className="font-drama italic text-brand-500">
+            <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
               everything
             </span>{" "}
             we do.
@@ -421,7 +421,7 @@ function TeamBios() {
         </div>
         <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
           A{" "}
-          <span className="font-drama italic text-brand-500">small team</span>
+          <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">small team</span>
           {" "}with a big commitment.
         </h2>
       </div>
@@ -495,7 +495,7 @@ function AboutCTA() {
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
           Ready to start your
-          <span className="font-drama italic text-brand-500"> journey?</span>
+          <span className="font-drama italic text-brand-500 text-3xl md:text-5xl"> journey?</span>
         </h2>
         <p className="mt-4 text-navy/50 text-base max-w-lg mx-auto leading-relaxed">
           We work with individuals and families at every stage of the recovery
