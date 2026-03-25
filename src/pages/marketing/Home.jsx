@@ -65,29 +65,18 @@ function Hero() {
       ref={heroRef}
       className="relative h-[100dvh] min-h-[640px] flex items-end overflow-hidden"
     >
-      {/* Background — Austin skyline base layer */}
-      <div className="absolute inset-0">
-        <img
-          src={AUSTIN.ladyBirdSunset}
-          alt="Austin, Texas — Lady Bird Lake at golden hour"
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
-
-      {/* Team photo overlay — right-positioned, blends with city */}
+      {/* Background */}
       <div className="absolute inset-0">
         <img
           src={TEAM.heroMain}
           alt="Brain Food Recovery Services team"
-          className="w-full h-full object-cover object-right"
-          style={{ mixBlendMode: "luminosity", opacity: 0.55 }}
+          className="w-full h-full object-cover object-center"
         />
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
+        <NoiseOverlay />
       </div>
-
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/30" />
-      <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent" />
-      <NoiseOverlay />
 
       {/* Content */}
       <div className="relative z-10 section-pad pb-16 md:pb-28 max-w-6xl">
