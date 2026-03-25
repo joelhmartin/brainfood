@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
   Heart,
@@ -11,7 +10,35 @@ import {
 } from "lucide-react";
 import { AUSTIN, TEAM } from "../../config/images.js";
 
-gsap.registerPlugin(ScrollTrigger);
+/* ── Scroll reveal helper (IntersectionObserver, no ScrollTrigger) ── */
+function useScrollReveal(ref, selector, animProps) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const targets = el.querySelectorAll(selector);
+    if (!targets.length) return;
+
+    gsap.set(targets, { opacity: 0, y: animProps.y ?? 24 });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          gsap.to(targets, {
+            opacity: 1,
+            y: 0,
+            duration: animProps.duration ?? 0.8,
+            stagger: animProps.stagger ?? 0.08,
+            ease: animProps.ease ?? "power3.out",
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+}
 
 /* ─── NOISE OVERLAY ─── */
 function NoiseOverlay() {
@@ -95,20 +122,7 @@ function AboutHero() {
 /* ─── OUR STORY ─── */
 function OurStory() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-story]", {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-story]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32">
@@ -171,20 +185,7 @@ function OurStory() {
 /* ─── MISSION ─── */
 function Mission() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-mission]", {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-mission]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
@@ -231,20 +232,7 @@ function Mission() {
 /* ─── PHILOSOPHY — dark section with Austin bg ─── */
 function Philosophy() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-philo]", {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-philo]", { y: 40, duration: 0.8, stagger: 0.12 });
 
   return (
     <section
@@ -318,20 +306,7 @@ function Philosophy() {
 /* ─── VALUES ─── */
 function Values() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-value-card]", {
-        y: 40,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 70%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-value-card]", { y: 40, duration: 0.7, stagger: 0.12 });
 
   const values = [
     {
@@ -394,23 +369,49 @@ function Values() {
   );
 }
 
-/* ─── TEAM PHOTOS ─── */
-function TeamPhotos() {
-  const ref = useRef(null);
+/* ─── TEAM BIOS ─── */
+const COACHES = [
+  {
+    id: "charlie",
+    name: "Charlie Moffet",
+    role: "Recovery Coach & Co-Founder",
+    photo: TEAM.charles1,
+    bio: `Charlie Moffet has been working in the treatment industry for over six years. After starting his own journey in recovery he quickly realized working in addiction was his path forward. Charlie worked for a non-profit all male treatment center in Wimberley, TX for five years. He did everything from being a recovery advocate to recovery specialist, meeting with guys one on one, helping the family along the way and marketing.
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-team-img]", {
-        scale: 0.95,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 78%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+In 2017, Charlie decided to open an all male sober living business called, "Chuck and Joe's Sober Living." It's a staple in the Austin community and is still in business to this day! In 2022, Charlie worked for a dual diagnoses center as a "group facilitator." His duty was to teach skill groups that included DBT, CBT, attachment theory and 12 step work. Charlie decided to get an RSPS certificate in 2022 with hopes, of once again, working with guys one on one. He is currently in college to get his LMSW and one day become a clinical therapist. Charlie is also a screen writer and a passionate traveler.`,
+    quote: `"Living life to the fullest is the best gift sobriety has given me and I want everyone to know anything is possible if you put your recovery first."`,
+  },
+  {
+    id: "justin",
+    name: "Justin Yoken",
+    role: "Recovery Coach & Co-Founder",
+    photo: TEAM.justin1,
+    bio: `Justin Yoken has been working in treatment since 2016. He has worked as a Recovery Coach, Program Director, Assistant Director and eventually became the Director of an aftercare which included a coaching team and sober living houses. He got certified as a Peer Recovery Support Specialist in 2016 by the State of Texas. In addition, he has worked with hundreds of families over the past seven years assisting their journey with establishing new boundaries, communication patterns, and overall behaviors with their loved ones.
+
+Justin got sober in 2014 and lives the recovery lifestyle himself, which allows him to transmit the behaviors more easily due to walking the same path as many of his clients. Justin enjoys working out, sports, live music, and spending time with his family and friends.`,
+    quote: `"Recovery has given me more than I could ever expect and I am so grateful that I was given the opportunity to get sober and be in recovery. If I was able to do it after ten years of substance use, then so can anyone."`,
+  },
+  {
+    id: "matthew",
+    name: "Matthew Harvey-Parrish",
+    role: "Recovery Coach",
+    photo: TEAM.matthew1,
+    bio: `Matthew, born and raised in Austin, Texas, found recovery in December of 2020. Matthew's favorite part of being in recovery is being immersed in a community that gave him a space to gain clarity, purpose, and an ability to help others find the same. Matthew enjoys working out, time with his family, live music, and sports.`,
+    quote: `"My biggest blessings in recovery have been the ability to mend relationships, building a family, becoming the man I was meant to be, and getting to witness others do the same."`,
+  },
+  {
+    id: "damian",
+    name: "Damian Vickers",
+    role: "Recovery Coach",
+    photo: TEAM.damian1,
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas faucibus mollis interdum. Nullam id dolor id nibh ultricies vehicula ut id elit. Donec ullamcorper nulla non metus auctor fringilla. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Nulla vitae elit libero, a pharetra augue.",
+    quote: null,
+  },
+];
+
+function TeamBios() {
+  const ref = useRef(null);
+  useScrollReveal(ref, "[data-bio-card]", { y: 40, duration: 0.8, stagger: 0.15 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
@@ -425,29 +426,63 @@ function TeamPhotos() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div
-          data-team-img
-          className="col-span-2 row-span-2 rounded-3xl overflow-hidden aspect-square md:aspect-auto"
-        >
-          <img
-            src={TEAM.heroAlt}
-            alt="Brain Food Recovery Services team"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div data-team-img className="rounded-3xl overflow-hidden aspect-square">
-          <img src={TEAM.charles1} alt="Charles" className="w-full h-full object-cover" />
-        </div>
-        <div data-team-img className="rounded-3xl overflow-hidden aspect-square">
-          <img src={TEAM.justin1} alt="Justin" className="w-full h-full object-cover" />
-        </div>
-        <div data-team-img className="rounded-3xl overflow-hidden aspect-square">
-          <img src={TEAM.charlesJustin2} alt="Charles and Justin" className="w-full h-full object-cover" />
-        </div>
-        <div data-team-img className="rounded-3xl overflow-hidden aspect-square">
-          <img src={TEAM.dsc} alt="Team" className="w-full h-full object-cover" />
-        </div>
+      <div className="space-y-16">
+        {COACHES.map((coach, i) => (
+          <div
+            key={coach.id}
+            id={coach.id}
+            data-bio-card
+            className="scroll-mt-32"
+          >
+            <div
+              className={`grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-center ${
+                i % 2 === 1 ? "lg:direction-rtl" : ""
+              }`}
+            >
+              {/* Photo — 2 of 5 cols */}
+              <div
+                className={`lg:col-span-2 ${
+                  i % 2 === 1 ? "lg:order-2" : "lg:order-1"
+                }`}
+              >
+                <div className="relative rounded-3xl overflow-hidden aspect-[3/4] shadow-xl shadow-navy/10">
+                  <img
+                    src={coach.photo}
+                    alt={coach.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Content — 3 of 5 cols */}
+              <div
+                className={`lg:col-span-3 ${
+                  i % 2 === 1 ? "lg:order-1" : "lg:order-2"
+                }`}
+              >
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-4 tracking-wide">
+                  {coach.role}
+                </div>
+                <h3 className="font-heading font-bold text-2xl md:text-3xl text-navy tracking-tight mb-5">
+                  {coach.name}
+                </h3>
+                {coach.bio.split("\n\n").map((paragraph, pi) => (
+                  <p
+                    key={pi}
+                    className="text-navy/60 text-base leading-relaxed mb-4 last:mb-0"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+                {coach.quote && (
+                  <blockquote className="mt-6 pl-5 border-l-3 border-brand-300 text-navy/50 italic text-base leading-relaxed">
+                    {coach.quote}
+                  </blockquote>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -485,10 +520,23 @@ function AboutCTA() {
 }
 
 /* ─── PAGE EXPORT ─── */
+// Also export COACHES so Home page can reference the same data
+export { COACHES };
+
 export function AboutPage() {
+  const { hash } = useLocation();
+
   useEffect(() => {
+    if (hash) {
+      const timer = setTimeout(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
     window.scrollTo(0, 0);
-  }, []);
+  }, [hash]);
+
 
   return (
     <>
@@ -497,7 +545,7 @@ export function AboutPage() {
       <Mission />
       <Philosophy />
       <Values />
-      <TeamPhotos />
+      <TeamBios />
       <AboutCTA />
     </>
   );

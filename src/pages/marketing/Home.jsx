@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
   Heart,
@@ -19,7 +18,40 @@ import {
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 
-gsap.registerPlugin(ScrollTrigger);
+/* ── Scroll reveal helper ─────────────────────
+   Uses IntersectionObserver instead of GSAP
+   ScrollTrigger to avoid layout-shift issues
+   with externally loaded images.
+──────────────────────────────────────────── */
+function useScrollReveal(ref, selector, animProps) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const targets = el.querySelectorAll(selector);
+    if (!targets.length) return;
+
+    // Keep targets invisible until observer fires
+    gsap.set(targets, { opacity: 0, y: animProps.y ?? 24 });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          gsap.to(targets, {
+            opacity: 1,
+            y: 0,
+            duration: animProps.duration ?? 0.8,
+            stagger: animProps.stagger ?? 0.08,
+            ease: animProps.ease ?? "power3.out",
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+}
 
 /* ─────────────────────────────────────────────
    NOISE OVERLAY
@@ -163,23 +195,7 @@ function Hero() {
 ───────────────────────────────────────────── */
 function Mission() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-mission-anim]", {
-        y: 32,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "top 80%",
-        },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-mission-anim]", { y: 32, duration: 0.9, stagger: 0.12 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32">
@@ -346,20 +362,7 @@ const SERVICE_TABS = [
 
 function Services() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-services-hdr]", {
-        y: 28,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 80%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-services-hdr]", { y: 28, duration: 0.9, stagger: 0.1 });
 
   return (
     <section id="services" ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
@@ -428,20 +431,7 @@ const WHO_WE_SERVE = [
 
 function WhoWeServe() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-who-card]", {
-        y: 24,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 78%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-who-card]", { y: 24, duration: 0.8, stagger: 0.08 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32">
@@ -515,20 +505,7 @@ const WHY_ITEMS = [
 
 function WhyBrainFood() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-why-card]", {
-        y: 24,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 78%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-why-card]", { y: 24, duration: 0.8, stagger: 0.08 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32 bg-navy relative overflow-hidden">
@@ -580,24 +557,18 @@ function WhyBrainFood() {
 }
 
 /* ─────────────────────────────────────────────
-   TEAM
+   MEET THE TEAM — 4 coaches with links to bios
 ───────────────────────────────────────────── */
+const COACHES = [
+  { id: "charlie",  name: "Charlie Moffet",          role: "Recovery Coach & Co-Founder", photo: TEAM.charles1 },
+  { id: "justin",   name: "Justin Yoken",            role: "Recovery Coach & Co-Founder", photo: TEAM.justin1 },
+  { id: "matthew",  name: "Matthew Harvey-Parrish",  role: "Recovery Coach",              photo: TEAM.matthew1 },
+  { id: "damian",   name: "Damian Vickers",           role: "Recovery Coach",              photo: TEAM.damian1 },
+];
+
 function Team() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-team-photo]", {
-        scale: 0.95,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 78%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-team-card]", { y: 30, duration: 0.8, stagger: 0.12 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
@@ -617,46 +588,40 @@ function Team() {
         </p>
       </div>
 
-      {/* Photo grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div
-          data-team-photo
-          className="col-span-2 row-span-2 rounded-3xl overflow-hidden aspect-square md:aspect-auto"
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {COACHES.map((coach) => (
+          <Link
+            key={coach.id}
+            to={`/about#${coach.id}`}
+            data-team-card
+            className="group block"
+          >
+            <div className="relative rounded-3xl overflow-hidden aspect-[3/4] shadow-md group-hover:shadow-xl transition-shadow duration-300">
+              <img
+                src={coach.photo}
+                alt={coach.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <h3 className="font-heading font-bold text-lg text-white leading-tight">
+                  {coach.name}
+                </h3>
+                <p className="text-white/60 text-sm mt-0.5">{coach.role}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="text-center mt-10">
+        <Link
+          to="/about#charlie"
+          className="inline-flex items-center gap-2 text-brand-500 font-semibold text-sm hover:gap-3 transition-all duration-300"
         >
-          <img
-            src={TEAM.heroAlt}
-            alt="Brain Food Recovery Services team"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
-          <img
-            src={TEAM.charles1}
-            alt="Charles"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
-          <img
-            src={TEAM.justin1}
-            alt="Justin"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
-          <img
-            src={TEAM.charlesJustin2}
-            alt="Charles and Justin"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
-          <img
-            src={TEAM.dsc}
-            alt="Team"
-            className="w-full h-full object-cover"
-          />
-        </div>
+          Read Full Bios
+          <ArrowRight size={16} />
+        </Link>
       </div>
     </section>
   );
@@ -667,20 +632,7 @@ function Team() {
 ───────────────────────────────────────────── */
 function CTA() {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from("[data-cta-anim]", {
-        y: 28,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ref.current, start: "top 82%" },
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
+  useScrollReveal(ref, "[data-cta-anim]", { y: 28, duration: 0.9, stagger: 0.12 });
 
   return (
     <section ref={ref} className="section-pad py-24 md:py-32">
