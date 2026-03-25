@@ -1,29 +1,22 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
+import { ArrowUpRight, Facebook, Instagram, Phone, Mail } from "lucide-react";
 
 const SOCIALS = [
-  { icon: Facebook, href: "https://facebook.com/diamondorthotic", label: "Facebook" },
-  { icon: Instagram, href: "https://instagram.com/diamondorthotic", label: "Instagram" },
-  { icon: Linkedin, href: "https://linkedin.com/company/diamond-orthotic-laboratory", label: "LinkedIn" },
-  { icon: Youtube, href: "https://youtube.com/@diamondorthotic", label: "YouTube" },
+  { icon: Facebook,  href: "#", label: "Facebook" },
+  { icon: Instagram, href: "#", label: "Instagram" },
 ];
 
 const FOOTER_NAV = {
-  Products: [
-    { label: "Olmos Series", to: "/products" },
-    { label: "DDSO Sleep Orthotic", to: "/products" },
-    { label: "TMD Orthotics", to: "/products" },
-    { label: "Materials", to: "/products" },
+  Services: [
+    { label: "Recovery & Mental Health Coaching", to: "/services/coaching" },
+    { label: "Sober Companion Services",          to: "/services/sober-companion" },
+    { label: "Experiential Integration",          to: "/services/experiential" },
+    { label: "Family Coaching & Support",         to: "/services/family" },
+    { label: "Collaborative Care",                to: "/services/collaborative" },
   ],
   Company: [
-    { label: "About Us", to: "/about" },
-    { label: "Our Process", to: "/about" },
-    { label: "Contact", to: "/contact" },
-  ],
-  Resources: [
-    { label: "For Dentists", to: "/contact" },
-    { label: "Case Submission", to: "/contact" },
-    { label: "Digital Workflow", to: "/about" },
+    { label: "About Us",  to: "/about" },
+    { label: "Contact",   to: "/contact" },
   ],
 };
 
@@ -34,14 +27,36 @@ export function Footer() {
         {/* Top section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 pb-12 border-b border-white/10">
           {/* Brand block */}
-          <div className="md:col-span-4">
-            <h3 className="font-heading font-bold text-white text-xl tracking-tight">
-              Diamond Orthotic Laboratory
-            </h3>
-            <p className="mt-3 text-white/50 text-sm leading-relaxed max-w-xs">
-              The premier Olmos-Method orthotic laboratory. Digital-first
-              precision for TMJ and sleep breathing disorders.
+          <div className="md:col-span-5">
+            <img
+              src="/images/logo/BRAINFOOD HORIZONTAL LOGO WHITE.svg"
+              alt="Brain Food Recovery Services"
+              className="h-10 w-auto mb-5"
+            />
+            <p className="text-white/50 text-sm leading-relaxed max-w-xs">
+              Personalized recovery coaching, mental health coaching, and sober
+              companion services for individuals and families navigating substance
+              use disorder and mental health challenges.
             </p>
+
+            {/* Contact */}
+            <div className="mt-6 flex flex-col gap-2">
+              <a
+                href="tel:+1-000-000-0000"
+                className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors"
+              >
+                <Phone size={13} />
+                <span>(000) 000-0000</span>
+              </a>
+              <a
+                href="mailto:info@brainfoodrecovery.com"
+                className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors"
+              >
+                <Mail size={13} />
+                <span>info@brainfoodrecovery.com</span>
+              </a>
+            </div>
+
             {/* Social links */}
             <div className="mt-6 flex items-center gap-3">
               {SOCIALS.map((s) => (
@@ -50,25 +65,17 @@ export function Footer() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:bg-white/10 transition-all duration-300"
+                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:bg-brand-500/20 hover:border-brand-500/30 transition-all duration-300"
                   aria-label={s.label}
                 >
                   <s.icon size={14} />
                 </a>
               ))}
             </div>
-
-            <div className="mt-4 flex items-center gap-3 font-mono text-xs text-white/40">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              System Operational
-            </div>
           </div>
 
           {/* Nav columns */}
-          <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
             {Object.entries(FOOTER_NAV).map(([title, links]) => (
               <div key={title}>
                 <h4 className="font-heading font-semibold text-white/30 text-xs uppercase tracking-widest mb-4">
@@ -98,8 +105,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
           <p className="text-white/30 text-xs">
-            &copy; {new Date().getFullYear()} Diamond Orthotic Laboratory. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} Brain Food Recovery Services. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-white/30 text-xs">
             <span className="hover:text-white/60 transition-colors cursor-pointer">
@@ -107,9 +113,6 @@ export function Footer() {
             </span>
             <span className="hover:text-white/60 transition-colors cursor-pointer">
               Terms of Service
-            </span>
-            <span className="hover:text-white/60 transition-colors cursor-pointer">
-              FDA Compliance
             </span>
           </div>
         </div>

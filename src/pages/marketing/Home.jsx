@@ -1,29 +1,35 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
-  Scan,
-  PenTool,
-  Printer,
-  ChevronRight,
-  Activity,
-  Shield,
-  Moon,
-  Clock,
+  Heart,
+  Users,
+  GitBranch,
+  Wrench,
+  Scale,
+  MapPin,
+  UserCheck,
+  Brain,
+  Home,
+  Stethoscope,
+  Compass,
 } from "lucide-react";
+import { Tabs } from "../../components/ui/Tabs.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── NOISE OVERLAY ─── */
+/* ─────────────────────────────────────────────
+   NOISE OVERLAY
+───────────────────────────────────────────── */
 function NoiseOverlay() {
   return (
     <svg className="noise-overlay" width="100%" height="100%">
       <filter id="noise">
         <feTurbulence
           type="fractalNoise"
-          baseFrequency="0.8"
+          baseFrequency="0.75"
           numOctaves="4"
           stitchTiles="stitch"
         />
@@ -33,7 +39,9 @@ function NoiseOverlay() {
   );
 }
 
-/* ─── HERO ─── */
+/* ─────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────── */
 function Hero() {
   const heroRef = useRef(null);
 
@@ -43,16 +51,9 @@ function Hero() {
         y: 40,
         opacity: 0,
         duration: 1,
-        stagger: 0.08,
+        stagger: 0.1,
         ease: "power3.out",
         delay: 0.3,
-      });
-      gsap.from("[data-hero-product]", {
-        x: 80,
-        opacity: 0,
-        duration: 1.2,
-        ease: "power3.out",
-        delay: 0.6,
       });
     }, heroRef);
     return () => ctx.revert();
@@ -61,523 +62,182 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative h-[100dvh] min-h-[600px] flex items-end overflow-hidden"
+      className="relative h-[100dvh] min-h-[640px] flex items-end overflow-hidden"
     >
-      {/* Background stage */}
+      {/* Background */}
       <div className="absolute inset-0">
         <img
-          src="/images/hero-stage-bg.webp"
-          alt=""
+          src="/images/team-photos/full team hero 2.webp"
+          alt="Brain Food Recovery Services team"
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/30 to-transparent" />
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
+        <NoiseOverlay />
       </div>
 
-      {/* Product image */}
-      <img
-        data-hero-product
-        src="/images/hero-ddso-reflection.webp"
-        alt="DDSO orthotic device"
-        className="absolute right-0 md:right-[5%] bottom-[-5%] w-[55%] md:w-[45%] max-w-[700px] h-auto object-contain z-[1] pointer-events-none"
-      />
-
       {/* Content */}
-      <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-3xl">
-        <div data-hero-anim className="mb-4">
+      <div className="relative z-10 section-pad pb-16 md:pb-28 max-w-4xl">
+        {/* Eyebrow */}
+        <div data-hero-anim className="mb-6">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-mono tracking-wider">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-400" />
             </span>
-            OLMOS-METHOD CERTIFIED LAB
+            Recovery Coaching &nbsp;•&nbsp; Mental Health Coaching &nbsp;•&nbsp; Sober Companion Services
           </span>
         </div>
 
-        <h1 data-hero-anim className="text-white">
-          <span className="block font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95]">
-            Precision is the
+        {/* Headline */}
+        <h1 data-hero-anim>
+          <span className="block font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white">
+            Practical Support.
           </span>
-          <span className="block font-drama italic text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] tracking-tight leading-[0.85] text-brand-500">
-            Protocol.
+          <span className="block font-drama italic text-5xl sm:text-6xl md:text-7xl lg:text-[8rem] tracking-tight leading-[0.85] text-brand-400">
+            Real Connection.
+          </span>
+          <span className="block font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1] text-white mt-1">
+            Lasting Change.
           </span>
         </h1>
 
+        {/* Sub */}
         <p
           data-hero-anim
-          className="mt-6 text-white/60 text-base md:text-lg max-w-lg leading-relaxed"
+          className="mt-7 text-white/60 text-base md:text-lg max-w-xl leading-relaxed"
         >
-          The only orthotic lab built around the Olmos Series system. Digital
-          workflow. Clinical accuracy. Every appliance, every time.
+          We provide personalized recovery and mental health coaching for
+          individuals and families navigating substance use disorder and mental
+          health challenges—working side by side in the real world.
         </p>
 
+        {/* CTAs */}
         <div data-hero-anim className="mt-8 flex flex-wrap items-center gap-4">
           <Link
             to="/contact"
-            className="btn-magnetic group px-7 py-3.5 rounded-full bg-accent-500 text-white font-semibold text-sm"
+            className="btn-magnetic group px-7 py-3.5 rounded-full bg-brand-500 text-white font-semibold text-sm"
           >
-            <span className="btn-bg bg-accent-600 rounded-full" />
+            <span className="btn-bg bg-brand-600 rounded-full" />
             <span className="relative z-10 flex items-center gap-2">
-              Contact Our Lab
+              Start Your Journey
               <ArrowRight
                 size={16}
                 className="group-hover:translate-x-1 transition-transform"
               />
             </span>
           </Link>
-          <Link
-            to="/products"
+          <a
+            href="#services"
             className="px-7 py-3.5 rounded-full border border-white/20 text-white/80 font-medium text-sm hover:bg-white/10 transition-colors duration-300"
           >
-            View Products
-          </Link>
+            Our Services
+          </a>
         </div>
 
+        {/* Values strip */}
         <div
           data-hero-anim
-          className="mt-12 flex items-center gap-8 text-white/40 text-xs font-mono"
+          className="mt-12 flex items-center flex-wrap gap-x-8 gap-y-2 text-white/35 text-xs font-mono"
         >
-          <span>Quality</span>
-          <span className="w-1 h-1 rounded-full bg-white/20" />
-          <span>Commitment</span>
-          <span className="w-1 h-1 rounded-full bg-white/20" />
-          <span>Accuracy</span>
-          <span className="w-1 h-1 rounded-full bg-white/20" />
-          <span>Efficiency</span>
+          {["Stability", "Accountability", "Connection", "Purpose"].map(
+            (v, i, arr) => (
+              <span key={v} className="flex items-center gap-8">
+                {v}
+                {i < arr.length - 1 && (
+                  <span className="w-1 h-1 rounded-full bg-white/20" />
+                )}
+              </span>
+            )
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-/* ─── FEATURES ─── */
-
-/* Card 1: Diagnostic Shuffler */
-function DiagnosticShuffler() {
-  const [order, setOrder] = useState([0, 1, 2]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOrder((prev) => {
-        const next = [...prev];
-        next.unshift(next.pop());
-        return next;
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const cards = [
-    {
-      label: "Olmos Protocol Assessment",
-      status: "Complete",
-      color: "bg-brand-500",
-    },
-    {
-      label: "Digital Articulation Review",
-      status: "In Progress",
-      color: "bg-accent-500",
-    },
-    {
-      label: "Clinical Verification",
-      status: "Pending",
-      color: "bg-emerald-500",
-    },
-  ];
-
-  return (
-    <div className="bg-white card-radius p-6 md:p-8 border border-surface-300/50 shadow-sm hover:shadow-md transition-shadow duration-500 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-2">
-        <Shield size={16} className="text-brand-500" />
-        <h3 className="font-heading font-bold text-base tracking-tight">
-          Olmos-Method Expertise
-        </h3>
-      </div>
-      <p className="text-navy/50 text-sm mb-6">
-        The only lab built around the Olmos Series system. We understand the
-        clinical protocol, not just the fabrication.
-      </p>
-      <div className="relative flex-1" style={{ minHeight: "140px" }}>
-        {order.map((idx, pos) => (
-          <div
-            key={idx}
-            className="absolute left-0 right-0 px-4 py-3 rounded-2xl border border-surface-300/50 shadow-sm transition-all duration-700"
-            style={{
-              top: pos * 8,
-              zIndex: 3 - pos,
-              opacity: pos === 0 ? 1 : 0.4 - pos * 0.15,
-              transform: `scale(${1 - pos * 0.04})`,
-              backgroundColor: pos === 0 ? "#FFFFFF" : "#F7F7F5",
-              transitionTimingFunction:
-                "cubic-bezier(0.34, 1.56, 0.64, 1)",
-            }}
-          >
-            <div className="flex items-center justify-between" style={{ visibility: pos === 0 ? "visible" : "hidden" }}>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`w-2 h-2 rounded-full ${cards[idx].color}`}
-                />
-                <span className="text-sm font-medium text-navy/80">
-                  {cards[idx].label}
-                </span>
-              </div>
-              <span className="text-xs font-mono text-navy/40">
-                {cards[idx].status}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* Card 2: Telemetry Typewriter */
-function TelemetryTypewriter() {
-  const [lines, setLines] = useState([]);
-  const [currentLine, setCurrentLine] = useState("");
-  const [charIndex, setCharIndex] = useState(0);
-  const feedMessages = [
-    "▸ Intraoral scan received — case #4012",
-    "▸ CAD articulation parameters loaded",
-    "▸ Olmos-Method bite registration verified",
-    "▸ Material: Nylon PA12 — biocompatible",
-    "▸ 3D print queue: position 2 of 8",
-    "▸ Quality control: dimensional check passed",
-    "▸ Appliance shipped — tracking generated",
-    "▸ Digital workflow cycle: 4.2 days avg",
-  ];
-  const lineIndex = useRef(0);
-
-  useEffect(() => {
-    const msg = feedMessages[lineIndex.current % feedMessages.length];
-    if (charIndex < msg.length) {
-      const timeout = setTimeout(
-        () => {
-          setCurrentLine(msg.slice(0, charIndex + 1));
-          setCharIndex(charIndex + 1);
-        },
-        20 + Math.random() * 30
-      );
-      return () => clearTimeout(timeout);
-    } else {
-      const timeout = setTimeout(() => {
-        setLines((prev) => [...prev.slice(-4), msg]);
-        setCurrentLine("");
-        setCharIndex(0);
-        lineIndex.current += 1;
-      }, 1200);
-      return () => clearTimeout(timeout);
-    }
-  }, [charIndex]);
-
-  return (
-    <div className="bg-white card-radius p-6 md:p-8 border border-surface-300/50 shadow-sm hover:shadow-md transition-shadow duration-500 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-2">
-        <Activity size={16} className="text-brand-500" />
-        <h3 className="font-heading font-bold text-base tracking-tight">
-          Digital-First Precision
-        </h3>
-      </div>
-      <p className="text-navy/50 text-sm mb-4">
-        Full digital workflow. No analog guesswork. Consistent, accurate
-        appliances with fast turnaround.
-      </p>
-      <div className="flex-1 bg-navy/[0.03] rounded-2xl p-4 font-mono text-xs overflow-hidden">
-        {lines.map((line, i) => (
-          <div key={i} className="text-navy/40 leading-relaxed truncate">
-            {line}
-          </div>
-        ))}
-        <div className="text-navy/80 leading-relaxed">
-          {currentLine}
-          <span className="inline-block w-1.5 h-3.5 bg-brand-500 ml-0.5 animate-pulse rounded-sm" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Card 3: TMJ + Sleep Under One Roof */
-function TMJSleepCard() {
-  const [phase, setPhase] = useState(0); // 0=TMJ visible, 1=Sleep visible
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPhase((prev) => (prev === 0 ? 1 : 0));
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-white card-radius p-6 md:p-8 border border-surface-300/50 shadow-sm hover:shadow-md transition-shadow duration-500 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-2">
-        <Moon size={16} className="text-brand-500" />
-        <h3 className="font-heading font-bold text-base tracking-tight">
-          TMJ + Sleep Under One Roof
-        </h3>
-      </div>
-      <p className="text-navy/50 text-sm mb-4">
-        Dual specialization in TMD orthotics and FDA-cleared sleep appliances.
-        One lab, every case.
-      </p>
-      <div className="flex-1 bg-navy/[0.03] rounded-2xl p-5 overflow-hidden min-h-[140px] flex flex-col items-center justify-center">
-        {/* SVG illustration: TMJ and Sleep side by side */}
-        <div className="flex items-center justify-center gap-6 w-full">
-          {/* TMJ figure */}
-          <div className={`flex flex-col items-center transition-all duration-700 ${phase === 0 ? "opacity-100 scale-100" : "opacity-30 scale-95"}`}>
-            <svg viewBox="0 0 80 90" className="w-16 h-20" fill="none">
-              {/* Head */}
-              <circle cx="40" cy="28" r="18" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Jaw - offset to show pain */}
-              <path d="M28 36 Q40 52 52 36" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Pain lines */}
-              <g className={`transition-opacity duration-500 ${phase === 0 ? "opacity-100" : "opacity-0"}`}>
-                <line x1="58" y1="28" x2="66" y2="24" stroke="#E63B2E" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="58" y1="33" x2="68" y2="33" stroke="#E63B2E" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="58" y1="38" x2="66" y2="42" stroke="#E63B2E" strokeWidth="1.5" strokeLinecap="round" />
-              </g>
-              {/* Shoulders */}
-              <path d="M20 58 Q40 48 60 58" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Eyes - squinting in pain */}
-              <line x1="33" y1="25" x2="37" y2="25" stroke="#0B1A2E" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="43" y1="25" x2="47" y2="25" stroke="#0B1A2E" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className={`mt-2 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-500 ${
-              phase === 0 ? "bg-brand-500 text-white" : "bg-surface-200/60 text-navy/30"
-            }`}>
-              TMD
-            </span>
-          </div>
-
-          {/* Divider */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-px h-12 bg-navy/10" />
-            <span className="text-[9px] font-mono text-navy/20">+</span>
-            <div className="w-px h-12 bg-navy/10" />
-          </div>
-
-          {/* Sleep figure */}
-          <div className={`flex flex-col items-center transition-all duration-700 ${phase === 1 ? "opacity-100 scale-100" : "opacity-30 scale-95"}`}>
-            <svg viewBox="0 0 80 90" className="w-16 h-20" fill="none">
-              {/* Head - tilted on pillow */}
-              <circle cx="38" cy="30" r="18" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Closed eyes */}
-              <path d="M31 27 Q34 29 37 27" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              <path d="M41 27 Q44 29 47 27" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Open mouth - snoring */}
-              <ellipse cx="39" cy="37" rx="4" ry="3" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-              {/* Z's */}
-              <g className={`transition-opacity duration-500 ${phase === 1 ? "opacity-100" : "opacity-0"}`}>
-                <text x="56" y="18" fill="#13AEEF" fontSize="11" fontWeight="700" fontFamily="IBM Plex Mono, monospace">Z</text>
-                <text x="63" y="10" fill="#13AEEF" fontSize="8" fontWeight="700" fontFamily="IBM Plex Mono, monospace" opacity="0.6">Z</text>
-                <text x="68" y="4" fill="#13AEEF" fontSize="6" fontWeight="700" fontFamily="IBM Plex Mono, monospace" opacity="0.3">Z</text>
-              </g>
-              {/* Shoulders */}
-              <path d="M18 58 Q38 48 58 58" stroke="#0B1A2E" strokeWidth="1.5" fill="none" />
-            </svg>
-            <span className={`mt-2 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-500 ${
-              phase === 1 ? "bg-accent-500 text-white" : "bg-surface-200/60 text-navy/30"
-            }`}>
-              Sleep
-            </span>
-          </div>
-        </div>
-
-        {/* "One Roof" bar */}
-        <div className="mt-4 w-full flex items-center gap-2">
-          <div className="flex-1 h-px bg-navy/10" />
-          <span className="text-[9px] font-mono text-navy/25 uppercase tracking-widest">One Lab · Every Case</span>
-          <div className="flex-1 h-px bg-navy/10" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Card 4: Turnaround Timeline */
-function TurnaroundTimeline() {
-  const [filledDays, setFilledDays] = useState(0);
-  const [activeLabel, setActiveLabel] = useState("");
-
-  const totalDays = 10; // 2 weeks of weekdays
-  const milestones = [
-    { day: 1, label: "Order Received" },
-    { day: 3, label: "Processing" },
-    { day: 5, label: "Printing" },
-    { day: 7, label: "Customizing" },
-    { day: 9, label: "Shipping" },
-    { day: 10, label: "Arrived!" },
-  ];
-  const isComplete = filledDays >= totalDays;
-
-  useEffect(() => {
-    let running = true;
-    const runAnimation = async () => {
-      while (running) {
-        // Reset
-        setFilledDays(0);
-        setActiveLabel("");
-        await wait(1000);
-        if (!running) break;
-        // Fill days sequentially over ~5 seconds
-        for (let d = 0; d <= totalDays; d++) {
-          if (!running) break;
-          setFilledDays(d);
-          const milestone = milestones.find((m) => m.day === d);
-          if (milestone) setActiveLabel(milestone.label);
-          await wait(450);
-        }
-        if (!running) break;
-        // Hold on "Arrived!" for a beat
-        await wait(3000);
-      }
-    };
-    runAnimation();
-    return () => { running = false; };
-  }, []);
-
-  const week1 = ["M", "T", "W", "T", "F"];
-  const week2 = ["M", "T", "W", "T", "F"];
-
-  return (
-    <div className="bg-white card-radius p-6 md:p-8 border border-surface-300/50 shadow-sm hover:shadow-md transition-shadow duration-500 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-2">
-        <Clock size={16} className="text-brand-500" />
-        <h3 className="font-heading font-bold text-base tracking-tight">
-          2-Week Turnaround
-        </h3>
-      </div>
-      <p className="text-navy/50 text-sm mb-4">
-        From scan to delivery in 10 business days or less. No shortcuts — just
-        an efficient digital pipeline.
-      </p>
-      <div className="flex-1 bg-navy/[0.03] rounded-2xl p-4 overflow-hidden min-h-[140px] flex flex-col justify-between">
-        {/* Week rows */}
-        <div className="space-y-2">
-          <div>
-            <div className="flex items-center justify-between mb-1.5 px-0.5">
-              <span className="text-[10px] font-mono text-navy/30 uppercase">Week 1</span>
-            </div>
-            <div className="grid grid-cols-5 gap-1">
-              {week1.map((day, i) => {
-                const dayIndex = i;
-                const isFilled = dayIndex < filledDays;
-                const isCurrent = dayIndex === filledDays - 1;
-                return (
-                  <div
-                    key={i}
-                    className={`h-7 rounded-lg flex items-center justify-center text-[10px] font-medium transition-all duration-200 ${
-                      isComplete
-                        ? "bg-emerald-500 text-white"
-                        : isCurrent
-                        ? "bg-brand-500 text-white ring-2 ring-brand-500/30 scale-105"
-                        : isFilled
-                        ? "bg-brand-500/80 text-white"
-                        : "bg-surface-200/60 text-navy/30"
-                    }`}
-                  >
-                    {day}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5 px-0.5">
-              <span className="text-[10px] font-mono text-navy/30 uppercase">Week 2</span>
-            </div>
-            <div className="grid grid-cols-5 gap-1">
-              {week2.map((day, i) => {
-                const dayIndex = i + 5;
-                const isFilled = dayIndex < filledDays;
-                const isCurrent = dayIndex === filledDays - 1;
-                return (
-                  <div
-                    key={i}
-                    className={`h-7 rounded-lg flex items-center justify-center text-[10px] font-medium transition-all duration-200 ${
-                      isComplete
-                        ? "bg-emerald-500 text-white"
-                        : isCurrent
-                        ? "bg-brand-500 text-white ring-2 ring-brand-500/30 scale-105"
-                        : isFilled
-                        ? "bg-brand-500/80 text-white"
-                        : "bg-surface-200/60 text-navy/30"
-                    }`}
-                  >
-                    {day}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Active milestone label */}
-        <div className="mt-3 flex items-center justify-center">
-          <span
-            className={`px-3 py-1.5 rounded-full text-[10px] font-semibold transition-all duration-300 ${
-              activeLabel === "Arrived!"
-                ? "bg-emerald-500 text-white"
-                : activeLabel
-                ? "bg-brand-500/10 text-brand-500"
-                : "bg-transparent text-transparent"
-            }`}
-          >
-            {activeLabel || "\u00A0"}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Features() {
-  const sectionRef = useRef(null);
+/* ─────────────────────────────────────────────
+   MISSION
+───────────────────────────────────────────── */
+function Mission() {
+  const ref = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from("[data-feature-card]", {
-        y: 60,
+      gsap.from("[data-mission-anim]", {
+        y: 32,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
+        duration: 0.9,
+        stagger: 0.12,
         ease: "power3.out",
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
+          trigger: ref.current,
+          start: "top 80%",
         },
       });
-    }, sectionRef);
+    }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="section-pad py-24 md:py-32">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-12 md:mb-16">
-          <span className="font-mono text-xs text-navy/40 uppercase tracking-widest">
-            Why Diamond
-          </span>
-          <h2 className="mt-3 font-heading font-bold text-3xl md:text-4xl tracking-tight text-balance">
-            Built for the protocol.
-            <br />
-            <span className="text-brand-500">Not just the appliance.</span>
-          </h2>
+    <section ref={ref} className="section-pad py-24 md:py-32">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+        {/* Photo */}
+        <div data-mission-anim className="relative order-2 lg:order-1">
+          <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl shadow-navy/10">
+            <img
+              src="/images/team-photos/charles-justin-1.webp"
+              alt="Brain Food Recovery Services co-founders"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+          {/* Floating badge */}
+          <div className="absolute -bottom-5 -right-5 md:right-6 bg-white rounded-2xl px-6 py-4 shadow-xl border border-surface-200/80">
+            <p className="font-heading font-bold text-3xl text-brand-500 leading-none">
+              Real
+            </p>
+            <p className="text-navy/50 text-sm mt-0.5">World Support</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div data-feature-card>
-            <DiagnosticShuffler />
+        {/* Text */}
+        <div className="order-1 lg:order-2">
+          <div data-mission-anim className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
+            Our Mission
           </div>
-          <div data-feature-card>
-            <TelemetryTypewriter />
-          </div>
-          <div data-feature-card>
-            <TMJSleepCard />
-          </div>
-          <div data-feature-card>
-            <TurnaroundTimeline />
+
+          <h2
+            data-mission-anim
+            className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight mb-6"
+          >
+            We work in the real world—
+            <span className="font-drama italic text-brand-500">
+              {" "}side by side{" "}
+            </span>
+            with our clients.
+          </h2>
+
+          <p data-mission-anim className="text-navy/60 text-base leading-relaxed mb-5">
+            Our mission is to help individuals and families create lives rooted
+            in stability, accountability, connection, and purpose.
+          </p>
+          <p data-mission-anim className="text-navy/60 text-base leading-relaxed mb-8">
+            Using our own lived experience with substance use disorder and
+            mental health challenges, we deliver coaching that is both
+            compassionate and direct. We believe sustainable recovery is built
+            through practical skills, supportive relationships, and consistent
+            real-world application—not just insight alone.
+          </p>
+
+          <div data-mission-anim>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 text-brand-500 font-semibold text-sm hover:gap-3 transition-all duration-300"
+            >
+              Learn More About Us
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </div>
@@ -585,522 +245,492 @@ function Features() {
   );
 }
 
-/* ─── PHILOSOPHY ─── */
-function Philosophy() {
-  const sectionRef = useRef(null);
+/* ─────────────────────────────────────────────
+   SERVICES TABS
+   Pexels images are linked below — verify and
+   download after approval.
+───────────────────────────────────────────── */
+const SERVICE_TABS = [
+  {
+    id: "coaching",
+    label: "Recovery Coaching",
+    subtitle: "Recovery & Mental Health Coaching",
+    title: "Weekly In-Person Coaching for Stability and Forward Momentum",
+    description:
+      "Our core service is weekly, in-person recovery and mental health coaching. This work is structured, consistent, and highly individualized—designed to help clients translate insight into action and build lasting stability.",
+    items: [
+      "Short-term, achievable goal setting",
+      "Daily structure, routine, and accountability",
+      "Physical health, wellness, and self-care practices",
+      "Financial awareness, budgeting, and responsibility",
+      "Time management and effective use of resources",
+      "Development of practical life skills",
+      "Reconnection to community, purpose, and identity",
+    ],
+    // Pexels — two people in a supportive conversation outdoors
+    image: "https://images.pexels.com/photos/5699517/pexels-photo-5699517.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    imageAlt: "Recovery coaching session",
+  },
+  {
+    id: "sober-companion",
+    label: "Sober Companion",
+    subtitle: "Sober Companion Services",
+    title: "24/7 Transitional Support When It Matters Most",
+    description:
+      "Our Sober Companion Services offer round-the-clock support for individuals who need an elevated level of care during critical or high-risk transitions. Our companions provide calm, consistent presence—helping clients make healthy decisions while reinforcing structure, safety, and self-awareness.",
+    items: [
+      "Traveling with a client who requires additional structure",
+      "Temporarily living with a client during transition",
+      "Supporting clients following treatment or hospitalization",
+      "Assisting through high-risk situations in real time",
+      "Strengthening routines and coping strategies",
+      "Increasing confidence and self-trust",
+      "Reducing risk during vulnerable periods",
+    ],
+    // Pexels — two people walking together outdoors
+    image: "https://images.pexels.com/photos/1456951/pexels-photo-1456951.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    imageAlt: "Sober companion walking with client",
+  },
+  {
+    id: "experiential",
+    label: "Experiential Integration",
+    subtitle: "Experiential Integration",
+    title: "Building a Life That Supports Recovery",
+    description:
+      "Recovery is not just about avoiding substances—it's about actively creating a life that feels engaging, meaningful, and sustainable. Our Experiential Integration services help clients reconnect with themselves and the world through intentional real-life experiences.",
+    items: [
+      "Hiking and outdoor experiences",
+      "Fitness and physical wellness activities",
+      "Attending concerts, events, and community gatherings",
+      "Exploring hobbies, creativity, and personal interests",
+      "Rebuilding social confidence and connection",
+      "Identifying passions that bring meaning to daily life",
+    ],
+    // Pexels — hiking/outdoors nature
+    image: "https://images.pexels.com/photos/1365425/pexels-photo-1365425.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    imageAlt: "Hiking in nature as part of recovery",
+  },
+  {
+    id: "family",
+    label: "Family Coaching",
+    subtitle: "Family Coaching & Support",
+    title: "Educated Families Create Stronger Recovery Systems",
+    description:
+      "Substance use and mental health challenges affect the entire family system. We provide coaching and support to help families move from confusion and fear to clarity and confidence.",
+    items: [
+      "Understanding substance use disorder and mental health",
+      "Healthy communication and boundary setting",
+      "Reducing burnout, fear, and emotional overwhelm",
+      "Learning how to support recovery without enabling",
+    ],
+    // Pexels — family having a supportive conversation
+    image: "https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    imageAlt: "Family coaching session",
+  },
+  {
+    id: "collaborative",
+    label: "Collaborative Care",
+    icon: Stethoscope,
+    subtitle: "Collaborative Care & Advocacy",
+    title: "Working Alongside Your Support Network",
+    description:
+      "We actively collaborate with therapists, psychologists, medical providers, attorneys, and case managers to create realistic, integrated life plans that support recovery outside of institutional settings and within everyday life.",
+    items: [
+      "Therapists and psychologists",
+      "Medical and mental health providers",
+      "Attorneys and legal professionals",
+      "Case managers and extended support networks",
+    ],
+    // Pexels — professionals collaborating / meeting
+    image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=1",
+    imageAlt: "Collaborative care team meeting",
+  },
+];
+
+function Services() {
+  const ref = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from("[data-phil]", {
-        y: 30,
+      gsap.from("[data-services-hdr]", {
+        y: 28,
         opacity: 0,
-        duration: 0.8,
+        duration: 0.9,
         stagger: 0.1,
         ease: "power3.out",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 65%" },
+        scrollTrigger: { trigger: ref.current, start: "top 80%" },
       });
-      gsap.from("[data-phil-stat]", {
-        y: 20,
+    }, ref);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="services" ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
+      <div data-services-hdr className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
+        Our Services
+      </div>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-14">
+        <h2
+          data-services-hdr
+          className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight max-w-xl"
+        >
+          Comprehensive, Real-World Support for{" "}
+          <span className="font-drama italic text-brand-500">
+            Recovery & Mental Wellness
+          </span>
+        </h2>
+        <p
+          data-services-hdr
+          className="text-navy/50 text-sm max-w-xs leading-relaxed"
+        >
+          We tailor our work to the individual—not the diagnosis. Recovery is
+          not one-size-fits-all.
+        </p>
+      </div>
+
+      <Tabs tabs={SERVICE_TABS} />
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   WHO WE SERVE
+───────────────────────────────────────────── */
+const WHO_WE_SERVE = [
+  {
+    icon: Brain,
+    title: "Substance Use Disorder",
+    desc: "Individuals navigating recovery from addiction and substance dependence.",
+  },
+  {
+    icon: Heart,
+    title: "Mental Health Challenges",
+    desc: "Individuals managing anxiety, depression, trauma, and co-occurring conditions.",
+  },
+  {
+    icon: UserCheck,
+    title: "Abstinence-Based Recovery",
+    desc: "Clients seeking full abstinence as their recovery pathway.",
+  },
+  {
+    icon: GitBranch,
+    title: "Harm Reduction Pathways",
+    desc: "Clients utilizing harm reduction or alternative, individualized recovery approaches.",
+  },
+  {
+    icon: Home,
+    title: "Transitioning from Treatment",
+    desc: "Individuals stepping down from treatment centers, hospitals, or institutional settings.",
+  },
+  {
+    icon: Users,
+    title: "Families Seeking Support",
+    desc: "Families seeking education, guidance, and support for their loved ones.",
+  },
+];
+
+function WhoWeServe() {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from("[data-who-card]", {
+        y: 24,
         opacity: 0,
-        duration: 0.6,
+        duration: 0.8,
         stagger: 0.08,
         ease: "power3.out",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 50%" },
+        scrollTrigger: { trigger: ref.current, start: "top 78%" },
       });
-    }, sectionRef);
+    }, ref);
     return () => ctx.revert();
   }, []);
 
-  const stats = [
-    { value: "100%", label: "Digital Workflow" },
-    { value: "<2wk", label: "Turnaround" },
-    { value: "FDA", label: "510(k) Cleared" },
-    { value: "50+", label: "Certified Labs" },
-  ];
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative bg-navy overflow-hidden"
-    >
-      {/* Background layers */}
-      <div className="absolute inset-0 opacity-[0.06]">
-        <img
-          src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=1920&q=80"
-          alt=""
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-navy via-transparent to-navy" />
-
-      {/* Lottie animation — right side */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none hidden md:block">
-        <iframe
-          src="https://cdn.lottielab.com/l/Bqd8dkXRTJHiWh.html?speed=0.5"
-          width="750"
-          height="750"
-          style={{ border: "none" }}
-          loading="lazy"
-          title="Decorative animation"
-        />
-      </div>
-
-      <div className="relative z-10 section-pad py-28 md:py-40">
-        <div className="max-w-6xl mx-auto">
-          {/* Top label */}
-          <div data-phil className="mb-6">
-            <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.2em]">
-              Our Philosophy
-            </span>
-          </div>
-
-          <div data-phil className="mt-8">
-            <h2 className="font-drama italic text-3xl sm:text-4xl md:text-5xl text-white leading-[1.1] tracking-tight">
-              <span className="text-brand-400">Protocol-driven</span> precision
-              for every{" "}
-              <span className="relative inline-block">
-                case
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent-500 rounded-full" />
-              </span>
-              .
-            </h2>
-          </div>
-
-          {/* Supporting text */}
-          <div data-phil className="mt-10 md:mt-14 max-w-xl">
-            <p className="text-white/40 text-sm md:text-base leading-relaxed">
-              Every orthotic we fabricate follows the Olmos-Method protocol
-              — digitally designed, SLS-printed to sub-millimeter tolerance,
-              and quality-checked before it leaves our lab.
-            </p>
-          </div>
-
-          {/* Stat bar */}
-          <div className="mt-16 md:mt-20 pt-10 border-t border-white/10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {stats.map((s, i) => (
-                <div key={i} data-phil-stat>
-                  <span className="block font-heading font-bold text-3xl md:text-4xl text-white tracking-tight">
-                    {s.value}
-                  </span>
-                  <span className="block font-mono text-[10px] text-white/30 uppercase tracking-wider mt-1">
-                    {s.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+    <section ref={ref} className="section-pad py-24 md:py-32">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
+          Who We Serve
         </div>
+        <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
+          Recovery is{" "}
+          <span className="font-drama italic text-brand-500">not linear</span>
+          —and it's not one-size-fits-all.
+        </h2>
       </div>
-    </section>
-  );
-}
 
-/* ─── STICKY PROTOCOL ─── */
-function Protocol() {
-  const sectionRef = useRef(null);
-  const panelsRef = useRef([]);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const total = panelsRef.current.length;
-
-      panelsRef.current.forEach((panel, i) => {
-        // Pin ALL cards (including last)
-        ScrollTrigger.create({
-          trigger: panel,
-          start: "top top",
-          pin: true,
-          pinSpacing: i === total - 1, // last card gets real spacing so it holds
-          ...(i < total - 1
-            ? {
-                endTrigger: panelsRef.current[total - 1],
-                end: "top top",
-              }
-            : {
-                end: "+=50%", // last card holds for 50vh of scroll
-              }),
-        });
-
-        // Fade/blur out all except the last card
-        if (i < total - 1) {
-          gsap.to(panel, {
-            scale: 0.9,
-            filter: "blur(12px)",
-            opacity: 0.5,
-            scrollTrigger: {
-              trigger: panelsRef.current[i + 1],
-              start: "top 60%",
-              end: "top top",
-              scrub: true,
-            },
-          });
-
-          // Hide the pinned card once the next card fully arrives
-          ScrollTrigger.create({
-            trigger: panelsRef.current[i + 1],
-            start: "top top",
-            onEnter: () => (panel.style.visibility = "hidden"),
-            onLeaveBack: () => (panel.style.visibility = "visible"),
-          });
-        }
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
-  const steps = [
-    {
-      step: "01",
-      title: "Scan",
-      desc: "Intraoral digital capture eliminates traditional impressions. Precision data from the first touch.",
-      Icon: Scan,
-      animation: <RotatingGeometry />,
-    },
-    {
-      step: "02",
-      title: "Design",
-      desc: "CAD articulation with Olmos-Method parameters. Every micron calculated, every occlusal surface mapped.",
-      Icon: PenTool,
-      animation: <ScanningGrid />,
-    },
-    {
-      step: "03",
-      title: "Fabricate",
-      desc: "3D printed in clinical-grade materials. Quality verified. Shipped with tracking and care kit.",
-      Icon: Printer,
-      animation: <PulsingWaveform />,
-    },
-  ];
-
-  return (
-    <section ref={sectionRef} className="relative">
-      {steps.map((step, i) => (
-        <div key={i}>
-          {/* Spacer between cards gives scroll room for the "hold" */}
-          {i > 0 && <div className="h-[40vh]" />}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {WHO_WE_SERVE.map(({ icon: Icon, title, desc }) => (
           <div
-            ref={(el) => (panelsRef.current[i] = el)}
-            className="h-screen flex items-center justify-center"
-            style={{ zIndex: i + 1 }}
+            key={title}
+            data-who-card
+            className="bg-white rounded-3xl p-7 border border-surface-200/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
           >
-            <div className="section-pad w-full max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                  <span className="font-mono text-brand-500 text-sm mb-4 block">
-                    {step.step}
-                  </span>
-                  <h3 className="font-heading font-bold text-4xl md:text-6xl tracking-tight mb-4">
-                    {step.title}
-                  </h3>
-                  <p className="text-navy/50 text-lg max-w-md leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-                <div className="flex items-center justify-center">
-                  <div className="w-72 h-72 md:w-96 md:h-96 rounded-[3rem] flex items-center justify-center overflow-hidden">
-                    {step.animation}
-                  </div>
-                </div>
-              </div>
+            <div className="w-10 h-10 rounded-2xl bg-brand-100 flex items-center justify-center mb-4">
+              <Icon size={18} className="text-brand-500" />
             </div>
+            <h3 className="font-heading font-bold text-base text-navy mb-2">
+              {title}
+            </h3>
+            <p className="text-navy/55 text-sm leading-relaxed">{desc}</p>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 }
 
-/* SVG animations for protocol cards */
-function RotatingGeometry() {
+/* ─────────────────────────────────────────────
+   WHY BRAIN FOOD
+───────────────────────────────────────────── */
+const WHY_ITEMS = [
+  {
+    icon: Heart,
+    title: "Lived Experience + Professional Collaboration",
+    desc: "Grounded in firsthand experience with substance use disorder and mental health, supported by clinical and professional partners.",
+  },
+  {
+    icon: MapPin,
+    title: "Hands-On, Real-World Support",
+    desc: "We show up—in person, in daily life—where recovery actually happens. Not just in an office.",
+  },
+  {
+    icon: GitBranch,
+    title: "Multiple Recovery Pathways",
+    desc: "Abstinence-based, harm reduction, and individualized approaches—all respected with professionalism and dignity.",
+  },
+  {
+    icon: Wrench,
+    title: "Practical Life Skills",
+    desc: "Emotional growth matters, but so does budgeting, scheduling, and building daily structure. We work on both.",
+  },
+  {
+    icon: Scale,
+    title: "Honest Accountability, Compassionate Delivery",
+    desc: "We tell the truth with care—helping clients recognize blind spots and build insight without shame or judgment.",
+  },
+  {
+    icon: Compass,
+    title: "Care That Fits Real Life",
+    desc: "As a mom-and-pop organization, our work is deeply personal. We help people build a blueprint for a meaningful, stable life.",
+  },
+];
+
+function WhyBrainFood() {
   const ref = useRef(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to("[data-rotate]", {
-        rotation: 360,
-        duration: 20,
-        repeat: -1,
-        ease: "none",
-        transformOrigin: "center center",
-      });
-      gsap.to("[data-rotate-reverse]", {
-        rotation: -360,
-        duration: 30,
-        repeat: -1,
-        ease: "none",
-        transformOrigin: "center center",
+      gsap.from("[data-why-card]", {
+        y: 24,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ref.current, start: "top 78%" },
       });
     }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <svg
-      ref={ref}
-      viewBox="0 0 200 200"
-      className="w-48 h-48 md:w-64 md:h-64"
-    >
-      <g data-rotate>
-        <circle
-          cx="100"
-          cy="100"
-          r="60"
-          fill="none"
-          stroke="#13AEEF"
-          strokeWidth="0.5"
-          opacity="0.4"
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r="45"
-          fill="none"
-          stroke="#13AEEF"
-          strokeWidth="0.5"
-          opacity="0.3"
-        />
-        {[0, 60, 120, 180, 240, 300].map((angle) => (
-          <circle
-            key={angle}
-            cx={100 + 60 * Math.cos((angle * Math.PI) / 180)}
-            cy={100 + 60 * Math.sin((angle * Math.PI) / 180)}
-            r="3"
-            fill="#13AEEF"
-            opacity="0.6"
-          />
+    <section ref={ref} className="section-pad py-24 md:py-32 bg-navy">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/60 text-xs font-medium mb-5 tracking-wide">
+          Our Approach
+        </div>
+        <h2 className="font-heading font-bold text-3xl md:text-4xl text-white tracking-tight leading-tight">
+          Why{" "}
+          <span className="font-drama italic text-brand-400">
+            Brain Food Recovery Services
+          </span>
+        </h2>
+        <p className="mt-4 text-white/50 text-base leading-relaxed">
+          We don't believe in perfection. We believe in progress, connection, and momentum.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {WHY_ITEMS.map(({ icon: Icon, title, desc }) => (
+          <div
+            key={title}
+            data-why-card
+            className="rounded-3xl p-7 border border-white/8 bg-white/4 hover:bg-white/7 transition-colors duration-300"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-brand-500/15 flex items-center justify-center mb-4">
+              <Icon size={18} className="text-brand-400" />
+            </div>
+            <h3 className="font-heading font-bold text-base text-white mb-2">
+              {title}
+            </h3>
+            <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
+          </div>
         ))}
-      </g>
-      <g data-rotate-reverse>
-        <rect
-          x="65"
-          y="65"
-          width="70"
-          height="70"
-          fill="none"
-          stroke="#13AEEF"
-          strokeWidth="0.5"
-          opacity="0.2"
-          rx="4"
-        />
-        <rect
-          x="78"
-          y="78"
-          width="44"
-          height="44"
-          fill="none"
-          stroke="#13AEEF"
-          strokeWidth="0.5"
-          opacity="0.3"
-          rx="4"
-        />
-      </g>
-      <circle cx="100" cy="100" r="4" fill="#13AEEF" opacity="0.8" />
-    </svg>
+      </div>
+    </section>
   );
 }
 
-function ScanningGrid() {
+/* ─────────────────────────────────────────────
+   TEAM
+───────────────────────────────────────────── */
+function Team() {
   const ref = useRef(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to("[data-scan-line]", {
-        y: 160,
-        duration: 2.5,
-        repeat: -1,
-        ease: "power1.inOut",
-        yoyo: true,
-      });
-    }, ref);
-    return () => ctx.revert();
-  }, []);
-
-  const dots = [];
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      dots.push(
-        <circle
-          key={`${row}-${col}`}
-          cx={40 + col * 17}
-          cy={20 + row * 20}
-          r="2"
-          fill="#13AEEF"
-          opacity="0.15"
-        />
-      );
-    }
-  }
-
-  return (
-    <svg
-      ref={ref}
-      viewBox="0 0 200 200"
-      className="w-48 h-48 md:w-64 md:h-64"
-    >
-      {dots}
-      <line
-        data-scan-line
-        x1="30"
-        y1="20"
-        x2="170"
-        y2="20"
-        stroke="#13AEEF"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <rect
-        data-scan-line
-        x="30"
-        y="12"
-        width="140"
-        height="16"
-        fill="url(#scanGradient)"
-      />
-      <defs>
-        <linearGradient id="scanGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#13AEEF" stopOpacity="0" />
-          <stop offset="50%" stopColor="#13AEEF" stopOpacity="0.1" />
-          <stop offset="100%" stopColor="#13AEEF" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
-function PulsingWaveform() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.to("[data-waveform]", {
-        strokeDashoffset: -400,
-        duration: 3,
-        repeat: -1,
-        ease: "none",
+      gsap.from("[data-team-photo]", {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ref.current, start: "top 78%" },
       });
     }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <svg
-      ref={ref}
-      viewBox="0 0 200 100"
-      className="w-48 h-24 md:w-64 md:h-32"
-    >
-      <path
-        data-waveform
-        d="M0,50 L20,50 L25,50 L30,20 L35,80 L40,30 L45,70 L50,45 L55,55 L60,50 L80,50 L85,50 L90,15 L95,85 L100,25 L105,75 L110,40 L115,60 L120,50 L140,50 L145,50 L150,20 L155,80 L160,30 L165,70 L170,45 L175,55 L180,50 L200,50"
-        fill="none"
-        stroke="#13AEEF"
-        strokeWidth="1.5"
-        strokeDasharray="200"
-        strokeDashoffset="0"
-        opacity="0.6"
-      />
-      <path
-        d="M0,50 L200,50"
-        fill="none"
-        stroke="#13AEEF"
-        strokeWidth="0.3"
-        opacity="0.2"
-      />
-    </svg>
+    <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
+      <div className="text-center max-w-xl mx-auto mb-14">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
+          Meet the Team
+        </div>
+        <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
+          A{" "}
+          <span className="font-drama italic text-brand-500">personal</span>{" "}
+          organization, deeply committed to your growth.
+        </h2>
+        <p className="mt-4 text-navy/55 text-base leading-relaxed">
+          As a mom-and-pop organization, our work is personal. We bring lived
+          experience, compassionate honesty, and hands-on dedication to every
+          client relationship.
+        </p>
+      </div>
+
+      {/* Photo grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div
+          data-team-photo
+          className="col-span-2 row-span-2 rounded-3xl overflow-hidden aspect-square md:aspect-auto"
+        >
+          <img
+            src="/images/team-photos/full team hero.webp"
+            alt="Brain Food Recovery Services team"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
+          <img
+            src="/images/team-photos/charles1.webp"
+            alt="Charles"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
+          <img
+            src="/images/team-photos/justin1.webp"
+            alt="Justin"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
+          <img
+            src="/images/team-photos/charles-justin-2.webp"
+            alt="Charles and Justin"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div data-team-photo className="rounded-3xl overflow-hidden aspect-square">
+          <img
+            src="/images/team-photos/DSC04087.webp"
+            alt="Team"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </section>
   );
 }
 
-/* ─── CTA SECTION ─── */
-function CTASection() {
-  const sectionRef = useRef(null);
+/* ─────────────────────────────────────────────
+   CTA
+───────────────────────────────────────────── */
+function CTA() {
+  const ref = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from("[data-cta-anim]", {
-        y: 40,
+        y: 28,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
+        duration: 0.9,
+        stagger: 0.12,
         ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-        },
+        scrollTrigger: { trigger: ref.current, start: "top 82%" },
       });
-    }, sectionRef);
+    }, ref);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="section-pad py-24 md:py-32">
-      <div className="max-w-4xl mx-auto text-center">
-        <span
-          data-cta-anim
-          className="font-mono text-xs text-navy/40 uppercase tracking-widest"
-        >
-          Partner With Us
-        </span>
-        <h2
-          data-cta-anim
-          className="mt-4 font-heading font-bold text-3xl md:text-5xl tracking-tight"
-        >
-          Get the best for your
-          <br />
-          <span className="font-drama italic text-brand-500">
-            patients.
-          </span>
-        </h2>
-        <p
-          data-cta-anim
-          className="mt-6 text-navy/50 text-lg max-w-xl mx-auto leading-relaxed"
-        >
-          Whether you&apos;re treating TMJ disorders, sleep breathing
-          conditions, or both — we&apos;re the lab that understands your
-          protocol.
-        </p>
-        <div data-cta-anim className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            to="/contact"
-            className="btn-magnetic group px-8 py-4 rounded-full bg-accent-500 text-white font-semibold"
+    <section ref={ref} className="section-pad py-24 md:py-32">
+      <div className="bg-brand-500 rounded-4xl md:rounded-5xl p-10 md:p-16 text-center relative overflow-hidden">
+        {/* Noise texture */}
+        <NoiseOverlay />
+
+        <div className="relative z-10">
+          <div data-cta-anim className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white/80 text-xs font-medium mb-6 tracking-wide">
+            Take the Next Step
+          </div>
+          <h2
+            data-cta-anim
+            className="font-heading font-bold text-3xl md:text-5xl text-white tracking-tight leading-tight max-w-2xl mx-auto"
           >
-            <span className="btn-bg bg-accent-600 rounded-full" />
-            <span className="relative z-10 flex items-center gap-2">
-              Contact Our Lab
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </span>
-          </Link>
-          <Link
-            to="/products"
-            className="px-8 py-4 rounded-full border border-surface-300 text-navy/70 font-medium hover:bg-surface-200/60 transition-colors duration-300"
+            Ready to start your recovery{" "}
+            <span className="font-drama italic">journey?</span>
+          </h2>
+          <p
+            data-cta-anim
+            className="mt-5 text-white/70 text-base md:text-lg max-w-xl mx-auto leading-relaxed"
           >
-            View All Products
-          </Link>
+            We work with individuals and families at every stage of the recovery
+            process. Reach out today for a confidential conversation.
+          </p>
+          <div data-cta-anim className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              to="/contact"
+              className="px-8 py-3.5 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors duration-300 shadow-lg"
+            >
+              Get in Touch
+            </Link>
+            <Link
+              to="/about"
+              className="px-8 py-3.5 rounded-full border border-white/30 text-white font-medium text-sm hover:bg-white/10 transition-colors duration-300"
+            >
+              Learn About Us
+            </Link>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ─── UTILITY ─── */
-function wait(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-/* ─── PAGE EXPORT ─── */
+/* ─────────────────────────────────────────────
+   PAGE EXPORT
+───────────────────────────────────────────── */
 export function HomePage() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <>
-      <NoiseOverlay />
       <Hero />
-      <Features />
-      <Philosophy />
-      <Protocol />
-      <CTASection />
+      <Mission />
+      <Services />
+      <WhoWeServe />
+      <WhyBrainFood />
+      <Team />
+      <CTA />
     </>
   );
 }

@@ -72,18 +72,15 @@ function AppRoutes() {
         <Route path="/products" element={<ProductPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/submit-case" element={<CaseSubmissionPage />} />
-        <Route path="/resources/videos" element={<InstructionalVideosPage />} />
-        {/* Coming soon routes */}
-        <Route path="/about/team" element={<ComingSoonPage />} />
-        <Route path="/about/dr-olmos" element={<ComingSoonPage />} />
-        <Route path="/services/tmd" element={<ComingSoonPage />} />
-        <Route path="/services/sleep" element={<ComingSoonPage />} />
-        <Route path="/services/digital-workflow" element={<ComingSoonPage />} />
-        <Route path="/resources/rx-instructions" element={<ComingSoonPage />} />
-        <Route path="/resources/downloads" element={<ComingSoonPage />} />
-        <Route path="/resources/new-client" element={<ComingSoonPage />} />
-        <Route path="/resources/certified-labs" element={<ComingSoonPage />} />
-        <Route path="/resources/courses" element={<ComingSoonPage />} />
+        {/* Services routes */}
+        <Route path="/services/coaching"          element={<ComingSoonPage />} />
+        <Route path="/services/sober-companion"   element={<ComingSoonPage />} />
+        <Route path="/services/experiential"      element={<ComingSoonPage />} />
+        <Route path="/services/family"            element={<ComingSoonPage />} />
+        <Route path="/services/collaborative"     element={<ComingSoonPage />} />
+        {/* Legacy / other coming soon routes */}
+        <Route path="/about/team"                 element={<ComingSoonPage />} />
+        <Route path="/resources/videos"           element={<ComingSoonPage />} />
       </Route>
 
       {/* Auth routes */}
