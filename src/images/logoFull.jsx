@@ -1,16 +1,27 @@
-// Brain Food Recovery Services — Logo component
-// Uses the horizontal SVG logos from /public/images/logo/
-// dark=true → black logo (for light/scrolled navbar)
-// dark=false → white logo (for transparent/dark navbar, default)
-const LogoFull = ({ className = "", dark = false }) => {
+import { LOGOS, BUSINESS } from "../config/site.js";
+
+/**
+ * Logo component — renders the appropriate variant based on context.
+ *
+ * @param {string}  className
+ * @param {boolean} dark      — true = dark/black logo (for light backgrounds)
+ * @param {"horizontal"|"stacked"|"icon"} variant — logo layout (default: horizontal)
+ */
+const LogoFull = ({ className = "", dark = false, variant = "horizontal" }) => {
+  let src;
+
+  if (variant === "icon") {
+    src = LOGOS.icon;
+  } else if (variant === "stacked") {
+    src = dark ? (LOGOS.stackedBlack || LOGOS.horizontalBlack) : (LOGOS.stackedWhite || LOGOS.horizontalWhite);
+  } else {
+    src = dark ? LOGOS.horizontalBlack : LOGOS.horizontalWhite;
+  }
+
   return (
     <img
-      src={
-        dark
-          ? "/images/logo/BRAINFOOD HORIZONTAL LOGO BLACK.svg"
-          : "/images/logo/BRAINFOOD HORIZONTAL LOGO WHITE.svg"
-      }
-      alt="Brain Food Recovery Services"
+      src={src}
+      alt={BUSINESS.name}
       className={className}
     />
   );

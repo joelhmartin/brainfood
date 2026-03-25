@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Facebook, Instagram } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import gsap from "gsap";
 import LogoFull from "../../images/logoFull.jsx";
+import { SITE, CONTENT } from "../../config/site.js";
 
 const NAV_LINKS = [
   { label: "About", to: "/about" },
@@ -16,12 +17,9 @@ const NAV_LINKS = [
       { label: "Collaborative Care",                to: "/services/collaborative" },
     ],
   },
+  { label: CONTENT.events.label, to: CONTENT.events.listPath },
+  { label: CONTENT.blog.label,   to: CONTENT.blog.listPath },
   { label: "Contact", to: "/contact" },
-];
-
-const SOCIALS = [
-  { icon: Facebook,  href: "#", label: "Facebook" },
-  { icon: Instagram, href: "#", label: "Instagram" },
 ];
 
 /* ─── Animated hamburger icon (3 bars → X) ─── */
@@ -90,7 +88,7 @@ function NavItem({ link, scrolled, isActive }) {
 
       {open && (
         <div className="absolute top-full left-0 pt-2 z-50">
-          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-surface-300/50 shadow-xl shadow-navy/10 py-2 min-w-[260px]">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-surface-300/50 shadow-xl shadow-navy/10 py-2 min-w-[260px] overflow-hidden">
             {link.children.map((child) => (
               <Link
                 key={child.label}
@@ -237,7 +235,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
 
         {/* Socials */}
         <div data-mobile-link className="mt-8 flex items-center gap-4">
-          {SOCIALS.map((s) => (
+          {SITE.socials.map((s) => (
             <a
               key={s.label}
               href={s.href}
@@ -287,7 +285,7 @@ export function Navbar() {
             : "opacity-100"
         }`}
       >
-        {SOCIALS.map((s) => (
+        {SITE.socials.map((s) => (
           <a
             key={s.label}
             href={s.href}

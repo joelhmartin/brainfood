@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import {
@@ -15,6 +15,7 @@ import {
   Stethoscope,
   Compass,
 } from "lucide-react";
+import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 
@@ -195,24 +196,33 @@ function Hero() {
 ───────────────────────────────────────────── */
 function Mission() {
   const ref = useRef(null);
+  const [winkData, setWinkData] = useState(null);
   useScrollReveal(ref, "[data-mission-anim]", { y: 32, duration: 0.9, stagger: 0.12 });
 
+  useEffect(() => {
+    fetch("/lottie/BRAINFOOD WINK.json")
+      .then((r) => r.json())
+      .then(setWinkData)
+      .catch(() => {});
+  }, []);
+
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
+    <section ref={ref} className="relative section-pad py-24 md:py-32">
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
         {/* Photo */}
         <div data-mission-anim className="relative order-2 lg:order-1">
-          <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl shadow-navy/10">
+          <div className="relative rounded-3xl overflow-hidden aspect-[4/4]">
             <img
-              src={TEAM.charlesJustin1}
-              alt="Brain Food Recovery Services co-founders"
-              className="w-full h-full object-cover object-center"
+              src={TEAM.teamIsoBg}
+              alt="Brain Food Recovery Services team"
+              className="w-full h-full object-contain object-center"
             />
           </div>
           {/* Floating badge */}
           <div className="absolute -bottom-5 -right-5 md:right-6 bg-white rounded-2xl px-6 py-4 shadow-xl border border-surface-200/80">
             <p className="font-heading font-bold text-3xl text-brand-500 leading-none">
-              Real
+              Real World Support
             </p>
             <p className="text-navy/50 text-sm mt-0.5">World Support</p>
           </div>

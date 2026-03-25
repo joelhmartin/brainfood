@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Facebook, Instagram, Phone, Mail } from "lucide-react";
-
-const SOCIALS = [
-  { icon: Facebook,  href: "#", label: "Facebook" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-];
+import { ArrowUpRight, Phone, Mail } from "lucide-react";
+import { SITE, CONTENT } from "../../config/site.js";
 
 const FOOTER_NAV = {
   Services: [
@@ -15,8 +11,10 @@ const FOOTER_NAV = {
     { label: "Collaborative Care",                to: "/services/collaborative" },
   ],
   Company: [
-    { label: "About Us",  to: "/about" },
-    { label: "Contact",   to: "/contact" },
+    { label: "About Us",                  to: "/about" },
+    { label: CONTENT.events.label,        to: CONTENT.events.listPath },
+    { label: CONTENT.blog.label,          to: CONTENT.blog.listPath },
+    { label: "Contact",                   to: "/contact" },
   ],
 };
 
@@ -42,24 +40,24 @@ export function Footer() {
             {/* Contact */}
             <div className="mt-6 flex flex-col gap-2">
               <a
-                href="tel:+1-000-000-0000"
+                href={SITE.phoneHref}
                 className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors"
               >
                 <Phone size={13} />
-                <span>(000) 000-0000</span>
+                <span>{SITE.phone}</span>
               </a>
               <a
-                href="mailto:info@brainfoodrecovery.com"
+                href={SITE.emailHref}
                 className="flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors"
               >
                 <Mail size={13} />
-                <span>info@brainfoodrecovery.com</span>
+                <span>{SITE.email}</span>
               </a>
             </div>
 
             {/* Social links */}
             <div className="mt-6 flex items-center gap-3">
-              {SOCIALS.map((s) => (
+              {SITE.socials.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}

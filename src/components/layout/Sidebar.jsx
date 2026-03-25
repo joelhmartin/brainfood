@@ -6,6 +6,8 @@ import { usePermission } from "../../hooks/usePermission.js";
 
 const navItems = [
   { label: "Dashboard", to: ROUTES.DASHBOARD, permission: null },
+  { label: "Events", to: "/app/events", permission: null },
+  { label: "Blog Posts", to: "/app/posts", permission: null },
   { label: "Members", to: ROUTES.MEMBERS, permission: "users:read" },
   { label: "Settings", to: ROUTES.SETTINGS, permission: "settings:read" },
 ];

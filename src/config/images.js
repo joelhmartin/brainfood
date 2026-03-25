@@ -75,6 +75,7 @@ export const TEAM = {
   matthew2: "/images/team-photos/matthew2.webp",
   damian1: "/images/team-photos/damian.webp",
   damian2: "/images/team-photos/damian2.webp",
+  teamIsoBg: "/images/team-photos/full team iso-bg.webp",
   dsc: "/images/team-photos/DSC04087.webp",
   team2: "/images/team-photos/Team 2.webp",
 };

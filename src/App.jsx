@@ -21,6 +21,8 @@ import { AcceptInvitePage } from "./pages/auth/AcceptInvitePage.jsx";
 import { DashboardPage } from "./pages/app/DashboardPage.jsx";
 import { SettingsPage } from "./pages/app/SettingsPage.jsx";
 import { MembersPage } from "./pages/app/MembersPage.jsx";
+import { EventsAdminPage } from "./pages/app/EventsAdminPage.jsx";
+import { PostsAdminPage } from "./pages/app/PostsAdminPage.jsx";
 
 // Marketing pages
 import { HomePage } from "./pages/marketing/Home.jsx";
@@ -30,8 +32,13 @@ import { ContactPage } from "./pages/marketing/Contact.jsx";
 import { CaseSubmissionPage } from "./pages/marketing/CaseSubmission.jsx";
 import { InstructionalVideosPage } from "./pages/marketing/InstructionalVideos.jsx";
 import { ComingSoonPage } from "./pages/marketing/ComingSoon.jsx";
+import { EventsPage } from "./pages/marketing/Events.jsx";
+import { EventDetailPage } from "./pages/marketing/EventDetail.jsx";
+import { BlogPage } from "./pages/marketing/Blog.jsx";
+import { BlogPostPage } from "./pages/marketing/BlogPost.jsx";
 import { Navbar } from "./components/marketing/Navbar.jsx";
 import { Footer } from "./components/marketing/Footer.jsx";
+import { CONTENT } from "./config/site.js";
 
 /* Marketing layout: Navbar + page + Footer */
 function MarketingLayout() {
@@ -71,6 +78,14 @@ function AppRoutes() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        {/* Events — paths driven by CONTENT config */}
+        <Route path={CONTENT.events.listPath} element={<EventsPage />} />
+        <Route path={`${CONTENT.events.listPath}${CONTENT.events.paginationSlug}/:page`} element={<EventsPage />} />
+        <Route path={`${CONTENT.events.prefix}/:slug`} element={<EventDetailPage />} />
+        {/* Blog — paths driven by CONTENT config */}
+        <Route path={CONTENT.blog.listPath} element={<BlogPage />} />
+        <Route path={`${CONTENT.blog.listPath}${CONTENT.blog.paginationSlug}/:page`} element={<BlogPage />} />
+        <Route path={`${CONTENT.blog.prefix}/:slug`} element={<BlogPostPage />} />
         <Route path="/submit-case" element={<CaseSubmissionPage />} />
         {/* Services routes */}
         <Route path="/services/coaching"          element={<ComingSoonPage />} />
@@ -109,6 +124,8 @@ function AppRoutes() {
         <Route index element={<DashboardPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="members" element={<MembersPage />} />
+        <Route path="events" element={<EventsAdminPage />} />
+        <Route path="posts" element={<PostsAdminPage />} />
       </Route>
 
       {/* Fallback */}
