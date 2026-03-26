@@ -116,7 +116,7 @@ function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 section-pad pb-16 md:pb-28 max-w-6xl">
+      <div className="relative z-10 section-pad pt-24 pb-16 md:pb-28 max-w-6xl">
         {/* Eyebrow */}
         <div data-hero-anim className="mb-6">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-mono tracking-wider">

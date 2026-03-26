@@ -166,7 +166,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
       <div className="h-24" />
 
       {/* Links */}
-      <div ref={linksRef} className="flex-1 flex flex-col justify-center px-8 -mt-16">
+      <div ref={linksRef} className="flex-1 flex flex-col justify-start px-8 pt-4 overflow-y-auto">
         {NAV_LINKS.map((link) => {
           if (!link.children) {
             return (
