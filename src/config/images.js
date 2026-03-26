@@ -63,7 +63,7 @@ export const SERVICES = {
 
 export const TEAM = {
   heroMain: "/images/team-photos/full team hero 2 with copy space.webp",
-  heroMobile: "/images/team-photos/full team hero 2.webp",
+  heroMobile: "/images/team-photos/full team hero mobile.webp",
   heroAlt: "/images/team-photos/full team hero.webp",
   goofin: "/images/team-photos/full team goofin.webp",
   charlesJustin1: "/images/team-photos/charles-justin-1.webp",

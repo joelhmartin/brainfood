@@ -165,8 +165,8 @@ function MobileOverlay({ open, onNavigate, isActive }) {
       {/* Spacer for navbar */}
       <div className="h-24" />
 
-      {/* Links */}
-      <div ref={linksRef} className="flex-1 flex flex-col justify-start px-8 pt-4 overflow-y-auto">
+      {/* Scrollable nav links */}
+      <div ref={linksRef} className="flex-1 overflow-y-auto px-8 pt-4 pb-4">
         {NAV_LINKS.map((link) => {
           if (!link.children) {
             return (
@@ -221,20 +221,19 @@ function MobileOverlay({ open, onNavigate, isActive }) {
             </div>
           );
         })}
+      </div>
 
-        {/* CTA */}
-        <div data-mobile-link className="mt-10">
-          <Link
-            to="/contact"
-            onClick={handleNavigate}
-            className="inline-flex px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-600 transition-colors"
-          >
-            Get Started
-          </Link>
-        </div>
-
-        {/* Socials */}
-        <div data-mobile-link className="mt-8 flex items-center gap-4">
+      {/* Sticky bottom — CTA + socials */}
+      <div className="flex-shrink-0 px-8 pb-8 pt-4 border-t border-white/10 bg-navy/95">
+        <Link
+          to="/contact"
+          data-mobile-link
+          onClick={handleNavigate}
+          className="block w-full text-center px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-600 transition-colors"
+        >
+          Get Started
+        </Link>
+        <div data-mobile-link className="mt-4 flex items-center justify-center gap-4">
           {SITE.socials.map((s) => (
             <a
               key={s.label}

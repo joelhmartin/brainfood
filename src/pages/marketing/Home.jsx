@@ -97,7 +97,7 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative h-[100dvh] min-h-[640px] flex items-end overflow-hidden"
+      className="relative min-h-[100dvh] flex items-end"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -116,16 +116,27 @@ function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 section-pad pt-24 pb-16 md:pb-28 max-w-6xl">
-        {/* Eyebrow */}
+      <div className="relative z-10 section-pad pt-60 md:pt-48 pb-16 md:pb-28 max-w-6xl">
+        {/* Eyebrow — news ticker */}
         <div data-hero-anim className="mb-6">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-mono tracking-wider">
-            <span className="relative flex h-1.5 w-1.5">
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 max-w-[90vw] sm:max-w-md overflow-hidden">
+            {/* Pulsing dot */}
+            <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-400" />
             </span>
-            Recovery Coaching &nbsp;•&nbsp; Mental Health Coaching &nbsp;•&nbsp; Sober Companion Services
-          </span>
+            {/* Scrolling ticker */}
+            <div className="overflow-hidden flex-1">
+              <div className="ticker-track">
+                <span className="text-white/70 text-xs font-mono tracking-wider whitespace-nowrap">
+                  Recovery Coaching&nbsp;&nbsp;&bull;&nbsp;&nbsp;Mental Health Coaching&nbsp;&nbsp;&bull;&nbsp;&nbsp;Sober Companion Services&nbsp;&nbsp;&bull;&nbsp;&nbsp;
+                </span>
+                <span className="text-white/70 text-xs font-mono tracking-wider whitespace-nowrap">
+                  Recovery Coaching&nbsp;&nbsp;&bull;&nbsp;&nbsp;Mental Health Coaching&nbsp;&nbsp;&bull;&nbsp;&nbsp;Sober Companion Services&nbsp;&nbsp;&bull;&nbsp;&nbsp;
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Headline */}
