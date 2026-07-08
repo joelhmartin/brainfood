@@ -89,7 +89,7 @@ function ServiceHero({ service }) {
         className="hidden md:block top-[-5rem] right-[-4rem] w-[26rem] opacity-[0.06] z-[1]"
       />
 
-      <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
+      <div className="relative z-10 content-container pb-16 md:pb-24">
         <span
           data-svc-hero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
@@ -121,8 +121,8 @@ function ServiceIntro({ service }) {
   useScrollReveal(ref, "[data-svc-intro]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
         <div>
           <div
             data-svc-intro
@@ -182,8 +182,8 @@ function ServiceLookLike({ service }) {
   useScrollReveal(ref, "[data-svc-look]", { y: 40, duration: 0.7, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="py-24 md:py-32 bg-surface-100">
+      <div className="content-container">
         <div className="mb-12 md:mb-16 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
             What this looks like
@@ -221,14 +221,14 @@ function ServiceWhoFor({ service }) {
   useScrollReveal(ref, "[data-svc-who]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="relative section-pad pt-48 md:pt-64 pb-24 md:pb-32 overflow-hidden">
+    <section ref={ref} className="relative pt-48 md:pt-64 pb-24 md:pb-32 overflow-hidden">
       <BrandMotif
         tone="natural"
         float={false}
         fade
         className="top-0 left-1/2 -translate-x-1/2 w-[34rem] max-w-none opacity-[0.13]"
       />
-      <div className="relative max-w-3xl mx-auto">
+      <div className="content-container relative max-w-3xl">
         <div className="text-center mb-10">
           <div
             data-svc-who
@@ -271,8 +271,8 @@ function ServiceWhoFor({ service }) {
 function OtherServices({ currentSlug }) {
   const others = SERVICES_CONTENT.filter((s) => s.slug !== currentSlug);
   return (
-    <section className="section-pad py-20 bg-surface-100 border-t border-surface-200/60">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-20 bg-surface-100 border-t border-surface-200/60">
+      <div className="content-container">
         <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
           <h2 className="font-heading font-bold text-2xl md:text-3xl text-navy tracking-tight">
             Explore other services

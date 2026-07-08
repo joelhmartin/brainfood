@@ -88,7 +88,7 @@ function ServicesHero() {
         tone="light"
         className="hidden md:block top-[-5rem] right-[-4rem] w-[26rem] opacity-[0.06] z-[1]"
       />
-      <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
+      <div className="relative z-10 content-container pb-16 md:pb-24">
         <span
           data-services-hero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
@@ -121,8 +121,8 @@ function ServicesGrid() {
   useScrollReveal(ref, "[data-svc-card]", { y: 40, duration: 0.7, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container">
         <div className="mb-12 md:mb-16 max-w-2xl">
           <h2 className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight">
             Five ways we{" "}

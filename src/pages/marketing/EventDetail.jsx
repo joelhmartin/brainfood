@@ -101,7 +101,7 @@ export function EventDetailPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent" />
         </div>
-        <div className="relative z-10 section-pad pb-12 md:pb-16 max-w-4xl">
+        <div className="relative z-10 content-container max-w-4xl pb-12 md:pb-16">
           <Link
             to={CONTENT.events.listPath}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-medium mb-5 hover:bg-white/20 transition-colors"
@@ -121,8 +121,8 @@ export function EventDetailPage() {
       </section>
 
       {/* Content + sidebar */}
-      <section className="section-pad py-12 md:py-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+      <section className="py-12 md:py-16">
+        <div className="content-container grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
           {/* Main content */}
           <div>
             {/* Meta bar */}

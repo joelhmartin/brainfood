@@ -74,7 +74,7 @@ function ContactHero() {
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent" />
       </div>
-      <div className="relative z-10 section-pad pb-12 md:pb-16 max-w-3xl">
+      <div className="relative z-10 content-container pb-12 md:pb-16">
         <span
           data-chero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
@@ -319,8 +319,8 @@ export function ContactPage() {
     <div ref={sectionRef}>
       <ContactHero />
 
-      <section className="section-pad py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 md:py-24">
+        <div className="content-container">
           <div
             data-contact-anim
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16"
@@ -334,8 +334,8 @@ export function ContactPage() {
       </section>
 
       {/* Austin ambient image */}
-      <section className="section-pad pb-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="pb-8">
+        <div className="content-container">
           <div className="relative w-full aspect-[21/9] rounded-3xl overflow-hidden">
             <img
               src={AUSTIN.ladyBirdAerial}

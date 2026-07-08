@@ -71,7 +71,7 @@ function FeaturedPost({ post }) {
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
         </div>
 
-        <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
+        <div className="relative z-10 content-container pb-16 md:pb-24">
           <div data-feat className="flex items-center gap-3 mb-5">
             <span className="px-3 py-1 rounded-full bg-brand-500 text-white text-xs font-semibold">
               Featured
@@ -297,8 +297,8 @@ export function BlogPage() {
       {featured && <FeaturedPost post={featured} />}
 
       {/* Blog grid + sidebar */}
-      <section ref={gridRef} className="section-pad py-16 md:py-24">
-        <div className="max-w-7xl mx-auto">
+      <section ref={gridRef} className="py-16 md:py-24">
+        <div className="content-container">
           {/* Header + filter */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
             <div>

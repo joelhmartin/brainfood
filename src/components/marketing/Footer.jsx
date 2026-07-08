@@ -21,7 +21,7 @@ const FOOTER_NAV = {
 export function Footer() {
   return (
     <footer className="relative bg-navy rounded-t-[3rem] md:rounded-t-[4rem] mt-24">
-      <div className="section-pad pt-16 pb-8 md:pt-24 md:pb-10">
+      <div className="content-container pt-16 pb-8 md:pt-24 md:pb-10">
         {/* Top section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 pb-12 border-b border-white/10">
           {/* Brand block */}

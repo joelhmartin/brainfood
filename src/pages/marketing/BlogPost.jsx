@@ -108,8 +108,8 @@ function RelatedPosts({ currentId, category }) {
 
 function RelatedGrid({ posts }) {
   return (
-    <section className="section-pad py-16 md:py-20 bg-surface-100">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-16 md:py-20 bg-surface-100">
+      <div className="content-container max-w-4xl">
         <h3 className="font-heading font-bold text-xl text-navy mb-8">
           Keep Reading
         </h3>
@@ -170,7 +170,7 @@ export function BlogPostPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-navy/20" />
         </div>
-        <div className="relative z-10 section-pad pb-12 md:pb-16 max-w-4xl">
+        <div className="relative z-10 content-container max-w-4xl pb-12 md:pb-16">
           <Link
             to={CONTENT.blog.listPath}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-medium mb-5 hover:bg-white/20 transition-colors"
@@ -190,8 +190,8 @@ export function BlogPostPage() {
       </section>
 
       {/* Article + sidebar */}
-      <section className="section-pad py-12 md:py-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+      <section className="py-12 md:py-16">
+        <div className="content-container grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
           {/* Main content */}
           <div className="max-w-3xl">
             {/* Meta bar */}

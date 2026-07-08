@@ -93,7 +93,7 @@ function AboutHero() {
         <NoiseOverlay />
       </div>
 
-      <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
+      <div className="relative z-10 content-container pb-16 md:pb-24">
         <span
           data-about-hero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
@@ -127,8 +127,8 @@ function OurStory() {
   useScrollReveal(ref, "[data-story]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
         {/* Photo */}
         <div data-story>
           <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl shadow-navy/10">
@@ -190,12 +190,12 @@ function Mission() {
   useScrollReveal(ref, "[data-mission]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="relative section-pad py-24 md:py-32 bg-surface-100 overflow-hidden">
+    <section ref={ref} className="relative py-24 md:py-32 bg-surface-100 overflow-hidden">
       <BrandMotif
         tone="charcoal"
         className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[34rem] opacity-[0.035]"
       />
-      <div className="relative max-w-4xl mx-auto text-center">
+      <div className="content-container max-w-4xl text-center relative">
         <div
           data-mission
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-6 tracking-wide"
@@ -256,7 +256,7 @@ function Philosophy() {
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-navy/60" />
       </div>
 
-      <div className="relative z-10 section-pad">
+      <div className="relative z-10 content-container">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Content */}
           <div>
@@ -338,8 +338,8 @@ function Values() {
   ];
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container">
         <div className="mb-12 md:mb-16 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
             Our Values
@@ -422,8 +422,8 @@ function TeamBios() {
   useScrollReveal(ref, "[data-bio-card]", { y: 40, duration: 0.8, stagger: 0.15 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
-      <div className="text-center max-w-xl mx-auto mb-14">
+    <section ref={ref} className="py-24 md:py-32 bg-surface-100">
+      <div className="content-container max-w-xl text-center mb-14">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
           Meet the Team
         </div>
@@ -434,7 +434,7 @@ function TeamBios() {
         </h2>
       </div>
 
-      <div className="space-y-16">
+      <div className="content-container space-y-16">
         {COACHES.map((coach, i) => (
           <div
             key={coach.id}

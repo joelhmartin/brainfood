@@ -70,7 +70,7 @@ function EventsHero() {
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent" />
       </div>
-      <div className="relative z-10 section-pad pb-12 md:pb-16 max-w-3xl">
+      <div className="relative z-10 content-container max-w-3xl pb-12 md:pb-16">
         <span
           data-ehero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
@@ -162,8 +162,8 @@ export function EventsPage() {
     <>
       <EventsHero />
 
-      <section ref={gridRef} className="section-pad py-16 md:py-24">
-        <div className="max-w-7xl mx-auto">
+      <section ref={gridRef} className="py-16 md:py-24">
+        <div className="content-container">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
             {/* Main content */}
             <div>
