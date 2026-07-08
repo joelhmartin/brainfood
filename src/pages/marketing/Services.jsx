@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ArrowRight } from "lucide-react";
 import { AUSTIN } from "../../config/images.js";
 import { SERVICES_CONTENT } from "../../config/services.js";
+import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps = {}) {
@@ -82,6 +83,10 @@ function ServicesHero() {
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent" />
         <NoiseOverlay />
       </div>
+      <BrandMotif
+        tone="light"
+        className="hidden md:block top-[-5rem] right-[-4rem] w-[26rem] opacity-[0.06] z-[1]"
+      />
       <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
         <span
           data-services-hero
@@ -171,8 +176,13 @@ function ServicesGrid() {
 /* ─── CTA ─── */
 function ServicesCTA() {
   return (
-    <section className="section-pad py-24 md:py-32 bg-surface-100">
-      <div className="max-w-4xl mx-auto text-center">
+    <section className="relative section-pad py-24 md:py-32 bg-surface-100 overflow-hidden">
+      <BrandMotif
+        tone="charcoal"
+        float="alt"
+        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] opacity-[0.04]"
+      />
+      <div className="relative max-w-4xl mx-auto text-center">
         <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
           Not sure where to
           <span className="font-drama italic text-brand-500 text-3xl md:text-5xl">

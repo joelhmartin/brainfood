@@ -117,3 +117,59 @@
     100% { transform: translateX(-50%); }
   }
 }
+
+@layer components {
+  /* Soft card — legible on light surfaces (replaces the near-invisible
+     white-on-surface cards). Real border + soft shadow + brand-tinted lift. */
+  .card-soft {
+    @apply bg-white border border-surface-300 rounded-3xl transition-all duration-300;
+    box-shadow: 0 2px 16px -8px rgba(29, 26, 26, 0.12);
+  }
+
+  .card-soft:hover {
+    @apply border-brand-200 -translate-y-0.5;
+    box-shadow: 0 16px 36px -14px rgba(29, 26, 26, 0.22);
+  }
+
+  /* Brand icon watermark — a top hairline accent for card grids */
+  .card-accent-top {
+    position: relative;
+  }
+  .card-accent-top::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1.75rem;
+    right: 1.75rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, theme("colors.brand.300"), theme("colors.brand.500"));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card-accent-top:hover::before {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  /* Drifting brand motif — slow ambient float for decorative logo marks */
+  .brand-float {
+    animation: brand-float 15s ease-in-out infinite;
+  }
+  .brand-float-alt {
+    animation: brand-float 19s ease-in-out infinite reverse;
+  }
+
+  @keyframes brand-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-22px) rotate(5deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-float,
+    .brand-float-alt {
+      animation: none;
+    }
+  }
+}

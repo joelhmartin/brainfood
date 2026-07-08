@@ -19,6 +19,7 @@ import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 import { Responsive } from "../../hooks/useBreakpoint.jsx";
+import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 
 /* ── Scroll reveal helper ─────────────────────
    Uses IntersectionObserver instead of GSAP
@@ -476,7 +477,7 @@ function WhoWeServe() {
           <div
             key={title}
             data-who-card
-            className="bg-white rounded-3xl p-7 border border-surface-200/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+            className="card-soft card-accent-top p-7"
           >
             <div className="w-10 h-10 rounded-2xl bg-brand-100 flex items-center justify-center mb-4">
               <Icon size={18} className="text-brand-500" />
@@ -664,6 +665,15 @@ function CTA() {
       <div className="bg-brand-500 rounded-4xl md:rounded-5xl p-10 md:p-16 text-center relative overflow-hidden">
         {/* Noise texture */}
         <NoiseOverlay />
+        <BrandMotif
+          tone="light"
+          className="bottom-[-6rem] left-[-4rem] w-80 opacity-10"
+        />
+        <BrandMotif
+          tone="light"
+          float="alt"
+          className="hidden md:block top-[-5rem] right-[-3rem] w-64 opacity-[0.08]"
+        />
 
         <div className="relative z-10">
           <div data-cta-anim className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white/80 text-xs font-medium mb-6 tracking-wide">
@@ -678,7 +688,7 @@ function CTA() {
           </h2>
           <p
             data-cta-anim
-            className="mt-5 text-white/70 text-base md:text-lg max-w-xl mx-auto leading-relaxed"
+            className="mt-5 text-white/85 text-base md:text-lg max-w-xl mx-auto leading-relaxed"
           >
             We work with individuals and families at every stage of the recovery
             process. Reach out today for a confidential conversation.

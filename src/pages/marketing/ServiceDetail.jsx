@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
+import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 
 /* ── Scroll reveal helper (IntersectionObserver) ── */
 function useScrollReveal(ref, selector, animProps = {}) {
@@ -82,6 +83,11 @@ function ServiceHero({ service }) {
         <NoiseOverlay />
       </div>
 
+      <BrandMotif
+        tone="light"
+        className="hidden md:block top-[-5rem] right-[-4rem] w-[26rem] opacity-[0.06] z-[1]"
+      />
+
       <div className="relative z-10 section-pad pb-16 md:pb-24 max-w-4xl">
         <span
           data-svc-hero
@@ -134,12 +140,25 @@ function ServiceIntro({ service }) {
           ))}
         </div>
         <div data-svc-intro>
-          <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl shadow-navy/10">
-            <img
-              src={service.image}
-              alt={service.navLabel}
-              className="w-full h-full object-cover object-center"
+          <div className="relative overflow-hidden rounded-3xl aspect-[4/3] lg:aspect-[5/4] flex items-center justify-center p-10 bg-gradient-to-br from-navy via-navy to-brand-950 shadow-2xl shadow-navy/20">
+            <BrandMotif
+              tone="light"
+              float="alt"
+              className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[135%] max-w-none opacity-[0.08]"
             />
+            <div className="relative z-10 text-center">
+              <BrandMotif
+                float={false}
+                className="!static mx-auto w-14 mb-6 opacity-95"
+              />
+              <p className="font-drama italic text-2xl md:text-3xl text-white leading-snug text-balance">
+                {service.tagline}
+              </p>
+              <div className="mt-6 mx-auto h-px w-12 bg-white/20" />
+              <span className="mt-4 inline-block font-mono text-[11px] tracking-widest text-white/40 uppercase">
+                {service.navLabel}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -172,7 +191,7 @@ function ServiceLookLike({ service }) {
             <div
               key={i}
               data-svc-look
-              className="flex items-start gap-4 bg-white rounded-3xl p-6 border border-surface-200/60 shadow-sm"
+              className="card-soft card-accent-top flex items-start gap-4 p-6"
             >
               <div className="w-9 h-9 rounded-2xl bg-brand-100 flex items-center justify-center flex-shrink-0">
                 <Check size={16} className="text-brand-500" />
@@ -192,39 +211,45 @@ function ServiceWhoFor({ service }) {
   useScrollReveal(ref, "[data-svc-who]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="max-w-4xl mx-auto text-center">
-        <div
-          data-svc-who
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-6 tracking-wide"
-        >
-          Who it's for
+    <section ref={ref} className="relative section-pad py-24 md:py-32 overflow-hidden">
+      <BrandMotif
+        tone="charcoal"
+        className="hidden md:block bottom-[-6rem] left-[-5rem] w-80 opacity-[0.035]"
+      />
+      <div className="relative max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <div
+            data-svc-who
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-6 tracking-wide"
+          >
+            Who it's for
+          </div>
+          <h2
+            data-svc-who
+            className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight"
+          >
+            This may be a fit if{" "}
+            <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
+              you're
+            </span>
+            …
+          </h2>
         </div>
-        <h2
-          data-svc-who
-          className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight mb-10"
-        >
-          This may be a fit if{" "}
-          <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
-            you're
-          </span>
-          …
-        </h2>
-        <ul className="space-y-4 text-left max-w-2xl mx-auto">
+        <div data-svc-who className="card-soft p-2 sm:p-3 divide-y divide-surface-200">
           {service.whoFor.map((item, i) => (
-            <li
+            <div
               key={i}
-              data-svc-who
-              className="flex items-start gap-3 text-navy/70 text-base md:text-lg leading-relaxed"
+              className="flex items-start gap-4 px-4 sm:px-5 py-4"
             >
-              <ArrowRight
-                size={18}
-                className="text-brand-500 mt-1.5 flex-shrink-0"
-              />
-              <span>{item}</span>
-            </li>
+              <div className="w-8 h-8 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check size={15} className="text-brand-500" />
+              </div>
+              <span className="text-navy/70 text-base md:text-lg leading-relaxed">
+                {item}
+              </span>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
@@ -253,7 +278,7 @@ function OtherServices({ currentSlug }) {
             <Link
               key={s.slug}
               to={`/services/${s.slug}`}
-              className="group flex items-center gap-3 bg-white rounded-2xl p-5 border border-surface-200/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+              className="card-soft !rounded-2xl group flex items-center gap-3 p-5"
             >
               <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
                 <s.icon size={16} className="text-brand-500" />
@@ -272,8 +297,13 @@ function OtherServices({ currentSlug }) {
 /* ─── CTA ─── */
 function ServiceCTA() {
   return (
-    <section className="section-pad py-24 md:py-32">
-      <div className="max-w-4xl mx-auto text-center">
+    <section className="relative section-pad py-24 md:py-32 overflow-hidden">
+      <BrandMotif
+        tone="charcoal"
+        float="alt"
+        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] opacity-[0.04]"
+      />
+      <div className="relative max-w-4xl mx-auto text-center">
         <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
           Ready to start your
           <span className="font-drama italic text-brand-500 text-3xl md:text-5xl">

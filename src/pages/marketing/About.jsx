@@ -9,6 +9,7 @@ import {
   Compass,
 } from "lucide-react";
 import { AUSTIN, TEAM } from "../../config/images.js";
+import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 
 /* ── Scroll reveal helper (IntersectionObserver, no ScrollTrigger) ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -188,8 +189,12 @@ function Mission() {
   useScrollReveal(ref, "[data-mission]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
-      <div className="max-w-4xl mx-auto text-center">
+    <section ref={ref} className="relative section-pad py-24 md:py-32 bg-surface-100 overflow-hidden">
+      <BrandMotif
+        tone="charcoal"
+        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[34rem] opacity-[0.035]"
+      />
+      <div className="relative max-w-4xl mx-auto text-center">
         <div
           data-mission
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-6 tracking-wide"
@@ -352,7 +357,7 @@ function Values() {
             <div
               key={v.title}
               data-value-card
-              className="bg-white rounded-3xl p-7 border border-surface-200/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+              className="card-soft card-accent-top p-7"
             >
               <div className="w-10 h-10 rounded-2xl bg-brand-100 flex items-center justify-center mb-5">
                 <v.icon size={18} className="text-brand-500" />
