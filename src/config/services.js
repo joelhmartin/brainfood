@@ -113,7 +113,7 @@ export const SERVICES_CONTENT = [
       "Helping families set boundaries, rebuild trust, and communicate through recovery together.",
     intro: [
       "Recovery affects the whole family, and families heal best when they have support of their own. We work with parents, partners, and loved ones to establish healthy boundaries, improve communication, and rebuild trust over time.",
-      "Drawing on years of work with hundreds of families, we help you understand the dynamics of substance use disorder, respond in ways that support recovery rather than enable it, and take care of your own well-being in the process.",
+      "We help you understand the dynamics of substance use disorder, respond in ways that support recovery rather than enable it, and take care of your own well-being in the process.",
       "You do not have to navigate this alone. We give families a clear, compassionate framework and a steady guide through it.",
     ],
     lookLike: [
