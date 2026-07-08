@@ -73,9 +73,15 @@
     @apply bg-navy/60 backdrop-blur-xl border border-white/10;
   }
 
-  /* Section padding */
+  /* Section padding (horizontal gutters only) */
   .section-pad {
     @apply px-5 md:px-8 lg:px-16 xl:px-24;
+  }
+
+  /* Canonical content column — every section's inner wrapper uses this so all
+     content (and the navbar) shares one max-width and aligned gutters. */
+  .content-container {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-8;
   }
 
   /* Card radius system */

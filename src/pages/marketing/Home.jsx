@@ -117,7 +117,7 @@ function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 section-pad pt-60 md:pt-48 pb-16 md:pb-28 max-w-6xl">
+      <div className="relative z-10 content-container pt-60 md:pt-48 pb-16 md:pb-28">
         {/* Eyebrow — news ticker */}
         <div data-hero-anim className="mb-6">
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 max-w-[90vw] sm:max-w-md overflow-hidden">
@@ -223,9 +223,9 @@ function Mission() {
   }, []);
 
   return (
-    <section ref={ref} className="relative section-pad py-24 md:py-32">
+    <section ref={ref} className="relative py-24 md:py-32">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+      <div className="content-container grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
         {/* Photo */}
         <div data-mission-anim className="relative order-2 lg:order-1">
           <div className="relative rounded-3xl overflow-hidden aspect-[4/4]">
@@ -391,7 +391,8 @@ function Services() {
   useScrollReveal(ref, "[data-services-hdr]", { y: 28, duration: 0.9, stagger: 0.1 });
 
   return (
-    <section id="services" ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
+    <section id="services" ref={ref} className="py-24 md:py-32 bg-surface-100">
+      <div className="content-container">
       <div data-services-hdr className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
         Our Services
       </div>
@@ -415,6 +416,7 @@ function Services() {
       </div>
 
       <Tabs tabs={SERVICE_TABS} />
+      </div>
     </section>
   );
 }
@@ -460,8 +462,8 @@ function WhoWeServe() {
   useScrollReveal(ref, "[data-who-card]", { y: 24, duration: 0.8, stagger: 0.08 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="text-center max-w-2xl mx-auto mb-14">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container max-w-2xl text-center mb-14">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
           Who We Serve
         </div>
@@ -472,7 +474,7 @@ function WhoWeServe() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="content-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {WHO_WE_SERVE.map(({ icon: Icon, title, desc }) => (
           <div
             key={title}
@@ -534,7 +536,7 @@ function WhyBrainFood() {
   useScrollReveal(ref, "[data-why-card]", { y: 24, duration: 0.8, stagger: 0.08 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-navy relative overflow-hidden">
+    <section ref={ref} className="py-24 md:py-32 bg-navy relative overflow-hidden">
       {/* Austin skyline bg — subtle atmospheric layer */}
       <div className="absolute inset-0 pointer-events-none">
         <img
@@ -546,7 +548,7 @@ function WhyBrainFood() {
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-navy/60" />
       </div>
 
-      <div className="text-center max-w-2xl mx-auto mb-14 relative">
+      <div className="content-container max-w-2xl text-center mb-14 relative">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/60 text-xs font-medium mb-5 tracking-wide">
           Our Approach
         </div>
@@ -561,7 +563,7 @@ function WhyBrainFood() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 relative">
+      <div className="content-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 relative">
         {WHY_ITEMS.map(({ icon: Icon, title, desc }) => (
           <div
             key={title}
@@ -597,8 +599,8 @@ function Team() {
   useScrollReveal(ref, "[data-team-card]", { y: 30, duration: 0.8, stagger: 0.12 });
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32 bg-surface-100">
-      <div className="text-center max-w-xl mx-auto mb-14">
+    <section ref={ref} className="py-24 md:py-32 bg-surface-100">
+      <div className="content-container max-w-xl text-center mb-14">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-100 text-brand-600 text-xs font-medium mb-5 tracking-wide">
           Meet the Team
         </div>
@@ -614,7 +616,7 @@ function Team() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="content-container grid grid-cols-2 lg:grid-cols-4 gap-6">
         {COACHES.map((coach) => (
           <Link
             key={coach.id}
@@ -640,7 +642,7 @@ function Team() {
         ))}
       </div>
 
-      <div className="text-center mt-10">
+      <div className="content-container text-center mt-10">
         <Link
           to="/about#charlie"
           className="inline-flex items-center gap-2 text-brand-500 font-semibold text-sm hover:gap-3 transition-all duration-300"

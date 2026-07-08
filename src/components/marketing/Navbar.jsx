@@ -336,7 +336,7 @@ export function Navbar() {
               ? "top-4 bg-white/80 backdrop-blur-xl border border-surface-300/50 shadow-lg shadow-navy/5"
               : "top-8 bg-transparent border border-transparent"
           }
-          rounded-full px-3 py-2 md:px-5 md:py-2.5 max-w-6xl w-[calc(100%-2rem)]`}
+          rounded-full px-3 py-2 md:px-5 md:py-2.5 max-w-7xl w-[calc(100%-3rem)]`}
       >
         <div className="flex items-center justify-between">
           {/* Logo */}

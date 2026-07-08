@@ -54,8 +54,9 @@ export function CtaBanner({
   }, []);
 
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="relative overflow-hidden rounded-4xl md:rounded-5xl bg-brand-500 p-10 md:p-16 text-center">
+    <section ref={ref} className="py-24 md:py-32">
+      <div className="content-container">
+        <div className="relative overflow-hidden rounded-4xl md:rounded-5xl bg-brand-500 p-10 md:p-16 text-center">
         <BrandMotif
           tone="light"
           className="bottom-[-6rem] left-[-4rem] w-80 opacity-10"
@@ -115,6 +116,7 @@ export function CtaBanner({
               </Link>
             )}
           </div>
+        </div>
         </div>
       </div>
     </section>
