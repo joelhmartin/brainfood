@@ -14,8 +14,16 @@ import { LOGOS } from "../../config/site.js";
  *   "charcoal"          — near-black silhouette; for subtle light-on-light marks
  *
  * float: "on" (default) drifts, "alt" drifts on an offset cycle, false is static.
+ * fade:  when true, the mark fades out toward the bottom (gradient mask),
+ *        so a top-anchored mark reads as a soft "hood" over the content
+ *        instead of a hard clipped edge.
  */
-export function BrandMotif({ className = "", tone = "natural", float = "on" }) {
+export function BrandMotif({
+  className = "",
+  tone = "natural",
+  float = "on",
+  fade = false,
+}) {
   const filter =
     tone === "light"
       ? "brightness(0) invert(1)"
@@ -26,6 +34,15 @@ export function BrandMotif({ className = "", tone = "natural", float = "on" }) {
   const floatClass =
     float === "alt" ? "brand-float-alt" : float ? "brand-float" : "";
 
+  const mask = fade
+    ? "linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.85) 25%, transparent 50%)"
+    : undefined;
+
+  const style =
+    filter || mask
+      ? { filter, maskImage: mask, WebkitMaskImage: mask }
+      : undefined;
+
   return (
     <img
       src={LOGOS.icon}
@@ -33,7 +50,7 @@ export function BrandMotif({ className = "", tone = "natural", float = "on" }) {
       aria-hidden="true"
       draggable="false"
       className={`pointer-events-none select-none absolute ${floatClass} ${className}`}
-      style={filter ? { filter } : undefined}
+      style={style}
     />
   );
 }
