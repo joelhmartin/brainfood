@@ -375,7 +375,7 @@ const COACHES = [
     id: "charlie",
     name: "Charlie Moffet",
     role: "Recovery Coach & Co-Founder",
-    photo: TEAM.charles1,
+    photo: TEAM.charles2,
     bio: `Charlie Moffet has been working in the treatment industry for over six years. After starting his own journey in recovery he quickly realized working in addiction was his path forward. Charlie worked for a non-profit all male treatment center in Wimberley, TX for five years. He did everything from being a recovery advocate to recovery specialist, meeting with guys one on one, helping the family along the way and marketing.
 
 In 2017, Charlie decided to open an all male sober living business called, "Chuck and Joe's Sober Living." It's a staple in the Austin community and is still in business to this day! In 2022, Charlie worked for a dual diagnoses center as a "group facilitator." His duty was to teach skill groups that included DBT, CBT, attachment theory and 12 step work. Charlie decided to get an RSPS certificate in 2022 with hopes, of once again, working with guys one on one. He is currently in college to get his LMSW and one day become a clinical therapist. Charlie is also a screen writer and a passionate traveler.`,
@@ -385,7 +385,7 @@ In 2017, Charlie decided to open an all male sober living business called, "Chuc
     id: "justin",
     name: "Justin Yoken",
     role: "Recovery Coach & Co-Founder",
-    photo: TEAM.justin1,
+    photo: TEAM.justin4,
     bio: `Justin Yoken has been working in treatment since 2016. He has worked as a Recovery Coach, Program Director, Assistant Director and eventually became the Director of an aftercare which included a coaching team and sober living houses. He got certified as a Peer Recovery Support Specialist in 2016 by the State of Texas. In addition, he has worked with hundreds of families over the past seven years assisting their journey with establishing new boundaries, communication patterns, and overall behaviors with their loved ones.
 
 Justin got sober in 2014 and lives the recovery lifestyle himself, which allows him to transmit the behaviors more easily due to walking the same path as many of his clients. Justin enjoys working out, sports, live music, and spending time with his family and friends.`,
@@ -404,8 +404,10 @@ Justin got sober in 2014 and lives the recovery lifestyle himself, which allows 
     name: "Damian Vickers",
     role: "Recovery Coach",
     photo: TEAM.damian1,
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas faucibus mollis interdum. Nullam id dolor id nibh ultricies vehicula ut id elit. Donec ullamcorper nulla non metus auctor fringilla. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam porta sem malesuada magna mollis euismod. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Nulla vitae elit libero, a pharetra augue.",
-    quote: null,
+    bio: `Damian Vickers was born and raised in Hollywood, Florida, and struggled for over twenty years with opiates and alcohol before beginning his recovery journey in 2018. Today he has over four years sober and more than six years in the recovery field, rising from technician in residential treatment centers to Director of Operations at Ranch House Recovery. He now works as a sober coach, supporting men in early recovery and life transition.
+
+What Damian loves most is the individual connection—sitting across from a man who feels completely alone, saying "I've been there," and meaning it. His greatest blessing is his family; since he got sober, his parents and younger brother have found sobriety too. Before recovery he traveled with a circus and spent eighteen years as a union stunt rigger in film. Today he is a husband and father who has run ultramarathons and loves the simple life.`,
+    quote: `"In the beginning, I got sober just to escape the pain. Now I stay sober because I want to see how good life can get."`,
   },
 ];
 

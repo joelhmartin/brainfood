@@ -585,8 +585,8 @@ function WhyBrainFood() {
    MEET THE TEAM — 4 coaches with links to bios
 ───────────────────────────────────────────── */
 const COACHES = [
-  { id: "charlie",  name: "Charlie Moffet",          role: "Recovery Coach & Co-Founder", photo: TEAM.charles1 },
-  { id: "justin",   name: "Justin Yoken",            role: "Recovery Coach & Co-Founder", photo: TEAM.justin1 },
+  { id: "charlie",  name: "Charlie Moffet",          role: "Recovery Coach & Co-Founder", photo: TEAM.charles2 },
+  { id: "justin",   name: "Justin Yoken",            role: "Recovery Coach & Co-Founder", photo: TEAM.justin4 },
   { id: "matthew",  name: "Matthew Harvey-Parrish",  role: "Recovery Coach",              photo: TEAM.matthew1 },
   { id: "damian",   name: "Damian Vickers",           role: "Recovery Coach",              photo: TEAM.damian1 },
 ];

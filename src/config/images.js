@@ -72,6 +72,7 @@ export const TEAM = {
   charles2: "/images/team-photos/charles2.webp",
   justin1: "/images/team-photos/justin1.webp",
   justin2: "/images/team-photos/justin2.webp",
+  justin4: "/images/team-photos/justin4.webp",
   matthew1: "/images/team-photos/matthew1.webp",
   matthew2: "/images/team-photos/matthew2.webp",
   damian1: "/images/team-photos/damian.webp",
