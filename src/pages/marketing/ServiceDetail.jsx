@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper (IntersectionObserver) ── */
 function useScrollReveal(ref, selector, animProps = {}) {
@@ -211,12 +212,8 @@ function ServiceWhoFor({ service }) {
   useScrollReveal(ref, "[data-svc-who]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="relative section-pad py-24 md:py-32 overflow-hidden">
-      <BrandMotif
-        tone="charcoal"
-        className="hidden md:block bottom-[-6rem] left-[-5rem] w-80 opacity-[0.035]"
-      />
-      <div className="relative max-w-3xl mx-auto">
+    <section ref={ref} className="section-pad py-24 md:py-32">
+      <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <div
             data-svc-who
@@ -294,45 +291,6 @@ function OtherServices({ currentSlug }) {
   );
 }
 
-/* ─── CTA ─── */
-function ServiceCTA() {
-  return (
-    <section className="relative section-pad py-24 md:py-32 overflow-hidden">
-      <BrandMotif
-        tone="charcoal"
-        float="alt"
-        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] opacity-[0.04]"
-      />
-      <div className="relative max-w-4xl mx-auto text-center">
-        <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
-          Ready to start your
-          <span className="font-drama italic text-brand-500 text-3xl md:text-5xl">
-            {" "}
-            journey?
-          </span>
-        </h2>
-        <p className="mt-4 text-navy/50 text-base max-w-lg mx-auto leading-relaxed">
-          We work with individuals and families at every stage of the recovery
-          process. Reach out today for a confidential conversation.
-        </p>
-        <Link
-          to="/contact"
-          className="btn-magnetic group mt-8 inline-flex px-8 py-4 rounded-full bg-brand-500 text-white font-semibold"
-        >
-          <span className="btn-bg bg-brand-600 rounded-full" />
-          <span className="relative z-10 flex items-center gap-2">
-            Get in Touch
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </span>
-        </Link>
-      </div>
-    </section>
-  );
-}
-
 /* ─── Page export ─── */
 export function ServiceDetailPage() {
   const { slug } = useParams();
@@ -353,7 +311,13 @@ export function ServiceDetailPage() {
       <ServiceLookLike service={service} />
       <ServiceWhoFor service={service} />
       <OtherServices currentSlug={service.slug} />
-      <ServiceCTA />
+      <CtaBanner
+        eyebrow="Take the Next Step"
+        title="Ready to start your"
+        titleAccent="journey?"
+        subtitle="We work with individuals and families at every stage of the recovery process. Reach out today for a confidential conversation."
+        primary={{ label: "Get in Touch", to: "/contact" }}
+      />
     </>
   );
 }

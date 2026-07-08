@@ -19,7 +19,7 @@ import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 import { Responsive } from "../../hooks/useBreakpoint.jsx";
-import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper ─────────────────────
    Uses IntersectionObserver instead of GSAP
@@ -657,59 +657,15 @@ function Team() {
    CTA
 ───────────────────────────────────────────── */
 function CTA() {
-  const ref = useRef(null);
-  useScrollReveal(ref, "[data-cta-anim]", { y: 28, duration: 0.9, stagger: 0.12 });
-
   return (
-    <section ref={ref} className="section-pad py-24 md:py-32">
-      <div className="bg-brand-500 rounded-4xl md:rounded-5xl p-10 md:p-16 text-center relative overflow-hidden">
-        {/* Noise texture */}
-        <NoiseOverlay />
-        <BrandMotif
-          tone="light"
-          className="bottom-[-6rem] left-[-4rem] w-80 opacity-10"
-        />
-        <BrandMotif
-          tone="light"
-          float="alt"
-          className="hidden md:block top-[-5rem] right-[-3rem] w-64 opacity-[0.08]"
-        />
-
-        <div className="relative z-10">
-          <div data-cta-anim className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white/80 text-xs font-medium mb-6 tracking-wide">
-            Take the Next Step
-          </div>
-          <h2
-            data-cta-anim
-            className="font-heading font-bold text-3xl md:text-5xl text-white tracking-tight leading-tight max-w-2xl mx-auto"
-          >
-            Ready to start your recovery{" "}
-            <span className="font-drama italic text-4xl md:text-6xl">journey?</span>
-          </h2>
-          <p
-            data-cta-anim
-            className="mt-5 text-white/85 text-base md:text-lg max-w-xl mx-auto leading-relaxed"
-          >
-            We work with individuals and families at every stage of the recovery
-            process. Reach out today for a confidential conversation.
-          </p>
-          <div data-cta-anim className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              to="/contact"
-              className="px-8 py-3.5 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors duration-300 shadow-lg"
-            >
-              Get in Touch
-            </Link>
-            <Link
-              to="/about"
-              className="px-8 py-3.5 rounded-full border border-white/30 text-white font-medium text-sm hover:bg-white/10 transition-colors duration-300"
-            >
-              Learn About Us
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
+    <CtaBanner
+      eyebrow="Take the Next Step"
+      title="Ready to start your recovery"
+      titleAccent="journey?"
+      subtitle="We work with individuals and families at every stage of the recovery process. Reach out today for a confidential conversation."
+      primary={{ label: "Get in Touch", to: "/contact" }}
+      secondary={{ label: "Learn About Us", to: "/about" }}
+    />
   );
 }
 

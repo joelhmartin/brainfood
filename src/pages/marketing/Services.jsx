@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { AUSTIN } from "../../config/images.js";
 import { SERVICES_CONTENT } from "../../config/services.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps = {}) {
@@ -173,45 +174,6 @@ function ServicesGrid() {
   );
 }
 
-/* ─── CTA ─── */
-function ServicesCTA() {
-  return (
-    <section className="relative section-pad py-24 md:py-32 bg-surface-100 overflow-hidden">
-      <BrandMotif
-        tone="charcoal"
-        float="alt"
-        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] opacity-[0.04]"
-      />
-      <div className="relative max-w-4xl mx-auto text-center">
-        <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
-          Not sure where to
-          <span className="font-drama italic text-brand-500 text-3xl md:text-5xl">
-            {" "}
-            start?
-          </span>
-        </h2>
-        <p className="mt-4 text-navy/50 text-base max-w-lg mx-auto leading-relaxed">
-          Reach out for a confidential conversation and we'll help you find the
-          right fit—for you or your loved one.
-        </p>
-        <Link
-          to="/contact"
-          className="btn-magnetic group mt-8 inline-flex px-8 py-4 rounded-full bg-brand-500 text-white font-semibold"
-        >
-          <span className="btn-bg bg-brand-600 rounded-full" />
-          <span className="relative z-10 flex items-center gap-2">
-            Get in Touch
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </span>
-        </Link>
-      </div>
-    </section>
-  );
-}
-
 /* ─── Page export ─── */
 export function ServicesPage() {
   useEffect(() => {
@@ -222,7 +184,13 @@ export function ServicesPage() {
     <>
       <ServicesHero />
       <ServicesGrid />
-      <ServicesCTA />
+      <CtaBanner
+        eyebrow="Take the Next Step"
+        title="Not sure where to"
+        titleAccent="start?"
+        subtitle="Reach out for a confidential conversation and we'll help you find the right fit—for you or your loved one."
+        primary={{ label: "Get in Touch", to: "/contact" }}
+      />
     </>
   );
 }
