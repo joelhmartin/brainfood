@@ -8,6 +8,10 @@
   }
 
   html {
+    /* Root size that all rem values (Tailwind text-*, spacing) derive from.
+       Browser default is 16px; bump this to scale the whole UI up/down.
+       106.25% = 17px, 112.5% = 18px. */
+    font-size: 106.25%;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
