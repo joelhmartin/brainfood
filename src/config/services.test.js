@@ -22,6 +22,8 @@ describe("services config", () => {
       expect(s.title).toBeTruthy();
       expect(s.accent).toBeTruthy();
       expect(s.tagline).toBeTruthy();
+      expect(s.introHeading).toBeTruthy();
+      expect(s.introAccent).toBeTruthy();
       expect(Array.isArray(s.intro) && s.intro.length >= 2).toBe(true);
       expect(Array.isArray(s.lookLike) && s.lookLike.length >= 4).toBe(true);
       expect(Array.isArray(s.whoFor) && s.whoFor.length >= 3).toBe(true);

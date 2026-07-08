@@ -24,6 +24,8 @@ export const SERVICES_CONTENT = [
     accent: "real-world recovery.",
     tagline:
       "Personalized recovery and mental health coaching that turns insight into daily, livable action.",
+    introHeading: "Insight, turned into",
+    introAccent: "daily action.",
     intro: [
       "Our coaching pairs you with someone who has walked this road and knows the terrain. We meet you where you are—no shame, no judgment—and work side by side to build the skills, structure, and support that make recovery sustainable.",
       "This is practical, action-oriented work. Together we set concrete goals, build routines that hold up under pressure, and practice the tools you need for the hard days. We tell the truth with care, helping you see blind spots and take ownership without losing your footing.",
@@ -53,6 +55,8 @@ export const SERVICES_CONTENT = [
     accent: "high-stakes moments.",
     tagline:
       "In-person support during transitions, travel, and the early days when connection matters most.",
+    introHeading: "A steady presence when it",
+    introAccent: "matters most.",
     intro: [
       "A sober companion is a trusted presence by your side through the moments that feel most fragile—the first weeks home, a return to work, travel, or a major life transition. We provide structure, accountability, and real companionship when you need it most.",
       "Our companions bring lived experience and calm, practical support. We help you build a daily rhythm, navigate triggers in real time, and stay connected to the plan you have set for yourself—all while respecting your dignity and independence.",
@@ -82,6 +86,8 @@ export const SERVICES_CONTENT = [
     accent: "into real life.",
     tagline:
       "Getting outside the room—building confidence and connection through shared, real-world experience.",
+    introHeading: "Recovery you can",
+    introAccent: "feel.",
     intro: [
       "Lasting change is built in real life, not just in conversation. Experiential integration takes the work outdoors and into the world—hikes, activities, and shared experiences that rebuild confidence, connection, and a sense of what a meaningful sober life can feel like.",
       "We use these experiences to practice new skills where they actually matter: managing stress, staying present, working through discomfort, and rediscovering joy without substances. It is recovery you can feel in your body, not just talk about.",
@@ -111,6 +117,8 @@ export const SERVICES_CONTENT = [
     accent: "whole family.",
     tagline:
       "Helping families set boundaries, rebuild trust, and communicate through recovery together.",
+    introHeading: "The whole family",
+    introAccent: "heals together.",
     intro: [
       "Recovery affects the whole family, and families heal best when they have support of their own. We work with parents, partners, and loved ones to establish healthy boundaries, improve communication, and rebuild trust over time.",
       "We help you understand the dynamics of substance use disorder, respond in ways that support recovery rather than enable it, and take care of your own well-being in the process.",
@@ -140,6 +148,8 @@ export const SERVICES_CONTENT = [
     accent: "together for you.",
     tagline:
       "Coordinating with your clinicians and professional partners so your care is aligned, not scattered.",
+    introHeading: "Everyone on the",
+    introAccent: "same page.",
     intro: [
       "Recovery works best when everyone supporting you is on the same page. Collaborative care means we coordinate closely with your therapists, clinicians, treatment programs, and other professional partners so your support is aligned and consistent.",
       "We act as a connective thread across your care team—sharing observations, reinforcing your treatment goals, and making sure nothing falls through the cracks between appointments and providers.",

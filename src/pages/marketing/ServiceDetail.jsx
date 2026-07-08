@@ -130,6 +130,15 @@ function ServiceIntro({ service }) {
           >
             {service.navLabel}
           </div>
+          <h2
+            data-svc-intro
+            className="font-heading font-bold text-3xl md:text-4xl text-navy tracking-tight leading-tight mb-6"
+          >
+            {service.introHeading}{" "}
+            <span className="font-drama italic text-brand-500 text-4xl md:text-5xl">
+              {service.introAccent}
+            </span>
+          </h2>
           {service.intro.map((p, i) => (
             <p
               key={i}
