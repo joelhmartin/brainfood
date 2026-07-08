@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { label: "About", to: "/about" },
   {
     label: "Services",
+    to: "/services",
     children: [
       { label: "Recovery & Mental Health Coaching", to: "/services/coaching" },
       { label: "Sober Companion Services",          to: "/services/sober-companion" },
@@ -78,13 +79,23 @@ function NavItem({ link, scrolled, isActive }) {
 
   return (
     <div className="relative" onMouseEnter={enter} onMouseLeave={leave}>
-      <button className={`${baseClass} ${colorClass}`}>
-        {link.label}
-        <ChevronDown
-          size={12}
-          className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+      {link.to ? (
+        <Link to={link.to} className={`${baseClass} ${colorClass}`}>
+          {link.label}
+          <ChevronDown
+            size={12}
+            className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </Link>
+      ) : (
+        <button className={`${baseClass} ${colorClass}`}>
+          {link.label}
+          <ChevronDown
+            size={12}
+            className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      )}
 
       {open && (
         <div className="absolute top-full left-0 pt-2 z-50">
@@ -206,6 +217,15 @@ function MobileOverlay({ open, onNavigate, isActive }) {
                 }`}
               >
                 <div className="pl-4 py-2 space-y-1">
+                  {link.to && (
+                    <Link
+                      to={link.to}
+                      onClick={handleNavigate}
+                      className="block py-2.5 text-base text-white/70 font-medium hover:text-brand-400 transition-colors"
+                    >
+                      All Services
+                    </Link>
+                  )}
                   {link.children.map((child) => (
                     <Link
                       key={child.label}
@@ -270,6 +290,7 @@ export function Navbar() {
 
   const isActive = (link) => {
     if (link.to && location.pathname === link.to) return true;
+    if (link.to && location.pathname.startsWith(link.to + "/")) return true;
     if (link.children) return link.children.some((c) => location.pathname === c.to);
     return false;
   };
