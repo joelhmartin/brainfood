@@ -11,6 +11,7 @@ import {
 import { usePostsStore } from "../../stores/posts.store.js";
 import { BUSINESS, CONTENT, blogUrl } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -227,24 +228,6 @@ export function BlogPostPage() {
               </div>
             )}
 
-            {/* Bottom CTA */}
-            <div className="mt-12 bg-brand-500 rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
-              <h3 className="font-heading font-bold text-2xl text-white tracking-tight">
-                Need support?
-              </h3>
-              <p className="mt-2 text-white/70 text-sm max-w-md mx-auto">
-                {BUSINESS.name} offers personalized recovery coaching, mental
-                health coaching, and sober companion services.
-              </p>
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 mt-5 px-6 py-3 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors"
-              >
-                Get in Touch
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-
             {/* Back */}
             <div className="mt-8">
               <Link
@@ -271,6 +254,14 @@ export function BlogPostPage() {
 
       {/* Related */}
       <RelatedPosts currentId={post.id} category={post.category} />
+
+      <CtaBanner
+        eyebrow="Take the Next Step"
+        title="Ready to start your"
+        titleAccent="journey?"
+        subtitle="We work with individuals and families at every stage of the recovery process. Reach out today for a confidential conversation."
+        primary={{ label: "Get in Touch", to: "/contact" }}
+      />
     </>
   );
 }

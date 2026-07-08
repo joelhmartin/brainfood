@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AUSTIN, TEAM } from "../../config/images.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper (IntersectionObserver, no ScrollTrigger) ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -498,31 +499,13 @@ function TeamBios() {
 /* ─── CTA ─── */
 function AboutCTA() {
   return (
-    <section className="section-pad py-24 md:py-32">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="font-heading font-bold text-2xl md:text-4xl tracking-tight">
-          Ready to start your
-          <span className="font-drama italic text-brand-500 text-3xl md:text-5xl"> journey?</span>
-        </h2>
-        <p className="mt-4 text-navy/50 text-base max-w-lg mx-auto leading-relaxed">
-          We work with individuals and families at every stage of the recovery
-          process. Reach out today for a confidential conversation.
-        </p>
-        <Link
-          to="/contact"
-          className="btn-magnetic group mt-8 inline-flex px-8 py-4 rounded-full bg-brand-500 text-white font-semibold"
-        >
-          <span className="btn-bg bg-brand-600 rounded-full" />
-          <span className="relative z-10 flex items-center gap-2">
-            Get in Touch
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </span>
-        </Link>
-      </div>
-    </section>
+    <CtaBanner
+      eyebrow="Take the Next Step"
+      title="Ready to start your"
+      titleAccent="journey?"
+      subtitle="We work with individuals and families at every stage of the recovery process. Reach out today for a confidential conversation."
+      primary={{ label: "Get in Touch", to: "/contact" }}
+    />
   );
 }
 

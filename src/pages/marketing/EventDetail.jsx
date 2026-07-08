@@ -4,6 +4,7 @@ import { CONTENT, eventUrl } from "../../config/site.js";
 import { CalendarDays, MapPin, Clock, ArrowLeft, Share2 } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
+import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -145,24 +146,6 @@ export function EventDetailPage() {
               <RenderBody text={event.body} />
             </article>
 
-            {/* Bottom CTA */}
-            <div className="mt-12 pt-8 border-t border-surface-300/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <p className="font-heading font-bold text-lg text-navy">
-                  Interested in this event?
-                </p>
-                <p className="text-navy/50 text-sm">
-                  Reach out to us for more details or to reserve your spot.
-                </p>
-              </div>
-              <Link
-                to="/contact"
-                className="px-6 py-3 rounded-full bg-brand-500 text-white font-semibold text-sm hover:bg-brand-600 transition-colors"
-              >
-                Get in Touch
-              </Link>
-            </div>
-
             {/* Back link */}
             <div className="mt-8">
               <Link
@@ -186,6 +169,14 @@ export function EventDetailPage() {
           </div>
         </div>
       </section>
+
+      <CtaBanner
+        eyebrow="Take the Next Step"
+        title="Ready to start your"
+        titleAccent="journey?"
+        subtitle="We work with individuals and families at every stage of the recovery process. Reach out today for a confidential conversation."
+        primary={{ label: "Get in Touch", to: "/contact" }}
+      />
     </>
   );
 }
