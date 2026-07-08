@@ -36,6 +36,8 @@ import { EventsPage } from "./pages/marketing/Events.jsx";
 import { EventDetailPage } from "./pages/marketing/EventDetail.jsx";
 import { BlogPage } from "./pages/marketing/Blog.jsx";
 import { BlogPostPage } from "./pages/marketing/BlogPost.jsx";
+import { ServicesPage } from "./pages/marketing/Services.jsx";
+import { ServiceDetailPage } from "./pages/marketing/ServiceDetail.jsx";
 import { Navbar } from "./components/marketing/Navbar.jsx";
 import { Footer } from "./components/marketing/Footer.jsx";
 import { CONTENT } from "./config/site.js";
@@ -89,11 +91,8 @@ function AppRoutes() {
         <Route path={`${CONTENT.blog.prefix}/:slug`} element={<BlogPostPage />} />
         <Route path="/submit-case" element={<CaseSubmissionPage />} />
         {/* Services routes */}
-        <Route path="/services/coaching"          element={<ComingSoonPage />} />
-        <Route path="/services/sober-companion"   element={<ComingSoonPage />} />
-        <Route path="/services/experiential"      element={<ComingSoonPage />} />
-        <Route path="/services/family"            element={<ComingSoonPage />} />
-        <Route path="/services/collaborative"     element={<ComingSoonPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services/:slug" element={<ServiceDetailPage />} />
         {/* Legacy / other coming soon routes */}
         <Route path="/about/team"                 element={<ComingSoonPage />} />
         <Route path="/resources/videos"           element={<ComingSoonPage />} />
