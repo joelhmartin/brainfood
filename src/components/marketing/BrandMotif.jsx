@@ -35,7 +35,7 @@ export function BrandMotif({
     float === "alt" ? "brand-float-alt" : float ? "brand-float" : "";
 
   const mask = fade
-    ? "linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.85) 25%, transparent 50%)"
+    ? "linear-gradient(to bottom, #000 0%, #000 48%, transparent 72%)"
     : undefined;
 
   const style =

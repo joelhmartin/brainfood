@@ -212,12 +212,12 @@ function ServiceWhoFor({ service }) {
   useScrollReveal(ref, "[data-svc-who]", { y: 30, duration: 0.8, stagger: 0.1 });
 
   return (
-    <section ref={ref} className="relative section-pad py-24 md:py-32 overflow-hidden">
+    <section ref={ref} className="relative section-pad py-24 md:py-32">
       <BrandMotif
         tone="natural"
         float={false}
         fade
-        className="top-[-1rem] left-1/2 -translate-x-1/2 w-[34rem] max-w-none opacity-[0.12]"
+        className="top-[-7rem] left-1/2 -translate-x-1/2 w-[34rem] max-w-none opacity-[0.13]"
       />
       <div className="relative max-w-3xl mx-auto">
         <div className="text-center mb-10">
