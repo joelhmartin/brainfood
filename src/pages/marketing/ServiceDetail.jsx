@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
-import { AUSTIN } from "../../config/images.js";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
 
 /* ── Scroll reveal helper (IntersectionObserver) ── */
