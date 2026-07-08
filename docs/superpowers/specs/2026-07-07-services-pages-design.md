@@ -1,7 +1,7 @@
 # Services Pages — Design Spec
 
 **Date:** 2026-07-07
-**Status:** Approved (design), pending implementation plan
+**Status:** Implemented
 **Site:** Brain Food Recovery Services (`brainfood-web`, Vite + React + React Router + Tailwind + GSAP)
 
 ## Goal
