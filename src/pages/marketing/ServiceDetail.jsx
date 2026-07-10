@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
+import { TaglineCard } from "../../components/marketing/TaglineCard.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper (IntersectionObserver) ── */
@@ -150,26 +151,7 @@ function ServiceIntro({ service }) {
           ))}
         </div>
         <div data-svc-intro>
-          <div className="relative overflow-hidden rounded-3xl aspect-[4/3] lg:aspect-[5/4] flex items-center justify-center p-10 bg-gradient-to-br from-navy via-navy to-brand-950 shadow-2xl shadow-navy/20">
-            <BrandMotif
-              tone="light"
-              float="alt"
-              className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[135%] max-w-none opacity-[0.08]"
-            />
-            <div className="relative z-10 text-center">
-              <BrandMotif
-                float={false}
-                className="!static mx-auto w-14 mb-6 opacity-95"
-              />
-              <p className="font-drama italic text-2xl md:text-3xl text-white leading-snug text-balance">
-                {service.tagline}
-              </p>
-              <div className="mt-6 mx-auto h-px w-12 bg-white/20" />
-              <span className="mt-4 inline-block font-mono text-[11px] tracking-widest text-white/40 uppercase">
-                {service.navLabel}
-              </span>
-            </div>
-          </div>
+          <TaglineCard tagline={service.tagline} label={service.navLabel} />
         </div>
       </div>
     </section>

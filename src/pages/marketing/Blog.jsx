@@ -60,7 +60,7 @@ function FeaturedPost({ post }) {
     <section ref={ref}>
       <Link
         to={blogUrl(post.slug)}
-        className="group block relative h-[70dvh] min-h-[500px] flex items-end overflow-hidden"
+        className="group block relative min-h-[70dvh] flex items-end overflow-hidden"
       >
         <div className="absolute inset-0">
           <img
@@ -71,7 +71,7 @@ function FeaturedPost({ post }) {
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
         </div>
 
-        <div className="relative z-10 content-container pb-16 md:pb-24">
+        <div className="relative z-10 content-container pt-28 pb-12 md:pt-0 md:pb-24">
           <div data-feat className="flex items-center gap-3 mb-5">
             <span className="px-3 py-1 rounded-full bg-brand-500 text-white text-xs font-semibold">
               Featured

@@ -70,7 +70,7 @@ function EventsHero() {
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-navy/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent" />
       </div>
-      <div className="relative z-10 content-container max-w-3xl pb-12 md:pb-16">
+      <div className="relative z-10 content-container pb-12 md:pb-16">
         <span
           data-ehero
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-mono tracking-wider"
