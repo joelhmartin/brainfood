@@ -12,6 +12,7 @@ import {
   Box,
 } from "lucide-react";
 import { ModelViewer } from "../../components/ModelViewer";
+import { useSeo } from "../../lib/seo.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -569,6 +570,13 @@ function ProductCTA() {
 
 /* ─── PAGE EXPORT ─── */
 export function ProductPage() {
+  useSeo({
+    title: "Products",
+    description:
+      "Tools and products from Brain Food Recovery Services supporting individuals and families in recovery.",
+    path: "/products",
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

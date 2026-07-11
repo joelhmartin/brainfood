@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { forgotPasswordSchema } from "@my-app/shared";
+import { forgotPasswordSchema } from "../../config/schemas.js";
 import { Input } from "../ui/Input.jsx";
 import { Button } from "../ui/Button.jsx";
-import { useToast } from "../ui/Toast.jsx";
-import api from "../../config/api.js";
+import { useAuth } from "../../hooks/useAuth.js";
 
 export function ForgotPasswordForm() {
-  const { addToast } = useToast();
+  const { requestPasswordReset } = useAuth();
   const [sent, setSent] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -17,12 +17,14 @@ export function ForgotPasswordForm() {
   } = useForm({ resolver: zodResolver(forgotPasswordSchema) });
 
   const onSubmit = async (data) => {
+    // Deliberately shows the same confirmation whether or not the address exists.
+    // Reporting "no such user" would turn this form into an account-enumeration oracle.
     try {
-      await api.post("/auth/forgot-password", data);
-      setSent(true);
-    } catch (err) {
-      addToast({ message: "Something went wrong. Please try again.", type: "error" });
+      await requestPasswordReset(data.email);
+    } catch {
+      // swallowed for the same reason
     }
+    setSent(true);
   };
 
   if (sent) {

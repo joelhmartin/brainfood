@@ -5,3 +5,10 @@ dist/
 .env
 .env.*
 .vercel
+
+# Photoshop sources — 7MB+ and would be publicly downloadable from /public
+*.psd
+
+# Playwright
+/test-results/
+/playwright-report/

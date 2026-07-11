@@ -122,6 +122,53 @@ export const SEO = {
   ogImage:       null, // TODO: Add OG image path
 };
 
+// ── Live settings fallback ───────────────────────────────────────────────────
+//
+// Contact details, socials, and SEO defaults are edited in the dashboard and
+// stored in the `site_settings` table. This object is the compiled-in fallback
+// used before that fetch resolves — on first paint, during prerendering, and if
+// the database is unreachable. Without it, the prerendered HTML would bake in a
+// blank <title> and an empty footer.
+//
+// Values left EMPTY here are empty on purpose. The phone number in CONTACT above
+// is a 555 placeholder (reserved for fiction), and the Google review link is "#".
+// Structured data omits blank fields, so publishing nothing is correct; publishing
+// a fake phone number in LocalBusiness schema would create NAP inconsistency and
+// actively hurt local search. Fill these in from Settings → the dashboard writes
+// the real values to the database.
+
+export const FALLBACK_SETTINGS = {
+  name:        BUSINESS.name,
+  shortName:   BUSINESS.shortName,
+  tagline:     BUSINESS.tagline,
+  description: BUSINESS.description,
+  city:        BUSINESS.city,
+  state:       BUSINESS.state,
+  address:     "",
+  founded:     BUSINESS.founded,
+
+  phone: "",
+  email: CONTACT.email,
+  hours: CONTACT.hours,
+
+  googleMaps:   LINKS.googleMaps,
+  googleReview: "",
+
+  socials: SOCIALS.map(({ label, href }) => ({ label, href })),
+
+  siteUrl:       "",
+  titleTemplate: SEO.titleTemplate,
+  defaultTitle:  SEO.defaultTitle,
+  defaultDesc:   SEO.defaultDesc,
+  ogImage:       null,
+
+  gaMeasurementId: "",
+  gscVerification: "",
+
+  // Search engines are kept OUT until the site is on its production domain.
+  seoIndexable: false,
+};
+
 // ── Legacy compat — flat SITE export used by older components ────────────────
 
 export const SITE = {

@@ -1,16 +1,14 @@
 export const ROUTES = {
-  // Auth
+  // Auth. No REGISTER route: sign-up is disabled and admins arrive by invitation.
   LOGIN: "/auth/login",
-  REGISTER: "/auth/register",
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
-  VERIFY_EMAIL: "/auth/verify-email",
-  MAGIC_LINK: "/auth/magic-link",
   ACCEPT_INVITE: "/auth/accept-invite",
-  OAUTH_CALLBACK: "/auth/oauth-callback",
 
-  // App
+  // Dashboard
   DASHBOARD: "/app",
-  SETTINGS: "/app/settings",
+  EVENTS: "/app/events",
+  POSTS: "/app/posts",
   MEMBERS: "/app/members",
+  SETTINGS: "/app/settings",
 };

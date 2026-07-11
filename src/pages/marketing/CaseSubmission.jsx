@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
+import { useSeo } from "../../lib/seo.js";
 import {
   Upload,
   FileText,
@@ -642,6 +643,13 @@ function CaseHero() {
    ════════════════════════════════════════════════════════════════ */
 
 export function CaseSubmissionPage() {
+  useSeo({
+    title: "Submit a Case",
+    description:
+      "Refer a client or submit a case to Brain Food Recovery Services. Confidential, and we respond quickly.",
+    path: "/submit-case",
+  });
+
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(INITIAL_FORM);
   const [showModal, setShowModal] = useState(false);

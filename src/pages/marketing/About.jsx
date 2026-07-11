@@ -11,6 +11,7 @@ import {
 import { AUSTIN, TEAM } from "../../config/images.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
+import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal helper (IntersectionObserver, no ScrollTrigger) ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -514,6 +515,13 @@ function AboutCTA() {
 export { COACHES };
 
 export function AboutPage() {
+  useSeo({
+    title: "About",
+    description:
+      "Meet the Brain Food Recovery Services team. Coaching grounded in lived experience — practical, honest, and built on real connection.",
+    path: "/about",
+  });
+
   const { hash } = useLocation();
 
   useEffect(() => {

@@ -20,6 +20,8 @@ import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 import { Responsive } from "../../hooks/useBreakpoint.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
+import { useSeo, organizationSchema } from "../../lib/seo.js";
+import { useSettingsStore } from "../../stores/settings.store.js";
 
 /* ── Scroll reveal helper ─────────────────────
    Uses IntersectionObserver instead of GSAP
@@ -675,6 +677,14 @@ function CTA() {
    PAGE EXPORT
 ───────────────────────────────────────────── */
 export function HomePage() {
+  const settings = useSettingsStore((s) => s.settings);
+  useSeo({
+    description:
+      "Recovery coaching, mental health coaching, and sober companion services in Austin, Texas. Practical support, real connection, lasting change.",
+    path: "/",
+    schemas: [organizationSchema(settings)],
+  });
+
   return (
     <>
       <Hero />

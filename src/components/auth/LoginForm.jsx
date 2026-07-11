@@ -1,17 +1,19 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@my-app/shared";
+import { useNavigate, useLocation } from "react-router-dom";
+import { loginSchema } from "../../config/schemas.js";
 import { Input } from "../ui/Input.jsx";
 import { Button } from "../ui/Button.jsx";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useToast } from "../ui/Toast.jsx";
-import { MfaChallenge } from "./MfaChallenge.jsx";
+import { ROUTES } from "../../config/routes.js";
 
 export function LoginForm() {
   const { login } = useAuth();
   const { addToast } = useToast();
-  const [mfaState, setMfaState] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     register,
     handleSubmit,
@@ -20,21 +22,13 @@ export function LoginForm() {
 
   const onSubmit = async (data) => {
     try {
-      const result = await login(data);
-      if (result?.mfaRequired) {
-        setMfaState({ mfaToken: result.mfaToken });
-      }
+      await login(data);
+      // Send them back to whatever they were trying to reach before the redirect.
+      navigate(location.state?.from?.pathname ?? ROUTES.DASHBOARD, { replace: true });
     } catch (err) {
-      addToast({
-        message: err.response?.data?.error?.message || err.message || "Login failed",
-        type: "error",
-      });
+      addToast({ message: err.message || "Login failed", type: "error" });
     }
   };
-
-  if (mfaState) {
-    return <MfaChallenge mfaToken={mfaState.mfaToken} />;
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

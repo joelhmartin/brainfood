@@ -5,6 +5,8 @@ import { CalendarDays, Clock, ArrowRight, ChevronLeft, ChevronRight } from "luci
 import { usePostsStore } from "../../stores/posts.store.js";
 import { CONTENT, blogUrl, blogPageUrl } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
+import { Spinner } from "../../components/ui/Spinner.jsx";
+import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -258,7 +260,15 @@ export function BlogPage() {
   const { page: pageParam } = useParams();
   const currentPage = Math.max(1, parseInt(pageParam, 10) || 1);
   const allPosts = usePostsStore((s) => s.posts);
+  const status = usePostsStore((s) => s.status);
   const [activeCategory, setActiveCategory] = useState(null);
+
+  useSeo({
+    title: currentPage > 1 ? `Blog — page ${currentPage}` : "Blog",
+    description:
+      "Practical writing on recovery coaching, daily habits, and supporting a loved one — from the team at Brain Food Recovery Services.",
+    path: blogPageUrl(currentPage),
+  });
 
   const published = allPosts
     .filter((p) => p.published)
@@ -322,7 +332,11 @@ export function BlogPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
             {/* Main content */}
             <div>
-              {paginated.length === 0 ? (
+              {status === "idle" || status === "loading" ? (
+                <div className="flex justify-center py-16">
+                  <Spinner />
+                </div>
+              ) : paginated.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-navy/40 text-lg">No posts found.</p>
                 </div>

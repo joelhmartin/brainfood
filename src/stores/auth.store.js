@@ -1,70 +1,124 @@
 import { create } from "zustand";
+import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 
 /**
- * Auth store — offline mode with hardcoded admin.
- * When a real backend is connected, replace the mock methods
- * with API calls (the original api.post/get pattern).
+ * Auth state, backed by Supabase.
+ *
+ * Passwords are verified by Postgres, never by this file. The previous version
+ * compared the typed password against a string literal that shipped in the public
+ * JS bundle — anyone could read it in devtools. Session storage and token refresh
+ * are handled by supabase-js.
+ *
+ * `user` merges the Supabase auth user with their `profiles` row, so `user.role`
+ * is available for permission checks.
  */
-
-const MOCK_ADMIN = {
-  id: "1",
-  email: "brainfoodrs@gmail.com",
-  name: "Brain Food Admin",
-  role: "owner",
-};
-
-const MOCK_PASSWORD = "123changeMe!";
-
 export const useAuthStore = create((set, get) => ({
-  user: JSON.parse(sessionStorage.getItem("bf_user") || "null"),
-  accessToken: sessionStorage.getItem("bf_token") || null,
-  isAuthenticated: !!sessionStorage.getItem("bf_token"),
-  isLoading: false,
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
 
-  setAccessToken: (token) => {
-    sessionStorage.setItem("bf_token", token);
-    set({ accessToken: token });
-  },
-
-  setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
-
-  login: async ({ email, password }) => {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 400));
-
-    if (email === MOCK_ADMIN.email && password === MOCK_PASSWORD) {
-      const token = "mock-jwt-" + Date.now();
-      sessionStorage.setItem("bf_token", token);
-      sessionStorage.setItem("bf_user", JSON.stringify(MOCK_ADMIN));
-      set({ user: MOCK_ADMIN, accessToken: token, isAuthenticated: true });
-      return { user: MOCK_ADMIN, accessToken: token };
+  /** Resolves the current session on boot and subscribes to auth changes. */
+  init: async () => {
+    if (!isSupabaseConfigured) {
+      set({ user: null, isAuthenticated: false, isLoading: false });
+      return;
     }
 
-    throw new Error("Invalid email or password");
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    await get().loadProfile(session);
+
+    supabase.auth.onAuthStateChange((_event, nextSession) => {
+      get().loadProfile(nextSession);
+    });
   },
 
-  register: async () => {
-    throw new Error("Registration is disabled in offline mode");
+  /** Joins the auth user to their profile row. No session → logged out. */
+  loadProfile: async (session) => {
+    if (!session?.user) {
+      set({ user: null, isAuthenticated: false, isLoading: false });
+      return;
+    }
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id, email, name, role")
+      .eq("id", session.user.id)
+      .single();
+
+    if (error || !profile) {
+      // An auth user with no profile row cannot be authorized for anything.
+      // Fail closed rather than assuming a role.
+      set({ user: null, isAuthenticated: false, isLoading: false });
+      return;
+    }
+
+    set({
+      user: {
+        id: profile.id,
+        email: profile.email,
+        name: profile.name || profile.email,
+        role: profile.role,
+      },
+      isAuthenticated: true,
+      isLoading: false,
+    });
+  },
+
+  login: async ({ email, password }) => {
+    if (!isSupabaseConfigured) throw new Error("Supabase is not configured.");
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+
+    await get().loadProfile(data.session);
+
+    if (!get().isAuthenticated) {
+      await supabase.auth.signOut();
+      throw new Error("This account is not set up for dashboard access.");
+    }
+    return get().user;
   },
 
   logout: async () => {
-    sessionStorage.removeItem("bf_token");
-    sessionStorage.removeItem("bf_user");
-    set({ user: null, accessToken: null, isAuthenticated: false });
+    if (isSupabaseConfigured) await supabase.auth.signOut();
+    set({ user: null, isAuthenticated: false, isLoading: false });
   },
 
-  refresh: async () => {
-    // Restore from session if available
-    const token = sessionStorage.getItem("bf_token");
-    const user = JSON.parse(sessionStorage.getItem("bf_user") || "null");
-    if (token && user) {
-      set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
-    } else {
-      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
-    }
+  /** Sends a password-reset email. */
+  requestPasswordReset: async (email) => {
+    if (!isSupabaseConfigured) throw new Error("Supabase is not configured.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    if (error) throw new Error(error.message);
   },
 
-  verifyMfa: async () => {
-    throw new Error("MFA not available in offline mode");
+  /**
+   * Sets a new password for the current session. Backs both the reset-password
+   * page and the accept-invite page — Supabase drops the user into a valid
+   * session via the emailed link in both cases.
+   */
+  setPassword: async (password) => {
+    if (!isSupabaseConfigured) throw new Error("Supabase is not configured.");
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw new Error(error.message);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    await get().loadProfile(session);
+  },
+
+  /** Updates the signed-in admin's display name. */
+  updateName: async (name) => {
+    const { user } = get();
+    if (!user) throw new Error("Not signed in.");
+
+    const { error } = await supabase.from("profiles").update({ name }).eq("id", user.id);
+    if (error) throw new Error(error.message);
+
+    set({ user: { ...user, name } });
   },
 }));

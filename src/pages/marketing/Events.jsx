@@ -4,8 +4,10 @@ import gsap from "gsap";
 import { CalendarDays, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
 import { AUSTIN } from "../../config/images.js";
-import { eventUrl } from "../../config/site.js";
+import { eventUrl, CONTENT } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
+import { Spinner } from "../../components/ui/Spinner.jsx";
+import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -148,15 +150,27 @@ function EventCard({ event }) {
 /* ─── PAGE EXPORT ─── */
 export function EventsPage() {
   const allEvents = useEventsStore((s) => s.events);
+  const status = useEventsStore((s) => s.status);
   const events = allEvents
     .filter((e) => e.published)
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   const gridRef = useRef(null);
   useScrollReveal(gridRef, "[data-event-card]", { y: 30, stagger: 0.1 });
 
+  useSeo({
+    title: "Events",
+    description:
+      "Community events, workshops, and sober socials hosted by Brain Food Recovery Services in Austin, Texas.",
+    path: CONTENT.events.listPath,
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // "Loading" and "no events" are different things. Showing the empty state while the
+  // fetch is still in flight would tell visitors there are no events when there are.
+  const loading = status === "idle" || status === "loading";
 
   return (
     <>
@@ -167,7 +181,11 @@ export function EventsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
             {/* Main content */}
             <div>
-              {events.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <Spinner />
+                </div>
+              ) : events.length === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-navy/40 text-lg">No upcoming events right now.</p>
                   <p className="text-navy/30 text-sm mt-2">Check back soon!</p>

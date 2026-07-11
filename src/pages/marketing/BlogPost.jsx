@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   CalendarDays,
   Clock,
@@ -9,9 +9,13 @@ import {
   Tag,
 } from "lucide-react";
 import { usePostsStore } from "../../stores/posts.store.js";
+import { useSettingsStore } from "../../stores/settings.store.js";
 import { BUSINESS, CONTENT, blogUrl } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
+import { Spinner } from "../../components/ui/Spinner.jsx";
+import { NotFoundPage } from "./NotFound.jsx";
+import { useSeo, blogPostingSchema, breadcrumbSchema } from "../../lib/seo.js";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -151,12 +155,46 @@ function RelatedGrid({ posts }) {
 export function BlogPostPage() {
   const { slug } = useParams();
   const post = usePostsStore((s) => s.posts.find((p) => p.slug === slug));
+  const status = usePostsStore((s) => s.status);
+  const settings = useSettingsStore((s) => s.settings);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  if (!post) return <Navigate to={CONTENT.blog.listPath} replace />;
+  useSeo({
+    title: post?.title,
+    description: post?.excerpt,
+    path: post ? blogUrl(post.slug) : undefined,
+    image: post?.image,
+    type: "article",
+    noindex: !post,
+    schemas: post
+      ? [
+          blogPostingSchema(post, settings),
+          breadcrumbSchema(
+            [
+              { name: "Home", path: "/" },
+              { name: CONTENT.blog.label, path: CONTENT.blog.listPath },
+              { name: post.title, path: blogUrl(post.slug) },
+            ],
+            settings,
+          ),
+        ]
+      : [],
+  });
+
+  // See EventDetail.jsx: redirecting on a falsy post used to fire before the fetch
+  // resolved, bouncing every post page to the blog index.
+  if (status === "idle" || status === "loading") {
+    return (
+      <div className="flex min-h-[60dvh] items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!post) return <NotFoundPage />;
 
   return (
     <>

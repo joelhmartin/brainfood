@@ -1,57 +1,35 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../../components/layout/AuthLayout.jsx";
+import { SetPasswordForm } from "../../components/auth/SetPasswordForm.jsx";
 import { Card } from "../../components/ui/Card.jsx";
 import { Spinner } from "../../components/ui/Spinner.jsx";
-import { Button } from "../../components/ui/Button.jsx";
-import { useAuth } from "../../hooks/useAuth.js";
-import { ROUTES } from "../../config/routes.js";
-import api from "../../config/api.js";
+import { useRecoverySession } from "../../hooks/useRecoverySession.js";
+import { useSettingsStore } from "../../stores/settings.store.js";
 
+/**
+ * Where an invited admin lands from their email.
+ *
+ * There is no "accept" button to press: the invite already created their account
+ * (auth.admin.inviteUserByEmail) and the emailed link signs them in. The only thing
+ * left is choosing a password.
+ */
 export function AcceptInvitePage() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [status, setStatus] = useState("idle");
-
-  const handleAccept = async () => {
-    setStatus("loading");
-    try {
-      await api.post(`/invitations/${token}/accept`);
-      setStatus("success");
-      setTimeout(() => navigate(ROUTES.DASHBOARD), 1500);
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <AuthLayout>
-        <Card className="text-center">
-          <h2 className="text-xl font-semibold">You've been invited!</h2>
-          <p className="mt-2 text-sm text-gray-500">Please sign in or create an account to accept.</p>
-          <Button className="mt-4" onClick={() => navigate(`${ROUTES.LOGIN}?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)}>
-            Sign in
-          </Button>
-        </Card>
-      </AuthLayout>
-    );
-  }
+  const status = useRecoverySession();
+  const siteName = useSettingsStore((s) => s.settings.name);
 
   return (
     <AuthLayout>
-      <Card className="text-center">
-        {status === "idle" && (
-          <>
-            <h2 className="text-xl font-semibold">Accept invitation?</h2>
-            <Button className="mt-4" onClick={handleAccept}>Accept & Join</Button>
-          </>
+      <Card>
+        <h2 className="text-center text-xl font-semibold">Welcome to {siteName}</h2>
+        <p className="mt-2 mb-6 text-center text-sm text-gray-500">
+          Choose a password to finish setting up your account.
+        </p>
+        {status === "checking" ? (
+          <div className="flex justify-center py-6">
+            <Spinner />
+          </div>
+        ) : (
+          <SetPasswordForm session={status === "ready"} submitLabel="Create account" />
         )}
-        {status === "loading" && <Spinner />}
-        {status === "success" && <p className="text-green-600 font-medium">Joined! Redirecting...</p>}
-        {status === "error" && <p className="text-red-600">Failed to accept invitation. It may be expired.</p>}
       </Card>
     </AuthLayout>
   );
