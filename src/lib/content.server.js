@@ -8,12 +8,47 @@ import { FALLBACK_SETTINGS } from "../config/site.js";
  * build — matching how the old prerender script behaved.
  */
 
-export async function getSettings() {
-  const supabase = createServerClient();
-  if (!supabase) return FALLBACK_SETTINGS;
+/**
+ * getSettings() is called from generateMetadata (root layout + route) and again
+ * from the page body, so every request pays 2-3x for an identical query. The
+ * textbook fix is React's `cache()`, which memoizes a function per-request for
+ * the lifetime of a single render — but `cache()` is a React 19 API, and this
+ * project is pinned to react@18.3 (verified: `import { cache } from "react"`
+ * resolves to `undefined` here, and wrapping getSettings with it throws
+ * "cache is not a function" immediately on import, breaking both Vitest and the
+ * Next dev server). Bumping React to 19 to unlock it is a cross-cutting change
+ * well outside this fix's scope, so instead this uses a manual "single-flight"
+ * in-flight-promise cache: concurrent callers within the same tick share one
+ * underlying Supabase call, and the slot clears the instant it settles.
+ *
+ * This is safe (not just a perf hack) because site_settings is identical for
+ * every caller — there is no per-request/per-user data here, so coalescing two
+ * callers that happen to overlap, whether from the same request or two
+ * different concurrent requests, can never serve the wrong data. It is a
+ * narrower guarantee than cache()'s true one-call-per-request semantics (it
+ * only dedupes calls that are actually in flight at the same time, not calls
+ * that happen to be sequential), but it is a real, verifiable improvement with
+ * no correctness downside, and it keeps this file working under React 18.
+ * Revisit with real cache() once the project moves to React 19.
+ */
+let inFlightSettings = null;
 
-  const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
-  return data ? { ...FALLBACK_SETTINGS, ...settingsFromRow(data) } : FALLBACK_SETTINGS;
+export async function getSettings() {
+  if (inFlightSettings) return inFlightSettings;
+
+  inFlightSettings = (async () => {
+    const supabase = createServerClient();
+    if (!supabase) return FALLBACK_SETTINGS;
+
+    const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
+    return data ? { ...FALLBACK_SETTINGS, ...settingsFromRow(data) } : FALLBACK_SETTINGS;
+  })();
+
+  try {
+    return await inFlightSettings;
+  } finally {
+    inFlightSettings = null;
+  }
 }
 
 export async function getPosts() {

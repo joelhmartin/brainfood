@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import {
   ArrowRight,
@@ -516,24 +517,38 @@ function AboutCTA() {
 export { COACHES };
 
 export function AboutPage() {
-  // react-router's useLocation() gave us `hash` reactively; next/navigation has no
-  // hash equivalent (usePathname() only returns the path). Since this effect only
-  // ever needs the hash present at mount (a fresh navigation to /about#coach-id),
-  // reading window.location.hash directly here is the direct swap-in — no routing
-  // library exposes anchor hash, in React Router or Next alike, as anything other
-  // than a raw browser API.
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      const timer = setTimeout(() => {
-        const el = document.querySelector(hash);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-    window.scrollTo(0, 0);
-  }, []);
+  const pathname = usePathname();
 
+  // react-router's useLocation() gave us `hash` reactively; next/navigation has no
+  // hash equivalent (usePathname() only returns the path, not the fragment). To
+  // keep this reactive to hash changes that don't remount the page — e.g.
+  // clicking from /about#charlie to /about#sarah, or clicking Navbar "About"
+  // while already on /about — this re-reads window.location.hash on every
+  // pathname change and also listens for the browser's native "hashchange"
+  // event, which fires for hash-only navigations pathname alone would miss.
+  useEffect(() => {
+    let timer;
+
+    const syncToHash = () => {
+      clearTimeout(timer);
+      const hash = window.location.hash;
+      if (hash) {
+        timer = setTimeout(() => {
+          const el = document.querySelector(hash);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    syncToHash();
+    window.addEventListener("hashchange", syncToHash);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("hashchange", syncToHash);
+    };
+  }, [pathname]);
 
   return (
     <>

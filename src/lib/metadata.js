@@ -69,6 +69,20 @@ export function buildMetadata({
 }
 
 /**
+ * Shared SEO contract for the 404 page. Two files render a not-found page —
+ * app/not-found.jsx (catches unmatched top-level URLs) and
+ * app/(marketing)/not-found.jsx (catches notFound() thrown inside the
+ * marketing segment) — and both must serve identical metadata for what is
+ * conceptually one page. Centralizing it here means editing one file can't
+ * silently make the two 404s diverge.
+ *
+ * @param {object} settings Live site settings (see getSettings).
+ */
+export function notFoundMetadata(settings) {
+  return buildMetadata({ title: "Page not found", path: "/404", noindex: true, settings });
+}
+
+/**
  * Renders JSON-LD. Structured data is suppressed while noindexed: it would be
  * describing a staging URL as if it were the real business listing.
  *

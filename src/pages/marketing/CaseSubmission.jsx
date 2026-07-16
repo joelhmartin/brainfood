@@ -644,7 +644,6 @@ function CaseHero() {
    ════════════════════════════════════════════════════════════════ */
 
 export function CaseSubmissionPage() {
-
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(INITIAL_FORM);
   const [showModal, setShowModal] = useState(false);
