@@ -1,15 +1,11 @@
+"use client";
+
 import { useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { CONTENT, eventUrl } from "../../config/site.js";
+import { CONTENT } from "../../config/site.js";
 import { CalendarDays, MapPin, Clock, ArrowLeft } from "lucide-react";
-import { useEventsStore } from "../../stores/events.store.js";
-import { useSettingsStore } from "../../stores/settings.store.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
-import { Spinner } from "../../components/ui/Spinner.jsx";
-import { NotFoundPage } from "./NotFound.jsx";
-import { useSeo, eventSchema, breadcrumbSchema } from "../../lib/seo.js";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -84,51 +80,10 @@ function RenderBody({ text }) {
   return <>{elements}</>;
 }
 
-export function EventDetailPage() {
-  const { slug } = useParams();
-  const event = useEventsStore((s) => s.events.find((e) => e.slug === slug));
-  const status = useEventsStore((s) => s.status);
-  const settings = useSettingsStore((s) => s.settings);
-
+export function EventDetailPage({ event }) {
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [slug]);
-
-  useSeo({
-    title: event?.title,
-    description: event?.excerpt,
-    path: event ? eventUrl(event.slug) : undefined,
-    image: event?.image,
-    type: "article",
-    noindex: !event,
-    schemas: event
-      ? [
-          eventSchema(event, settings),
-          breadcrumbSchema(
-            [
-              { name: "Home", path: "/" },
-              { name: CONTENT.events.label, path: CONTENT.events.listPath },
-              { name: event.title, path: eventUrl(event.slug) },
-            ],
-            settings,
-          ),
-        ]
-      : [],
-  });
-
-  // The old code redirected to /events whenever `event` was falsy. With the data now
-  // arriving asynchronously, that fired on the very first render — before the fetch
-  // resolved — so every event page bounced to the list. Wait for the fetch to settle,
-  // then show a real 404 if the slug genuinely does not exist.
-  if (status === "idle" || status === "loading") {
-    return (
-      <div className="flex min-h-[60dvh] items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!event) return <NotFoundPage />;
+  }, [event.slug]);
 
   return (
     <>
