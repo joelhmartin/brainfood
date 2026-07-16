@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { AuthLayout } from "../../components/layout/AuthLayout.jsx";
 import { LoginForm } from "../../components/auth/LoginForm.jsx";

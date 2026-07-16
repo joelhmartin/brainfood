@@ -1,3 +1,5 @@
+"use client";
+
 import { brand } from "../../config/brand.js";
 
 export function AuthLayout({ children }) {

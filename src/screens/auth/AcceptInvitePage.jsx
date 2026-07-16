@@ -1,3 +1,5 @@
+"use client";
+
 import { AuthLayout } from "../../components/layout/AuthLayout.jsx";
 import { SetPasswordForm } from "../../components/auth/SetPasswordForm.jsx";
 import { Card } from "../../components/ui/Card.jsx";
