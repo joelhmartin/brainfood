@@ -165,6 +165,13 @@ describe("getSettings", () => {
     expect(await getSettings()).toEqual(FALLBACK_SETTINGS);
   });
 
+  it("falls back to FALLBACK_SETTINGS when the query throws (hard rejection, not just a soft error field)", async () => {
+    const { client } = createRejectingSupabaseMock(new Error("network down"));
+    createServerClient.mockReturnValue(client);
+
+    await expect(getSettings()).resolves.toEqual(FALLBACK_SETTINGS);
+  });
+
   it("maps a DB row's snake_case values over FALLBACK_SETTINGS", async () => {
     // A close-to-real row: every column `settingsFromRow` knows about, populated
     // with values that differ from FALLBACK_SETTINGS so the test can prove the
@@ -259,16 +266,17 @@ describe("getSettings", () => {
     expect(eqCalls).toContainEqual(["id", 1]);
   });
 
-  it("clears the in-flight slot after a rejected query so a later call retries instead of replaying the error forever", async () => {
+  it("clears the in-flight slot after a failed query so a later call retries instead of replaying the failure forever", async () => {
     const { client: failingClient } = createRejectingSupabaseMock(new Error("network down"));
     createServerClient.mockReturnValue(failingClient);
 
-    // Current behavior: getSettings() does not catch a hard rejection into
-    // FALLBACK_SETTINGS (only the "soft" data:null case is handled) — the
-    // rejection propagates to the caller. What this test actually verifies is
-    // the single-flight guarantee: the `finally` clears the slot regardless
-    // of success or failure, so this failure must NOT poison future calls.
-    await expect(getSettings()).rejects.toThrow("network down");
+    // getSettings() catches the hard rejection and degrades to
+    // FALLBACK_SETTINGS (see the dedicated throw test above). What THIS test
+    // verifies is the single-flight guarantee: the `finally` clears the slot
+    // regardless of success or failure, so a failed query must NOT poison
+    // future calls — the next call should retry against Supabase rather than
+    // replaying a cached failure (or a cached FALLBACK_SETTINGS) forever.
+    await expect(getSettings()).resolves.toEqual(FALLBACK_SETTINGS);
 
     const { client: recoveredClient } = createSupabaseMock({
       data: { id: 1, name: "Recovered" },

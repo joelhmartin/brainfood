@@ -40,8 +40,23 @@ export async function getSettings() {
     const supabase = createServerClient();
     if (!supabase) return FALLBACK_SETTINGS;
 
-    const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
-    return data ? { ...FALLBACK_SETTINGS, ...settingsFromRow(data) } : FALLBACK_SETTINGS;
+    // A missing config (handled above) and a failed query (here) both degrade
+    // to FALLBACK_SETTINGS. getSettings() is called from the root layout's
+    // generateMetadata, so an uncaught rejection here would take down every
+    // page and fail `next build` — the exact failure mode FALLBACK_SETTINGS
+    // exists to prevent. `error` covers a resolved-with-error result; the
+    // try/catch covers the query promise itself rejecting (e.g. network drop).
+    try {
+      const { data, error } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
+      if (error) {
+        console.warn("[content] getSettings query returned an error, falling back to defaults:", error?.message ?? error);
+        return FALLBACK_SETTINGS;
+      }
+      return data ? { ...FALLBACK_SETTINGS, ...settingsFromRow(data) } : FALLBACK_SETTINGS;
+    } catch (err) {
+      console.warn("[content] getSettings query threw, falling back to defaults:", err?.message ?? err);
+      return FALLBACK_SETTINGS;
+    }
   })();
 
   try {
@@ -69,15 +84,20 @@ export async function getPostBySlug(slug) {
   const supabase = createServerClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .eq("slug", slug)
-    .maybeSingle();
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("published", true)
+      .eq("slug", slug)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  return postFromRow(data);
+    if (error || !data) return null;
+    return postFromRow(data);
+  } catch (err) {
+    console.warn(`[content] getPostBySlug("${slug}") query threw, returning null:`, err?.message ?? err);
+    return null;
+  }
 }
 
 export async function getEvents() {
@@ -98,13 +118,18 @@ export async function getEventBySlug(slug) {
   const supabase = createServerClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .eq("slug", slug)
-    .maybeSingle();
+  try {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("published", true)
+      .eq("slug", slug)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  return eventFromRow(data);
+    if (error || !data) return null;
+    return eventFromRow(data);
+  } catch (err) {
+    console.warn(`[content] getEventBySlug("${slug}") query threw, returning null:`, err?.message ?? err);
+    return null;
+  }
 }
