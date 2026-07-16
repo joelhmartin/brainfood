@@ -1,10 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
-import { roleCan } from "../src/config/roles.js";
+import { roleCan } from "../../config/roles.js";
 
 /**
- * Shared authorization for the /api functions.
+ * Shared authorization for the /api route handlers.
  *
- * These functions hold the SERVICE ROLE key, which bypasses Row Level Security
+ * These handlers hold the SERVICE ROLE key, which bypasses Row Level Security
  * completely. Everything the browser does elsewhere is protected by RLS in Postgres;
  * in here, RLS is not protecting anything, so this file IS the security boundary.
  * Every handler must call requirePermission() before it touches the admin client.
@@ -38,8 +38,8 @@ export class HttpError extends Error {
  *
  * @returns the caller's profile
  */
-export async function requirePermission(req, permission) {
-  const header = req.headers.authorization ?? req.headers.Authorization ?? "";
+export async function requirePermission(request, permission) {
+  const header = request.headers.get("authorization") ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 
   if (!token) throw new HttpError(401, "Not signed in.");
@@ -65,11 +65,11 @@ export async function requirePermission(req, permission) {
   return profile;
 }
 
-export function sendError(res, err) {
+export function errorResponse(err) {
   const status = err instanceof HttpError ? err.status : 500;
   // Internal failures must not leak their message to the client — it can reveal
   // schema details or key configuration. Log it, return something generic.
   const message = status === 500 ? "Something went wrong." : err.message;
   if (status === 500) console.error("[api]", err);
-  return res.status(status).json({ error: message });
+  return Response.json({ error: message }, { status });
 }

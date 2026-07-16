@@ -1,5 +1,5 @@
-import { adminClient, requirePermission, sendError, HttpError } from "./_auth.js";
-import { PERMISSIONS, ROLES } from "../src/config/roles.js";
+import { adminClient, requirePermission, errorResponse, HttpError } from "../../../src/lib/api/auth.js";
+import { PERMISSIONS, ROLES } from "../../../src/config/roles.js";
 
 /**
  * Admin user management.
@@ -12,26 +12,33 @@ import { PERMISSIONS, ROLES } from "../src/config/roles.js";
  *   POST   → invite an admin by email
  *   DELETE → remove an admin
  */
-export default async function handler(req, res) {
+
+export async function GET(request) {
   try {
-    switch (req.method) {
-      case "GET":
-        return await listUsers(req, res);
-      case "POST":
-        return await inviteUser(req, res);
-      case "DELETE":
-        return await removeUser(req, res);
-      default:
-        res.setHeader("Allow", "GET, POST, DELETE");
-        throw new HttpError(405, "Method not allowed.");
-    }
+    return await listUsers(request);
   } catch (err) {
-    return sendError(res, err);
+    return errorResponse(err);
   }
 }
 
-async function listUsers(req, res) {
-  await requirePermission(req, PERMISSIONS.USERS_READ);
+export async function POST(request) {
+  try {
+    return await inviteUser(request);
+  } catch (err) {
+    return errorResponse(err);
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    return await removeUser(request);
+  } catch (err) {
+    return errorResponse(err);
+  }
+}
+
+async function listUsers(request) {
+  await requirePermission(request, PERMISSIONS.USERS_READ);
 
   const { data, error } = await adminClient()
     .from("profiles")
@@ -40,13 +47,13 @@ async function listUsers(req, res) {
 
   if (error) throw new Error(error.message);
 
-  return res.status(200).json({ users: data });
+  return Response.json({ users: data }, { status: 200 });
 }
 
-async function inviteUser(req, res) {
-  await requirePermission(req, PERMISSIONS.USERS_INVITE);
+async function inviteUser(request) {
+  await requirePermission(request, PERMISSIONS.USERS_INVITE);
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+  const body = await request.json();
   const email = String(body.email ?? "")
     .trim()
     .toLowerCase();
@@ -55,7 +62,7 @@ async function inviteUser(req, res) {
     throw new HttpError(400, "Enter a valid email address.");
   }
 
-  const origin = req.headers.origin ?? `https://${req.headers.host}`;
+  const origin = request.headers.get("origin") ?? `https://${request.headers.get("host")}`;
 
   const { error } = await adminClient().auth.admin.inviteUserByEmail(email, {
     redirectTo: `${origin}/auth/accept-invite`,
@@ -71,13 +78,13 @@ async function inviteUser(req, res) {
     throw new Error(error.message);
   }
 
-  return res.status(200).json({ ok: true, email });
+  return Response.json({ ok: true, email }, { status: 200 });
 }
 
-async function removeUser(req, res) {
-  const caller = await requirePermission(req, PERMISSIONS.USERS_REMOVE);
+async function removeUser(request) {
+  const caller = await requirePermission(request, PERMISSIONS.USERS_REMOVE);
 
-  const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+  const body = await request.json();
   const userId = String(body.userId ?? "");
 
   if (!userId) throw new HttpError(400, "userId is required.");
@@ -103,5 +110,5 @@ async function removeUser(req, res) {
   const { error } = await admin.auth.admin.deleteUser(userId);
   if (error) throw new Error(error.message);
 
-  return res.status(200).json({ ok: true });
+  return Response.json({ ok: true }, { status: 200 });
 }
