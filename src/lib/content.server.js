@@ -70,14 +70,19 @@ export async function getPosts() {
   const supabase = createServerClient();
   if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .order("date", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("published", true)
+      .order("date", { ascending: false });
 
-  if (error || !data) return [];
-  return data.map(postFromRow);
+    if (error || !data) return [];
+    return data.map(postFromRow);
+  } catch (err) {
+    console.warn("[content] getPosts() query threw, returning empty results:", err?.message ?? err);
+    return [];
+  }
 }
 
 export async function getPostBySlug(slug) {
@@ -104,14 +109,19 @@ export async function getEvents() {
   const supabase = createServerClient();
   if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .order("date", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("published", true)
+      .order("date", { ascending: false });
 
-  if (error || !data) return [];
-  return data.map(eventFromRow);
+    if (error || !data) return [];
+    return data.map(eventFromRow);
+  } catch (err) {
+    console.warn("[content] getEvents() query threw, returning empty results:", err?.message ?? err);
+    return [];
+  }
 }
 
 export async function getEventBySlug(slug) {

@@ -57,6 +57,13 @@ describe("getPosts", () => {
     await getPosts();
     expect(eqCalls).toContainEqual(["published", true]);
   });
+
+  it("returns an empty array when the query throws (hard rejection, not just a soft error field)", async () => {
+    const { client } = createRejectingSupabaseMock(new Error("network down"));
+    createServerClient.mockReturnValue(client);
+
+    await expect(getPosts()).resolves.toEqual([]);
+  });
 });
 
 describe("getPostBySlug", () => {
@@ -97,6 +104,13 @@ describe("getEvents", () => {
     createServerClient.mockReturnValue(client);
     await getEvents();
     expect(eqCalls).toContainEqual(["published", true]);
+  });
+
+  it("returns an empty array when the query throws (hard rejection, not just a soft error field)", async () => {
+    const { client } = createRejectingSupabaseMock(new Error("network down"));
+    createServerClient.mockReturnValue(client);
+
+    await expect(getEvents()).resolves.toEqual([]);
   });
 });
 
