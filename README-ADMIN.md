@@ -16,7 +16,7 @@ invited from **Members**.
 | Login, invites, password resets | Supabase Auth |
 | Uploaded images | Supabase Storage (`media` bucket) |
 | Inviting / removing admins | `/api/users` (Vercel function — needs the secret key) |
-| Rebuild after publishing | `/api/rebuild` (Vercel function) |
+| Refresh pages after publishing | `/api/revalidate` (Vercel function, calls Next's `revalidatePath`) |
 | Everything else | Straight from the browser to Postgres, under Row Level Security |
 
 **Security is enforced in the database, not in React.** The policies in
@@ -33,7 +33,7 @@ npm install
 npm run db:start          # local Supabase in Docker
 npm run db:reset          # apply migrations + seed content
 npm run create-admin you@example.com     # prints a generated password once
-npm run dev:full          # Vite on :5173 + the /api functions on :3000
+npm run dev                # Next dev server on :3000, API routes included
 ```
 
 `npm run db:start` prints an `anon key` and a `service_role key`. Copy `.env.example` to
@@ -84,11 +84,10 @@ Invite and reset links will not work without these.
 
 | Variable | Value | Exposed to the browser? |
 |---|---|---|
-| `VITE_SUPABASE_URL` | Project URL | Yes — safe |
-| `VITE_SUPABASE_ANON_KEY` | `anon` public key | Yes — safe by design; RLS is what protects the data |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL | Yes — safe |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `anon` public key | Yes — safe by design; RLS is what protects the data |
 | `SUPABASE_URL` | Same project URL | No |
-| `SUPABASE_SERVICE_ROLE_KEY` | `service_role` key | **No. Never prefix this with `VITE_`** — that would publish a key that bypasses all security |
-| `VERCEL_DEPLOY_HOOK_URL` | Settings → Git → Deploy Hooks | No |
+| `SUPABASE_SERVICE_ROLE_KEY` | `service_role` key | **No. Never prefix this with `NEXT_PUBLIC_`** — that would publish a key that bypasses all security |
 
 ### 5. Seed and create the first admin
 
@@ -142,15 +141,10 @@ When you are live on the real domain:
 
 ## How publishing works
 
-Pages are **prerendered to static HTML** at build time (`scripts/prerender.mjs` drives a
-real headless Chromium over every route). This is what lets Facebook, LinkedIn, iMessage,
-and Slack show a proper preview when someone shares a link — none of those run JavaScript,
-so an ordinary SPA gives them a blank card.
+Pages are rendered **server-side by Next.js** on request, so Facebook, LinkedIn, iMessage,
+and Slack always see fully-formed HTML when someone shares a link — no headless browser or
+build-time snapshot step is involved.
 
-The trade-off: newly published content is not in those static files until the next build.
-So **publishing triggers a rebuild** (`/api/rebuild` → Vercel deploy hook), which takes
-about a minute. Visitors see new content immediately either way, because the app also
-fetches at runtime — only the prerendered HTML lags.
-
-If `VERCEL_DEPLOY_HOOK_URL` is not set, publishing still works; the static HTML just waits
-for the next deploy.
+Server-rendered pages are cached. Saving or publishing content calls `/api/revalidate`,
+which uses Next's `revalidatePath` to refresh just the affected pages (the listing plus the
+single item) in seconds — there is no full-site rebuild.
