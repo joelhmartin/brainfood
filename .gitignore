@@ -12,3 +12,7 @@ dist/
 # Playwright
 /test-results/
 /playwright-report/
+
+# Next.js
+.next/
+next-env.d.ts
