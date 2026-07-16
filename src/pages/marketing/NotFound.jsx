@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useSeo } from "../../lib/seo.js";
 import { CONTENT } from "../../config/site.js";
 
 /**
@@ -13,8 +14,6 @@ import { CONTENT } from "../../config/site.js";
  * noindex tag is what actually keeps these out of the index.)
  */
 export function NotFoundPage() {
-  useSeo({ title: "Page not found", path: "/404", noindex: true });
-
   return (
     <section className="flex min-h-[60dvh] items-center justify-center px-6 py-24">
       <div className="text-center">
@@ -28,20 +27,20 @@ export function NotFoundPage() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            to="/"
+            href="/"
             className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
           >
             <ArrowLeft size={14} />
             Back home
           </Link>
           <Link
-            to={CONTENT.blog.listPath}
+            href={CONTENT.blog.listPath}
             className="rounded-full border border-surface-300 px-6 py-3 text-sm font-semibold text-navy/70 transition-colors hover:bg-surface-100"
           >
             Read the blog
           </Link>
           <Link
-            to="/contact"
+            href="/contact"
             className="rounded-full border border-surface-300 px-6 py-3 text-sm font-semibold text-navy/70 transition-colors hover:bg-surface-100"
           >
             Get in touch

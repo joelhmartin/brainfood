@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import {
   ArrowRight,
@@ -11,7 +13,6 @@ import {
 import { AUSTIN, TEAM } from "../../config/images.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
-import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal helper (IntersectionObserver, no ScrollTrigger) ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -515,16 +516,14 @@ function AboutCTA() {
 export { COACHES };
 
 export function AboutPage() {
-  useSeo({
-    title: "About",
-    description:
-      "Meet the Brain Food Recovery Services team. Coaching grounded in lived experience — practical, honest, and built on real connection.",
-    path: "/about",
-  });
-
-  const { hash } = useLocation();
-
+  // react-router's useLocation() gave us `hash` reactively; next/navigation has no
+  // hash equivalent (usePathname() only returns the path). Since this effect only
+  // ever needs the hash present at mount (a fresh navigation to /about#coach-id),
+  // reading window.location.hash directly here is the direct swap-in — no routing
+  // library exposes anchor hash, in React Router or Next alike, as anything other
+  // than a raw browser API.
   useEffect(() => {
+    const hash = window.location.hash;
     if (hash) {
       const timer = setTimeout(() => {
         const el = document.querySelector(hash);
@@ -533,7 +532,7 @@ export function AboutPage() {
       return () => clearTimeout(timer);
     }
     window.scrollTo(0, 0);
-  }, [hash]);
+  }, []);
 
 
   return (

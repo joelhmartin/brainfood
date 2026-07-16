@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth.js";
 import { Avatar } from "../ui/Avatar.jsx";
 import { Dropdown, DropdownItem } from "../ui/Dropdown.jsx";
@@ -7,12 +7,12 @@ import { useSettingsStore } from "../../stores/settings.store.js";
 
 export function Topbar() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const siteName = useSettingsStore((s) => s.settings.name);
 
   const handleLogout = async () => {
     await logout();
-    navigate(ROUTES.LOGIN);
+    router.push(ROUTES.LOGIN);
   };
 
   return (
@@ -28,7 +28,7 @@ export function Topbar() {
           </button>
         }
       >
-        <DropdownItem onClick={() => navigate(ROUTES.SETTINGS)}>Settings</DropdownItem>
+        <DropdownItem onClick={() => router.push(ROUTES.SETTINGS)}>Settings</DropdownItem>
         <DropdownItem onClick={handleLogout}>Log out</DropdownItem>
       </Dropdown>
     </header>

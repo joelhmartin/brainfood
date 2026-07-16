@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { setPasswordSchema } from "../../config/schemas.js";
 import { Input } from "../ui/Input.jsx";
 import { Button } from "../ui/Button.jsx";
@@ -20,7 +20,7 @@ import { ROUTES } from "../../config/routes.js";
 export function SetPasswordForm({ session, submitLabel = "Set password" }) {
   const { setPassword } = useAuth();
   const { addToast } = useToast();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const {
     register,
@@ -32,7 +32,7 @@ export function SetPasswordForm({ session, submitLabel = "Set password" }) {
     try {
       await setPassword(password);
       addToast({ message: "Password set. Welcome in.", type: "success" });
-      navigate(ROUTES.DASHBOARD, { replace: true });
+      router.replace(ROUTES.DASHBOARD);
     } catch (err) {
       addToast({ message: err.message || "Could not set password.", type: "error" });
     }
@@ -44,7 +44,7 @@ export function SetPasswordForm({ session, submitLabel = "Set password" }) {
         <p className="text-sm text-gray-600">
           This link is invalid or has expired. Links are single-use and time-limited.
         </p>
-        <Button variant="secondary" onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}>
+        <Button variant="secondary" onClick={() => router.push(ROUTES.FORGOT_PASSWORD)}>
           Request a new link
         </Button>
       </div>

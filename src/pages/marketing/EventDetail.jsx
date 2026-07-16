@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { CONTENT, eventUrl } from "../../config/site.js";
 import { CalendarDays, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
@@ -143,7 +144,7 @@ export function EventDetailPage() {
         </div>
         <div className="relative z-10 content-container max-w-4xl pb-12 md:pb-16">
           <Link
-            to={CONTENT.events.listPath}
+            href={CONTENT.events.listPath}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-medium mb-5 hover:bg-white/20 transition-colors"
           >
             <ArrowLeft size={12} />
@@ -189,7 +190,7 @@ export function EventDetailPage() {
             {/* Back link */}
             <div className="mt-8">
               <Link
-                to={CONTENT.events.listPath}
+                href={CONTENT.events.listPath}
                 className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
               >
                 <ArrowLeft size={14} />

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import {
@@ -11,7 +13,6 @@ import {
 } from "lucide-react";
 import { SITE } from "../../config/site.js";
 import { AUSTIN } from "../../config/images.js";
-import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -305,13 +306,6 @@ function ContactInfo() {
 
 /* ─── PAGE EXPORT ─── */
 export function ContactPage() {
-  useSeo({
-    title: "Contact",
-    description:
-      "Reach out for a confidential conversation about recovery coaching and support. We work with individuals and families at every stage.",
-    path: "/contact",
-  });
-
   const sectionRef = useRef(null);
   useScrollReveal(sectionRef, "[data-contact-anim]", {
     y: 40,

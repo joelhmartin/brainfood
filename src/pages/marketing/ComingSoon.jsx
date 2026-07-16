@@ -1,16 +1,19 @@
+"use client";
+
 import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
 
 export function ComingSoonPage() {
-  const location = useLocation();
+  const pathname = usePathname();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   // Derive a readable title from the URL path
-  const pathTitle = location.pathname
+  const pathTitle = pathname
     .split("/")
     .pop()
     .replace(/-/g, " ")
@@ -47,13 +50,13 @@ export function ComingSoonPage() {
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link
-                to="/"
+                href="/"
                 className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-surface-300/50 text-navy/60 hover:text-navy hover:border-brand-500/30 transition-all"
               >
                 <ArrowLeft size={14} /> Home
               </Link>
               <Link
-                to="/contact"
+                href="/contact"
                 className="px-5 py-2.5 rounded-full text-sm font-semibold bg-accent-500 text-white hover:bg-accent-600 transition-colors"
               >
                 Contact Lab

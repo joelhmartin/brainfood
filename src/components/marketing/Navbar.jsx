@@ -1,5 +1,8 @@
+"use client";
+
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import gsap from "gsap";
 import LogoFull from "../../images/logoFull.jsx";
@@ -71,7 +74,7 @@ function NavItem({ link, scrolled, isActive }) {
 
   if (!link.children) {
     return (
-      <Link to={link.to} className={`${baseClass} ${colorClass}`}>
+      <Link href={link.to} className={`${baseClass} ${colorClass}`}>
         {link.label}
       </Link>
     );
@@ -80,7 +83,7 @@ function NavItem({ link, scrolled, isActive }) {
   return (
     <div className="relative" onMouseEnter={enter} onMouseLeave={leave}>
       {link.to ? (
-        <Link to={link.to} className={`${baseClass} ${colorClass}`}>
+        <Link href={link.to} className={`${baseClass} ${colorClass}`}>
           {link.label}
           <ChevronDown
             size={12}
@@ -103,7 +106,7 @@ function NavItem({ link, scrolled, isActive }) {
             {link.children.map((child) => (
               <Link
                 key={child.label}
-                to={child.to}
+                href={child.to}
                 className="block px-4 py-2.5 text-sm text-navy/70 hover:text-brand-500 hover:bg-brand-50 transition-colors"
                 onClick={() => setOpen(false)}
               >
@@ -183,7 +186,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
             return (
               <Link
                 key={link.label}
-                to={link.to}
+                href={link.to}
                 data-mobile-link
                 onClick={handleNavigate}
                 className={`block py-4 border-b border-white/10 text-2xl font-heading font-bold tracking-tight transition-colors ${
@@ -219,7 +222,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
                 <div className="pl-4 py-2 space-y-1">
                   {link.to && (
                     <Link
-                      to={link.to}
+                      href={link.to}
                       onClick={handleNavigate}
                       className="block py-2.5 text-base text-white/70 font-medium hover:text-brand-400 transition-colors"
                     >
@@ -229,7 +232,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
                   {link.children.map((child) => (
                     <Link
                       key={child.label}
-                      to={child.to}
+                      href={child.to}
                       onClick={handleNavigate}
                       className="block py-2.5 text-base text-white/50 hover:text-brand-400 transition-colors"
                     >
@@ -246,7 +249,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
       {/* Sticky bottom — CTA + socials */}
       <div className="flex-shrink-0 px-8 pb-8 pt-4 border-t border-white/10 bg-navy/95">
         <Link
-          to="/contact"
+          href="/contact"
           data-mobile-link
           onClick={handleNavigate}
           className="block w-full text-center px-8 py-4 rounded-full bg-brand-500 text-white font-semibold text-lg hover:bg-brand-600 transition-colors"
@@ -275,7 +278,7 @@ function MobileOverlay({ open, onNavigate, isActive }) {
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
   const navRef = useRef(null);
 
   useEffect(() => {
@@ -286,12 +289,12 @@ export function Navbar() {
 
   useEffect(() => {
     setMobileOpen(false);
-  }, [location.pathname]);
+  }, [pathname]);
 
   const isActive = (link) => {
-    if (link.to && location.pathname === link.to) return true;
-    if (link.to && location.pathname.startsWith(link.to + "/")) return true;
-    if (link.children) return link.children.some((c) => location.pathname === c.to);
+    if (link.to && pathname === link.to) return true;
+    if (link.to && pathname.startsWith(link.to + "/")) return true;
+    if (link.children) return link.children.some((c) => pathname === c.to);
     return false;
   };
 
@@ -340,7 +343,7 @@ export function Navbar() {
       >
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center hover-lift flex-shrink-0">
+          <Link href="/" className="flex items-center hover-lift flex-shrink-0">
             <LogoFull
               className="h-10 w-auto"
               dark={scrolled && !mobileOpen}
@@ -362,7 +365,7 @@ export function Navbar() {
           {/* CTA + Mobile toggle */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <Link
-              to="/contact"
+              href="/contact"
               className={`hidden lg:inline-flex px-5 py-2 rounded-full text-[13px] font-semibold transition-all duration-300 ${
                 scrolled
                   ? "bg-brand-500 text-white hover:bg-brand-600 shadow-sm"

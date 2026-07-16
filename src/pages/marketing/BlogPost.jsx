@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   CalendarDays,
   Clock,
@@ -121,7 +122,7 @@ function RelatedGrid({ posts }) {
           {posts.map((post) => (
             <Link
               key={post.id}
-              to={blogUrl(post.slug)}
+              href={blogUrl(post.slug)}
               className="group flex gap-4 bg-white rounded-2xl p-4 border border-surface-200/60 hover:shadow-md transition-all duration-300"
             >
               <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
@@ -210,7 +211,7 @@ export function BlogPostPage() {
         </div>
         <div className="relative z-10 content-container max-w-4xl pb-12 md:pb-16">
           <Link
-            to={CONTENT.blog.listPath}
+            href={CONTENT.blog.listPath}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-medium mb-5 hover:bg-white/20 transition-colors"
           >
             <ArrowLeft size={12} />
@@ -269,7 +270,7 @@ export function BlogPostPage() {
             {/* Back */}
             <div className="mt-8">
               <Link
-                to={CONTENT.blog.listPath}
+                href={CONTENT.blog.listPath}
                 className="inline-flex items-center gap-2 text-brand-500 text-sm font-semibold hover:gap-3 transition-all"
               >
                 <ArrowLeft size={14} />

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
@@ -262,7 +263,7 @@ function OtherServices({ currentSlug }) {
             Explore other services
           </h2>
           <Link
-            to="/services"
+            href="/services"
             className="text-brand-500 hover:text-brand-600 text-sm font-semibold inline-flex items-center gap-1"
           >
             All services
@@ -273,7 +274,7 @@ function OtherServices({ currentSlug }) {
           {others.map((s) => (
             <Link
               key={s.slug}
-              to={`/services/${s.slug}`}
+              href={`/services/${s.slug}`}
               className="card-soft !rounded-2xl group flex items-center gap-3 p-5"
             >
               <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">

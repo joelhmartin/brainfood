@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { ArrowUpRight, Phone, Mail } from "lucide-react";
 import { SITE, CONTENT } from "../../config/site.js";
 
@@ -83,7 +83,7 @@ export function Footer() {
                   {links.map((link) => (
                     <li key={link.label}>
                       <Link
-                        to={link.to}
+                        href={link.to}
                         className="group flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors duration-300"
                       >
                         {link.label}

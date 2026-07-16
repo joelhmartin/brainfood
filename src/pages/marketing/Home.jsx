@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import {
   ArrowRight,
@@ -20,8 +22,6 @@ import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 import { Responsive } from "../../hooks/useBreakpoint.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
-import { useSeo, organizationSchema } from "../../lib/seo.js";
-import { useSettingsStore } from "../../stores/settings.store.js";
 
 /* ── Scroll reveal helper ─────────────────────
    Uses IntersectionObserver instead of GSAP
@@ -168,7 +168,7 @@ function Hero() {
         {/* CTAs */}
         <div data-hero-anim className="mt-8 flex flex-wrap items-center gap-4">
           <Link
-            to="/contact"
+            href="/contact"
             className="btn-magnetic group px-7 py-3.5 rounded-full bg-brand-500 text-white font-semibold text-sm"
           >
             <span className="btn-bg bg-brand-600 rounded-full" />
@@ -277,7 +277,7 @@ function Mission() {
 
           <div data-mission-anim>
             <Link
-              to="/about"
+              href="/about"
               className="inline-flex items-center gap-2 text-brand-500 font-semibold text-sm hover:gap-3 transition-all duration-300"
             >
               Learn More About Us
@@ -622,7 +622,7 @@ function Team() {
         {COACHES.map((coach) => (
           <Link
             key={coach.id}
-            to={`/about#${coach.id}`}
+            href={`/about#${coach.id}`}
             data-team-card
             className="group block"
           >
@@ -646,7 +646,7 @@ function Team() {
 
       <div className="content-container text-center mt-10">
         <Link
-          to="/about#charlie"
+          href="/about#charlie"
           className="inline-flex items-center gap-2 text-brand-500 font-semibold text-sm hover:gap-3 transition-all duration-300"
         >
           Read Full Bios
@@ -677,14 +677,6 @@ function CTA() {
    PAGE EXPORT
 ───────────────────────────────────────────── */
 export function HomePage() {
-  const settings = useSettingsStore((s) => s.settings);
-  useSeo({
-    description:
-      "Recovery coaching, mental health coaching, and sober companion services in Austin, Texas. Practical support, real connection, lasting change.",
-    path: "/",
-    schemas: [organizationSchema(settings)],
-  });
-
   return (
     <>
       <Hero />

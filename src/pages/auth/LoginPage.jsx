@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { AuthLayout } from "../../components/layout/AuthLayout.jsx";
 import { LoginForm } from "../../components/auth/LoginForm.jsx";
 import { Card } from "../../components/ui/Card.jsx";
@@ -15,7 +15,7 @@ export function LoginPage() {
         <h2 className="mb-6 text-center text-xl font-semibold">Sign in to your account</h2>
         <LoginForm />
         <p className="mt-4 text-center text-sm">
-          <Link to={ROUTES.FORGOT_PASSWORD} className="text-brand-600 hover:underline">
+          <Link href={ROUTES.FORGOT_PASSWORD} className="text-brand-600 hover:underline">
             Forgot password?
           </Link>
         </p>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import { CalendarDays, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
@@ -96,7 +96,7 @@ function EventsHero() {
 function EventCard({ event }) {
   return (
     <Link
-      to={eventUrl(event.slug)}
+      href={eventUrl(event.slug)}
       className="group block bg-white rounded-3xl border border-surface-200/60 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
     >
       {/* Image */}

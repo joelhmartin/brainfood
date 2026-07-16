@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { CalendarDays, FileText, ArrowRight, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.js";
 import { H1, Text } from "../../components/ui/Typography.jsx";
@@ -11,7 +11,7 @@ import { ROUTES } from "../../config/routes.js";
 function StatCard({ icon: Icon, label, total, drafts, to }) {
   return (
     <Link
-      to={to}
+      href={to}
       className="group rounded-2xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
     >
       <div className="flex items-center justify-between">
@@ -68,7 +68,7 @@ export function DashboardPage() {
             <p className="font-medium">This site is hidden from Google.</p>
             <p className="mt-0.5 text-xs">
               Correct before launch. When you go live on the real domain, turn on indexing in{" "}
-              <Link to={ROUTES.SETTINGS} className="font-medium underline">
+              <Link href={ROUTES.SETTINGS} className="font-medium underline">
                 Settings
               </Link>
               .

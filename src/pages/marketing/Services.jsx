@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import { ArrowRight } from "lucide-react";
 import { AUSTIN } from "../../config/images.js";
@@ -137,7 +137,7 @@ function ServicesGrid() {
           {SERVICES_CONTENT.map((s) => (
             <Link
               key={s.slug}
-              to={`/services/${s.slug}`}
+              href={`/services/${s.slug}`}
               data-svc-card
               className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-surface-200/60 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >

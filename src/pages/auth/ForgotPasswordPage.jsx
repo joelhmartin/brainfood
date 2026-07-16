@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { AuthLayout } from "../../components/layout/AuthLayout.jsx";
 import { ForgotPasswordForm } from "../../components/auth/ForgotPasswordForm.jsx";
 import { Card } from "../../components/ui/Card.jsx";
@@ -11,7 +11,7 @@ export function ForgotPasswordPage() {
         <h2 className="mb-6 text-center text-xl font-semibold">Reset your password</h2>
         <ForgotPasswordForm />
         <p className="mt-4 text-center text-sm text-gray-500">
-          <Link to={ROUTES.LOGIN} className="text-brand-600 hover:underline">
+          <Link href={ROUTES.LOGIN} className="text-brand-600 hover:underline">
             Back to sign in
           </Link>
         </p>

@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -12,7 +14,6 @@ import {
   Box,
 } from "lucide-react";
 import { ModelViewer } from "../../components/ModelViewer";
-import { useSeo } from "../../lib/seo.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -261,7 +262,7 @@ function ProductViewer({ product }) {
         </div>
 
         <Link
-          to="/contact"
+          href="/contact"
           className="btn-magnetic group mt-8 w-full px-6 py-3.5 rounded-full bg-accent-500 text-white font-semibold text-sm inline-flex justify-center"
         >
           <span className="btn-bg bg-accent-600 rounded-full" />
@@ -551,7 +552,7 @@ function ProductCTA() {
           the best fit for your patients.
         </p>
         <Link
-          to="/contact"
+          href="/contact"
           className="btn-magnetic group mt-8 inline-flex px-8 py-4 rounded-full bg-accent-500 text-white font-semibold"
         >
           <span className="btn-bg bg-accent-600 rounded-full" />
@@ -570,13 +571,6 @@ function ProductCTA() {
 
 /* ─── PAGE EXPORT ─── */
 export function ProductPage() {
-  useSeo({
-    title: "Products",
-    description:
-      "Tools and products from Brain Food Recovery Services supporting individuals and families in recovery.",
-    path: "/products",
-  });
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

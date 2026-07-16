@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import gsap from "gsap";
 import { CalendarDays, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePostsStore } from "../../stores/posts.store.js";
@@ -61,7 +62,7 @@ function FeaturedPost({ post }) {
   return (
     <section ref={ref}>
       <Link
-        to={blogUrl(post.slug)}
+        href={blogUrl(post.slug)}
         className="group block relative min-h-[70dvh] flex items-end overflow-hidden"
       >
         <div className="absolute inset-0">
@@ -125,7 +126,7 @@ function FeaturedPost({ post }) {
 function PostCard({ post }) {
   return (
     <Link
-      to={blogUrl(post.slug)}
+      href={blogUrl(post.slug)}
       className="group block bg-white rounded-3xl border border-surface-200/60 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
@@ -212,7 +213,7 @@ function Pagination({ currentPage, totalPages }) {
       {/* Prev */}
       {currentPage > 1 ? (
         <Link
-          to={blogPageUrl(currentPage - 1)}
+          href={blogPageUrl(currentPage - 1)}
           className="w-10 h-10 rounded-full border border-surface-300 flex items-center justify-center text-navy/50 hover:text-brand-500 hover:border-brand-300 transition-colors"
         >
           <ChevronLeft size={16} />
@@ -227,7 +228,7 @@ function Pagination({ currentPage, totalPages }) {
       {pages.map((num) => (
         <Link
           key={num}
-          to={blogPageUrl(num)}
+          href={blogPageUrl(num)}
           className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
             num === currentPage
               ? "bg-brand-500 text-white shadow-md shadow-brand-500/20"
@@ -241,7 +242,7 @@ function Pagination({ currentPage, totalPages }) {
       {/* Next */}
       {currentPage < totalPages ? (
         <Link
-          to={blogPageUrl(currentPage + 1)}
+          href={blogPageUrl(currentPage + 1)}
           className="w-10 h-10 rounded-full border border-surface-300 flex items-center justify-center text-navy/50 hover:text-brand-500 hover:border-brand-300 transition-colors"
         >
           <ChevronRight size={16} />

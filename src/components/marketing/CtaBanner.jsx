@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import gsap from "gsap";
 import { ArrowRight } from "lucide-react";
 import { BrandMotif } from "./BrandMotif.jsx";
@@ -98,7 +100,7 @@ export function CtaBanner({
             className="mt-8 flex flex-wrap justify-center gap-4"
           >
             <Link
-              to={primary.to}
+              href={primary.to}
               className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white text-brand-600 font-semibold text-sm hover:bg-brand-50 transition-colors duration-300 shadow-lg"
             >
               {primary.label}
@@ -109,7 +111,7 @@ export function CtaBanner({
             </Link>
             {secondary && (
               <Link
-                to={secondary.to}
+                href={secondary.to}
                 className="px-8 py-3.5 rounded-full border border-white/30 text-white font-medium text-sm hover:bg-white/10 transition-colors duration-300"
               >
                 {secondary.label}
