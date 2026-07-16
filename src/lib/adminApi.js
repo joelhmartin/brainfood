@@ -27,11 +27,13 @@ async function call(method, body, path = "/api/users") {
   try {
     payload = await response.json();
   } catch {
-    // A non-JSON body means the request never reached the function — most likely
-    // the SPA rewrite swallowed /api/* (see vercel.json) or `vercel dev` isn't running.
+    // A non-JSON body means the request never reached the route handler. There's no
+    // SPA rewrite to blame anymore — /api/* is served by this same Next app (see
+    // app/api/*/route.js) — so a 404 here means the route itself is missing or
+    // `npm run dev` / `npm start` isn't running.
     throw new Error(
       response.status === 404
-        ? `The ${path} function is not running. In local dev, use \`npm run dev:full\`.`
+        ? `The ${path} route is not running. Make sure \`npm run dev\` (or \`npm start\`) is running.`
         : "The server returned an unexpected response.",
     );
   }
