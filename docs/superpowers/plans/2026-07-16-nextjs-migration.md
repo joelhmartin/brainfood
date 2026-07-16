@@ -730,10 +730,10 @@ git commit -m "feat: add Next.js root layout and providers"
 **Files:**
 - Create: `app/(marketing)/layout.jsx`, and `page.jsx` for `/`, `/about`, `/products`, `/contact`, `/submit-case`, `/about/team`, `/resources/videos`
 - Create: `app/(marketing)/not-found.jsx`
-- Reference: `src/App.jsx` (MarketingLayout), `src/pages/marketing/*.jsx`
+- Reference: `src/App.jsx` (MarketingLayout), `src/screens/marketing/*.jsx`
 
 **Interfaces:**
-- Consumes: `getSettings()`, `buildMetadata()`, `JsonLd`, `organizationSchema()`; existing page components in `src/pages/marketing/`.
+- Consumes: `getSettings()`, `buildMetadata()`, `JsonLd`, `organizationSchema()`; existing page components in `src/screens/marketing/`.
 - Produces: 7 marketing routes + a real 404.
 
 **Context:** Each existing page component (e.g. `Home.jsx`) currently calls `useSeo(...)` and reads content from Zustand. The page component keeps its markup and animations but becomes a client component; the new `page.jsx` is a thin Server Component that supplies metadata and (later) data.
@@ -761,7 +761,7 @@ If `Navbar`/`Footer` use hooks or `react-router` `Link`, they need `"use client"
 
 - [ ] **Step 2: Add `"use client"` to each marketing page component**
 
-For each of `Home.jsx`, `About.jsx`, `Product.jsx`, `Contact.jsx`, `CaseSubmission.jsx`, `ComingSoon.jsx`, `NotFound.jsx` in `src/pages/marketing/`: add `"use client";` as the first line (they use GSAP, refs, and state).
+For each of `Home.jsx`, `About.jsx`, `Product.jsx`, `Contact.jsx`, `CaseSubmission.jsx`, `ComingSoon.jsx`, `NotFound.jsx` in `src/screens/marketing/`: add `"use client";` as the first line (they use GSAP, refs, and state).
 
 - [ ] **Step 3: Swap react-router imports for Next equivalents**
 
@@ -795,7 +795,7 @@ Delete the `useSeo({...})` call and its import from each marketing page componen
 `app/(marketing)/page.jsx` (home) — carries the organization JSON-LD that `Home.jsx` used to emit:
 
 ```jsx
-import { HomePage } from "../../src/pages/marketing/Home.jsx";
+import { HomePage } from "../../src/screens/marketing/Home.jsx";
 import { getSettings } from "../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../src/lib/metadata.js";
 import { organizationSchema } from "../../src/lib/seo.js";
@@ -820,7 +820,7 @@ export default async function Page() {
 `app/(marketing)/about/page.jsx`:
 
 ```jsx
-import { AboutPage } from "../../../src/pages/marketing/About.jsx";
+import { AboutPage } from "../../../src/screens/marketing/About.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 
@@ -846,7 +846,7 @@ Use each page's existing `useSeo` title/description values from Step 4 rather th
 - [ ] **Step 6: Create `app/(marketing)/not-found.jsx`**
 
 ```jsx
-import { NotFoundPage } from "../../src/pages/marketing/NotFound.jsx";
+import { NotFoundPage } from "../../src/screens/marketing/NotFound.jsx";
 import { getSettings } from "../../src/lib/content.server.js";
 import { buildMetadata } from "../../src/lib/metadata.js";
 
@@ -883,7 +883,7 @@ git commit -m "feat: add marketing layout and static routes"
 
 **Files:**
 - Create: `app/(marketing)/services/page.jsx`, `app/(marketing)/services/[slug]/page.jsx`
-- Modify: `src/pages/marketing/Services.jsx`, `src/pages/marketing/ServiceDetail.jsx`
+- Modify: `src/screens/marketing/Services.jsx`, `src/screens/marketing/ServiceDetail.jsx`
 
 **Interfaces:**
 - Consumes: `SERVICES` from `src/config/services.js`; `getSettings()`, `buildMetadata()`, `JsonLd`, `breadcrumbSchema()`.
@@ -905,7 +905,7 @@ export function ServiceDetailPage({ slug }) {
 - [ ] **Step 2: Create `app/(marketing)/services/page.jsx`**
 
 ```jsx
-import { ServicesPage } from "../../../src/pages/marketing/Services.jsx";
+import { ServicesPage } from "../../../src/screens/marketing/Services.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 
@@ -923,7 +923,7 @@ export default function Page() {
 
 ```jsx
 import { notFound } from "next/navigation";
-import { ServiceDetailPage } from "../../../../src/pages/marketing/ServiceDetail.jsx";
+import { ServiceDetailPage } from "../../../../src/screens/marketing/ServiceDetail.jsx";
 import { SERVICES } from "../../../../src/config/services.js";
 import { getSettings } from "../../../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../../../src/lib/metadata.js";
@@ -978,7 +978,7 @@ Expected: build output lists `/services/[slug]` as SSG with 5 generated paths (`
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/ src/pages/marketing/Services.jsx src/pages/marketing/ServiceDetail.jsx
+git add app/ src/screens/marketing/Services.jsx src/screens/marketing/ServiceDetail.jsx
 git commit -m "feat: add services routes with static params"
 ```
 
@@ -988,7 +988,7 @@ git commit -m "feat: add services routes with static params"
 
 **Files:**
 - Create: `app/(marketing)/blog/page.jsx`, `app/(marketing)/blog/page/[page]/page.jsx`, `app/(marketing)/blog/[slug]/page.jsx`
-- Modify: `src/pages/marketing/Blog.jsx`, `src/pages/marketing/BlogPost.jsx`
+- Modify: `src/screens/marketing/Blog.jsx`, `src/screens/marketing/BlogPost.jsx`
 
 **Interfaces:**
 - Consumes: `getPosts()`, `getPostBySlug()`, `getSettings()` from `content.server.js`; `blogPostingSchema()`, `breadcrumbSchema()`; `CONTENT` from `src/config/site.js`.
@@ -1026,7 +1026,7 @@ export function BlogPostPage({ post }) {
 - [ ] **Step 3: Create `app/(marketing)/blog/page.jsx`**
 
 ```jsx
-import { BlogPage } from "../../../src/pages/marketing/Blog.jsx";
+import { BlogPage } from "../../../src/screens/marketing/Blog.jsx";
 import { getPosts, getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 
@@ -1047,7 +1047,7 @@ export default async function Page() {
 
 ```jsx
 import { notFound } from "next/navigation";
-import { BlogPage } from "../../../../../src/pages/marketing/Blog.jsx";
+import { BlogPage } from "../../../../../src/screens/marketing/Blog.jsx";
 import { getPosts, getSettings } from "../../../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../../../src/lib/metadata.js";
 import { CONTENT } from "../../../../../src/config/site.js";
@@ -1084,7 +1084,7 @@ export default async function Page({ params }) {
 
 ```jsx
 import { notFound } from "next/navigation";
-import { BlogPostPage } from "../../../../src/pages/marketing/BlogPost.jsx";
+import { BlogPostPage } from "../../../../src/screens/marketing/BlogPost.jsx";
 import { getPosts, getPostBySlug, getSettings } from "../../../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../../../src/lib/metadata.js";
 import { blogPostingSchema, breadcrumbSchema } from "../../../../src/lib/seo.js";
@@ -1151,7 +1151,7 @@ Expected: a real post title in both `<title>` and `og:title` — server-rendered
 - [ ] **Step 7: Commit**
 
 ```bash
-git add app/ src/pages/marketing/Blog.jsx src/pages/marketing/BlogPost.jsx
+git add app/ src/screens/marketing/Blog.jsx src/screens/marketing/BlogPost.jsx
 git commit -m "feat: add blog routes with ISR and server-rendered metadata"
 ```
 
@@ -1161,7 +1161,7 @@ git commit -m "feat: add blog routes with ISR and server-rendered metadata"
 
 **Files:**
 - Create: `app/(marketing)/events/page.jsx`, `app/(marketing)/events/page/[page]/page.jsx`, `app/(marketing)/events/[slug]/page.jsx`
-- Modify: `src/pages/marketing/Events.jsx`, `src/pages/marketing/EventDetail.jsx`
+- Modify: `src/screens/marketing/Events.jsx`, `src/screens/marketing/EventDetail.jsx`
 
 **Interfaces:**
 - Consumes: `getEvents()`, `getEventBySlug()`, `getSettings()`; `eventSchema()`, `breadcrumbSchema()`; `CONTENT.events` (perPage 9).
@@ -1174,7 +1174,7 @@ Same treatment as Task 8 Steps 1-2: add `"use client";`, delete `useEventsStore`
 - [ ] **Step 2: Create `app/(marketing)/events/page.jsx`**
 
 ```jsx
-import { EventsPage } from "../../../src/pages/marketing/Events.jsx";
+import { EventsPage } from "../../../src/screens/marketing/Events.jsx";
 import { getEvents, getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 
@@ -1195,7 +1195,7 @@ export default async function Page() {
 
 ```jsx
 import { notFound } from "next/navigation";
-import { EventsPage } from "../../../../../src/pages/marketing/Events.jsx";
+import { EventsPage } from "../../../../../src/screens/marketing/Events.jsx";
 import { getEvents, getSettings } from "../../../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../../../src/lib/metadata.js";
 import { CONTENT } from "../../../../../src/config/site.js";
@@ -1231,7 +1231,7 @@ export default async function Page({ params }) {
 
 ```jsx
 import { notFound } from "next/navigation";
-import { EventDetailPage } from "../../../../src/pages/marketing/EventDetail.jsx";
+import { EventDetailPage } from "../../../../src/screens/marketing/EventDetail.jsx";
 import { getEvents, getEventBySlug, getSettings } from "../../../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../../../src/lib/metadata.js";
 import { eventSchema, breadcrumbSchema } from "../../../../src/lib/seo.js";
@@ -1293,7 +1293,7 @@ Expected: `/events/[slug]` listed with 3 generated paths; no errors.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/ src/pages/marketing/Events.jsx src/pages/marketing/EventDetail.jsx
+git add app/ src/screens/marketing/Events.jsx src/screens/marketing/EventDetail.jsx
 git commit -m "feat: add events routes with ISR and server-rendered metadata"
 ```
 
@@ -1397,7 +1397,7 @@ git commit -m "feat: add native sitemap and robots routes"
 
 **Files:**
 - Create: `app/(auth)/layout.jsx`, `app/(auth)/auth/login/page.jsx`, `app/(auth)/auth/forgot-password/page.jsx`, `app/(auth)/auth/reset-password/page.jsx`, `app/(auth)/auth/accept-invite/page.jsx`
-- Modify: the 4 page components in `src/pages/auth/`
+- Modify: the 4 page components in `src/screens/auth/`
 
 **Interfaces:**
 - Consumes: `AuthLayout` from `src/components/layout/AuthLayout.jsx`; the 4 auth page components.
@@ -1407,7 +1407,7 @@ git commit -m "feat: add native sitemap and robots routes"
 
 - [ ] **Step 1: Add `"use client"` to auth components**
 
-Add `"use client";` to all four pages in `src/pages/auth/` and to `LoginForm.jsx`, `ForgotPasswordForm.jsx`, `SetPasswordForm.jsx`, `AuthLayout.jsx`. They use `react-hook-form`, Supabase auth, and router navigation.
+Add `"use client";` to all four pages in `src/screens/auth/` and to `LoginForm.jsx`, `ForgotPasswordForm.jsx`, `SetPasswordForm.jsx`, `AuthLayout.jsx`. They use `react-hook-form`, Supabase auth, and router navigation.
 
 - [ ] **Step 2: Create `app/(auth)/layout.jsx`**
 
@@ -1430,7 +1430,7 @@ If `AuthLayout` does not currently accept children (it may render an `<Outlet/>`
 `app/(auth)/auth/login/page.jsx`:
 
 ```jsx
-import { LoginPage } from "../../../../src/pages/auth/LoginPage.jsx";
+import { LoginPage } from "../../../../src/screens/auth/LoginPage.jsx";
 
 export const metadata = { title: "Sign in" };
 
@@ -1457,7 +1457,7 @@ Expected: a robots tag containing `noindex`.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/ src/pages/auth/ src/components/auth/ src/components/layout/AuthLayout.jsx
+git add app/ src/screens/auth/ src/components/auth/ src/components/layout/AuthLayout.jsx
 git commit -m "feat: add auth routes"
 ```
 
@@ -1467,7 +1467,7 @@ git commit -m "feat: add auth routes"
 
 **Files:**
 - Create: `app/app/layout.jsx`, `app/app/page.jsx`, `app/app/settings/page.jsx`, `app/app/members/page.jsx`, `app/app/events/page.jsx`, `app/app/posts/page.jsx`
-- Modify: `src/guards/RequireAuth.jsx`, `src/components/layout/AppShell.jsx`, the 5 pages in `src/pages/app/`
+- Modify: `src/guards/RequireAuth.jsx`, `src/components/layout/AppShell.jsx`, the 5 pages in `src/screens/app/`
 
 **Interfaces:**
 - Consumes: `RequireAuth` from `src/guards/RequireAuth.jsx`; `AppShell` from `src/components/layout/AppShell.jsx`; the 5 dashboard page components.
@@ -1477,7 +1477,7 @@ git commit -m "feat: add auth routes"
 
 - [ ] **Step 1: Add `"use client"` to dashboard components**
 
-Add `"use client";` to: `RequireAuth.jsx`, `AppShell.jsx`, `Sidebar.jsx`, `Topbar.jsx`, and all five pages in `src/pages/app/`. They all use Zustand stores, effects, and navigation.
+Add `"use client";` to: `RequireAuth.jsx`, `AppShell.jsx`, `Sidebar.jsx`, `Topbar.jsx`, and all five pages in `src/screens/app/`. They all use Zustand stores, effects, and navigation.
 
 - [ ] **Step 2: Update `RequireAuth` to use Next navigation**
 
@@ -1534,7 +1534,7 @@ If `AppShell` renders an `<Outlet/>`, change it to accept and render `{children}
 `app/app/page.jsx`:
 
 ```jsx
-import { DashboardPage } from "../../src/pages/app/DashboardPage.jsx";
+import { DashboardPage } from "../../src/screens/app/DashboardPage.jsx";
 
 export default function Page() {
   return <DashboardPage />;
@@ -1555,7 +1555,7 @@ Expected: redirect to `/auth/login`.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/ src/guards/ src/components/layout/ src/pages/app/
+git add app/ src/guards/ src/components/layout/ src/screens/app/
 git commit -m "feat: add dashboard routes with client-side auth guard"
 ```
 
