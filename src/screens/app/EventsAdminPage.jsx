@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Eye, EyeOff, Calendar, X } from "lucide-react";
 import { useEventsStore } from "../../stores/events.store.js";
