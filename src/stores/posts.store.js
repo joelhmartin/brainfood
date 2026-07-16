@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 import { postFromRow, postToRow } from "../lib/mappers.js";
-import { requestRebuild } from "../lib/rebuild.js";
+import { revalidateContent } from "../lib/adminApi.js";
 
 /**
  * Blog posts, backed by Supabase. Mirrors events.store.js — see it for the
@@ -52,7 +52,7 @@ export const usePostsStore = create((set, get) => ({
 
     const post = postFromRow(data);
     set((s) => ({ posts: [...s.posts, post] }));
-    if (post.published) requestRebuild();
+    if (post.published) await revalidateContent("post", post.slug);
     return post;
   },
 
@@ -74,18 +74,19 @@ export const usePostsStore = create((set, get) => ({
 
     const post = postFromRow(data);
     set((s) => ({ posts: s.posts.map((p) => (p.id === id ? post : p)) }));
-    if (post.published || wasPublished) requestRebuild();
+    if (post.published || wasPublished) await revalidateContent("post", post.slug);
     return post;
   },
 
   deletePost: async (id) => {
-    const wasPublished = get().getById(id)?.published;
+    const target = get().getById(id);
+    const wasPublished = target?.published;
 
     const { error } = await supabase.from("posts").delete().eq("id", id);
     if (error) throw new Error(friendly(error));
 
     set((s) => ({ posts: s.posts.filter((p) => p.id !== id) }));
-    if (wasPublished) requestRebuild();
+    if (wasPublished) await revalidateContent("post", target?.slug);
   },
 }));
 

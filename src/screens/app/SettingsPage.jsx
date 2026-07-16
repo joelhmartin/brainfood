@@ -395,7 +395,7 @@ export function SettingsPage() {
       <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-gray-200 bg-gray-50/90 py-4 backdrop-blur">
         <p className="flex items-center gap-1.5 text-xs text-gray-400">
           <Search size={12} />
-          Saving triggers a rebuild so the public pages pick up the changes.
+          Saving refreshes the public pages within seconds.
         </p>
         <button
           type="submit"

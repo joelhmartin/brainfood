@@ -12,14 +12,19 @@ export async function POST(request) {
   try {
     await requirePermission(request, PERMISSIONS.CONTENT_PUBLISH);
 
-    const { type, slug } = await request.json();
+    const { type, slug } = await request.json().catch(() => ({}));
+
+    // Slugs are only ever used to build a path passed to revalidatePath(), so a
+    // cheap whitelist is enough — anything outside it is stripped, not rejected,
+    // since a missing slug just means "revalidate the listing page only".
+    const safeSlug = typeof slug === "string" && /^[a-z0-9-]+$/.test(slug) ? slug : undefined;
 
     if (type === "post") {
       revalidatePath("/blog");
-      if (slug) revalidatePath(`/blog/${slug}`);
+      if (safeSlug) revalidatePath(`/blog/${safeSlug}`);
     } else if (type === "event") {
       revalidatePath("/events");
-      if (slug) revalidatePath(`/events/${slug}`);
+      if (safeSlug) revalidatePath(`/events/${safeSlug}`);
     } else if (type === "settings") {
       revalidatePath("/", "layout");
     } else {

@@ -53,7 +53,7 @@ async function listUsers(request) {
 async function inviteUser(request) {
   await requirePermission(request, PERMISSIONS.USERS_INVITE);
 
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const email = String(body.email ?? "")
     .trim()
     .toLowerCase();
@@ -84,7 +84,7 @@ async function inviteUser(request) {
 async function removeUser(request) {
   const caller = await requirePermission(request, PERMISSIONS.USERS_REMOVE);
 
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const userId = String(body.userId ?? "");
 
   if (!userId) throw new HttpError(400, "userId is required.");

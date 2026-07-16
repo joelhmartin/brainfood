@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 import { settingsFromRow, settingsToRow } from "../lib/mappers.js";
-import { requestRebuild } from "../lib/rebuild.js";
+import { revalidateContent } from "../lib/adminApi.js";
 import { FALLBACK_SETTINGS } from "../config/site.js";
 
 /**
@@ -49,8 +49,8 @@ export const useSettingsStore = create((set, get) => ({
     }
 
     set({ settings: { ...get().settings, ...next } });
-    // Settings feed <title>, meta tags, JSON-LD, robots.txt and sitemap.xml, all of
-    // which are baked at build time. Changing them means the static HTML is stale.
-    requestRebuild();
+    // Settings feed <title>, meta tags, JSON-LD, robots.txt and sitemap.xml. Those
+    // pages are cached by ISR, so a save must ask the server to refresh them.
+    await revalidateContent("settings");
   },
 }));

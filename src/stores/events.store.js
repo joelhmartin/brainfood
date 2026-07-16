@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 import { eventFromRow, eventToRow } from "../lib/mappers.js";
-import { requestRebuild } from "../lib/rebuild.js";
+import { revalidateContent } from "../lib/adminApi.js";
 
 /**
  * Events, backed by Supabase.
@@ -59,7 +59,7 @@ export const useEventsStore = create((set, get) => ({
 
     const event = eventFromRow(data);
     set((s) => ({ events: [...s.events, event] }));
-    if (event.published) requestRebuild();
+    if (event.published) await revalidateContent("event", event.slug);
     return event;
   },
 
@@ -83,18 +83,19 @@ export const useEventsStore = create((set, get) => ({
     const event = eventFromRow(data);
     set((s) => ({ events: s.events.map((e) => (e.id === id ? event : e)) }));
     // Either a change to a live page, or a page entering/leaving the public site.
-    if (event.published || wasPublished) requestRebuild();
+    if (event.published || wasPublished) await revalidateContent("event", event.slug);
     return event;
   },
 
   deleteEvent: async (id) => {
-    const wasPublished = get().getById(id)?.published;
+    const target = get().getById(id);
+    const wasPublished = target?.published;
 
     const { error } = await supabase.from("events").delete().eq("id", id);
     if (error) throw new Error(friendly(error));
 
     set((s) => ({ events: s.events.filter((e) => e.id !== id) }));
-    if (wasPublished) requestRebuild();
+    if (wasPublished) await revalidateContent("event", target?.slug);
   },
 }));
 
