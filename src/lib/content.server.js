@@ -1,5 +1,5 @@
 import { createServerClient } from "./supabase.server.js";
-import { eventFromRow, postFromRow } from "./mappers.js";
+import { eventFromRow, postFromRow, settingsFromRow } from "./mappers.js";
 import { FALLBACK_SETTINGS } from "../config/site.js";
 
 /**
@@ -13,7 +13,7 @@ export async function getSettings() {
   if (!supabase) return FALLBACK_SETTINGS;
 
   const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
-  return data ? { ...FALLBACK_SETTINGS, ...data } : FALLBACK_SETTINGS;
+  return data ? { ...FALLBACK_SETTINGS, ...settingsFromRow(data) } : FALLBACK_SETTINGS;
 }
 
 export async function getPosts() {
