@@ -31,12 +31,27 @@ export function buildMetadata({
   const canonical = absoluteUrl(path, settings.siteUrl);
   const ogImage = image || settings.ogImage;
 
+  // Without this, Next's default is `null`, and with an empty siteUrl (today's
+  // pre-launch state) every og:url ships as a bare relative path (e.g. "/about")
+  // — which the Open Graph spec doesn't allow. `siteUrl` comes from a dashboard
+  // text field an operator can mistype (e.g. "not a url"), so guard the URL
+  // construction rather than letting a malformed value throw during render.
+  let metadataBase;
+  if (settings.siteUrl) {
+    try {
+      metadataBase = new URL(settings.siteUrl);
+    } catch {
+      metadataBase = undefined;
+    }
+  }
+
   // The master switch, preserved from useSeo: until the site is on its production
   // domain, every page tells crawlers to stay out. Indexing a staging domain splits
   // ranking signals between it and the eventual real one, and is a pain to unwind.
   const blocked = noindex || !settings.seoIndexable;
 
   const metadata = {
+    metadataBase,
     title: fullTitle,
     description: desc,
     robots: blocked

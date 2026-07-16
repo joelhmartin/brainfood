@@ -254,29 +254,51 @@ function Pagination({ currentPage, totalPages }) {
   );
 }
 
+/* ─── PAGINATION MATH ───
+ * Pulled out as a pure function (rather than inlined in the component) so it can
+ * be unit-tested directly — it's the exact logic that must agree with
+ * generateStaticParams in app/(marketing)/blog/page/[page]/page.jsx. Mirrors
+ * paginateEvents in Events.jsx: it operates on the full published list with NO
+ * featured carve-out, so totalPages/paginated always match the route's raw-count
+ * basis and no post can ever be duplicated or orphaned across pages.
+ */
+export function paginatePosts(posts, page, perPageOverride = perPage) {
+  const currentPage = Math.max(1, Number(page) || 1);
+  const totalPages = perPageOverride > 0 ? Math.ceil(posts.length / perPageOverride) : 1;
+  const paginated = perPageOverride > 0
+    ? posts.slice((currentPage - 1) * perPageOverride, currentPage * perPageOverride)
+    : posts;
+  return { currentPage, totalPages, paginated };
+}
+
 /* ─── PAGE EXPORT ─── */
 export function BlogPage({ posts = [], page = 1 }) {
-  const currentPage = Math.max(1, Number(page) || 1);
   const [activeCategory, setActiveCategory] = useState(null);
 
   const published = posts
     .filter((p) => p.published)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const featured = currentPage === 1 ? published.find((p) => p.featured) : null;
-  const rest = published.filter((p) => p !== featured);
+  // totalPages/paginated are computed from the SAME basis (all published posts,
+  // no featured carve-out) that generateStaticParams uses in
+  // app/(marketing)/blog/page/[page]/page.jsx, so the two never disagree on how
+  // many pages exist.
+  const { currentPage, totalPages, paginated: pagePosts } = paginatePosts(published, page);
+
+  // The featured hero is a page-1-only DISPLAY concern layered on top of the raw
+  // pagination above. It is pulled from — and removed from the grid of — page 1's
+  // own slice only, so it never changes which raw posts land on which page (no
+  // duplication, no reshuffling of later pages) and today's 3-post rendering is
+  // unchanged (page 1's raw slice is the whole list when there's only one page).
+  const featured = currentPage === 1 ? pagePosts.find((p) => p.featured) ?? null : null;
+  const rest = featured ? pagePosts.filter((p) => p !== featured) : pagePosts;
+
   const categories = [...new Set(published.map((p) => p.category))];
 
-  // Apply category filter
-  const filtered = activeCategory
+  // Apply category filter (client-side only; scoped to this page's own slice)
+  const paginated = activeCategory
     ? rest.filter((p) => p.category === activeCategory)
     : rest;
-
-  // Paginate
-  const totalPages = perPage > 0 ? Math.ceil(filtered.length / perPage) : 1;
-  const paginated = perPage > 0
-    ? filtered.slice((currentPage - 1) * perPage, currentPage * perPage)
-    : filtered;
 
   const gridRef = useRef(null);
   useScrollReveal(gridRef, "[data-post-card]", { y: 30, stagger: 0.1 });

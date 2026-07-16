@@ -11,7 +11,7 @@ import { roleCan } from "../../config/roles.js";
  * Every handler must call requirePermission() before it touches the admin client.
  */
 
-const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export function adminClient() {

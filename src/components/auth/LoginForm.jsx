@@ -43,8 +43,8 @@ export function LoginForm() {
     try {
       await login(data);
       // Send them back to whatever they were trying to reach before the
-      // redirect, via a `from` query param (RequireAuth still needs updating
-      // to set it — Task 12 — until then this is always absent).
+      // redirect, via a `from` query param that RequireAuth sets when it
+      // bounces an unauthenticated visitor to /login.
       const from = new URLSearchParams(window.location.search).get("from");
       router.replace(safeRedirectPath(from));
     } catch (err) {

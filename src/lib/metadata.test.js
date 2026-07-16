@@ -45,4 +45,23 @@ describe("buildMetadata", () => {
     const withImg = buildMetadata({ title: "A", path: "/a", image: "/og.jpg", settings });
     expect(withImg.twitter.card).toBe("summary_large_image");
   });
+
+  it("sets metadataBase from a valid siteUrl, so og:url never ships relative", () => {
+    const m = buildMetadata({ title: "About", path: "/about", settings });
+    expect(m.metadataBase).toBeInstanceOf(URL);
+    expect(m.metadataBase.href).toBe("https://brainfoodrecovery.com/");
+  });
+
+  it("leaves metadataBase undefined when siteUrl is empty (today's pre-launch state)", () => {
+    const m = buildMetadata({ title: "About", path: "/about", settings: { ...settings, siteUrl: "" } });
+    expect(m.metadataBase).toBeUndefined();
+  });
+
+  it("does not throw and falls back to undefined when siteUrl is malformed", () => {
+    expect(() =>
+      buildMetadata({ title: "About", path: "/about", settings: { ...settings, siteUrl: "not a url" } }),
+    ).not.toThrow();
+    const m = buildMetadata({ title: "About", path: "/about", settings: { ...settings, siteUrl: "not a url" } });
+    expect(m.metadataBase).toBeUndefined();
+  });
 });
