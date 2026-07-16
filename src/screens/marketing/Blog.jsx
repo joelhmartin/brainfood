@@ -1,13 +1,11 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import gsap from "gsap";
 import { CalendarDays, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { usePostsStore } from "../../stores/posts.store.js";
 import { CONTENT, blogUrl, blogPageUrl } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
-import { Spinner } from "../../components/ui/Spinner.jsx";
-import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -257,21 +255,11 @@ function Pagination({ currentPage, totalPages }) {
 }
 
 /* ─── PAGE EXPORT ─── */
-export function BlogPage() {
-  const { page: pageParam } = useParams();
-  const currentPage = Math.max(1, parseInt(pageParam, 10) || 1);
-  const allPosts = usePostsStore((s) => s.posts);
-  const status = usePostsStore((s) => s.status);
+export function BlogPage({ posts = [], page = 1 }) {
+  const currentPage = Math.max(1, Number(page) || 1);
   const [activeCategory, setActiveCategory] = useState(null);
 
-  useSeo({
-    title: currentPage > 1 ? `Blog — page ${currentPage}` : "Blog",
-    description:
-      "Practical writing on recovery coaching, daily habits, and supporting a loved one — from the team at Brain Food Recovery Services.",
-    path: blogPageUrl(currentPage),
-  });
-
-  const published = allPosts
+  const published = posts
     .filter((p) => p.published)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -333,11 +321,7 @@ export function BlogPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
             {/* Main content */}
             <div>
-              {status === "idle" || status === "loading" ? (
-                <div className="flex justify-center py-16">
-                  <Spinner />
-                </div>
-              ) : paginated.length === 0 ? (
+              {paginated.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-navy/40 text-lg">No posts found.</p>
                 </div>
