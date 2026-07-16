@@ -60,6 +60,33 @@ async function signIn(page) {
   await expect(page).toHaveURL(/\/app$/);
 }
 
+/**
+ * Drives the real settings-save flow the admin UI actually uses, rather than
+ * writing straight to the DB. `/` is a fully static page with no time-based
+ * revalidate window — it only reflects a settings change once
+ * src/stores/settings.store.js's saveSettings() calls
+ * revalidateContent("settings") -> POST /api/revalidate ->
+ * revalidatePath("/", "layout"). A direct service-role DB write bypasses that
+ * entirely and never triggers it, which is exactly the assumption that used
+ * to make this describe block flaky/wrong. Saving via the UI, signed in as a
+ * real admin, exercises the identical path a human operator uses.
+ */
+async function setSearchIndexing(page, { indexable, siteUrl }) {
+  await signIn(page);
+  await page.goto("/app/settings");
+
+  const indexToggle = page.getByLabel("Allow search engines to index this site");
+  await expect(indexToggle).toBeVisible();
+  if ((await indexToggle.isChecked()) !== indexable) await indexToggle.click();
+
+  if (siteUrl !== undefined) {
+    await page.getByLabel("Site URL").fill(siteUrl);
+  }
+
+  await page.getByRole("button", { name: "Save settings" }).click();
+  await expect(page.getByText("Settings saved.")).toBeVisible();
+}
+
 test("signed-out visitors are redirected away from the dashboard", async ({ page }) => {
   await page.goto("/app/events");
   await expect(page).toHaveURL(/\/auth\/login/);
@@ -142,12 +169,17 @@ test("an admin can create, publish, and delete an event", async ({ page }) => {
  * describing a pre-launch domain as the real business listing). With it on, the reverse.
  */
 test.describe("the search-engine indexing switch", () => {
-  test.afterEach(async () => {
-    await service.from("site_settings").update({ seo_indexable: false }).eq("id", 1);
+  // Goes through the real settings-save flow, not a raw DB write: a raw write here
+  // would leave the static "/" cache showing whatever the last real revalidate
+  // produced (possibly still "index, follow" from the ON test) even though the
+  // DB row says false again — silently reintroducing the exact stale-cache
+  // assumption this describe block exists to catch.
+  test.afterEach(async ({ page }) => {
+    await setSearchIndexing(page, { indexable: false });
   });
 
   test("noindexes every page and emits no structured data while OFF", async ({ page }) => {
-    await service.from("site_settings").update({ seo_indexable: false }).eq("id", 1);
+    await setSearchIndexing(page, { indexable: false });
 
     await page.goto("/");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -156,10 +188,7 @@ test.describe("the search-engine indexing switch", () => {
   });
 
   test("indexes pages and emits structured data once ON", async ({ page }) => {
-    await service
-      .from("site_settings")
-      .update({ seo_indexable: true, site_url: "https://brainfoodrecovery.com" })
-      .eq("id", 1);
+    await setSearchIndexing(page, { indexable: true, siteUrl: "https://brainfoodrecovery.com" });
 
     await page.goto("/");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /^index, follow/);
@@ -202,8 +231,17 @@ test("an unknown URL renders a 404 with noindex, rather than redirecting home", 
   await expect(page.getByRole("heading", { name: /couldn't find that page/i })).toBeVisible();
   // The old behavior was <Navigate to="/" />, which told crawlers a dead URL was valid.
   await expect(page).toHaveURL(/this-page-does-not-exist/);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+  // Two <meta name="robots"> elements legitimately exist here: ours, and one Next's
+  // App Router unconditionally injects on any notFound() boundary (see the mechanism
+  // documented on notFoundMetadata() in src/lib/metadata.js). Both now read exactly
+  // "noindex", so .first() is deterministic rather than papering over a real mismatch.
+  await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute(
     "content",
     /noindex/,
   );
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(2);
+  const robotsContents = await page.locator('meta[name="robots"]').evaluateAll((els) =>
+    els.map((el) => el.getAttribute("content")),
+  );
+  expect(robotsContents.every((content) => content === "noindex")).toBe(true);
 });

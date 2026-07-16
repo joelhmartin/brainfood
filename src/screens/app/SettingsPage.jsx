@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Children, cloneElement, isValidElement, useEffect, useId, useState } from "react";
 import { Plus, Trash2, Search, AlertTriangle } from "lucide-react";
 import { H1 } from "../../components/ui/Typography.jsx";
 import { Spinner } from "../../components/ui/Spinner.jsx";
@@ -26,10 +26,22 @@ function Section({ title, description, children }) {
 }
 
 function Field({ label, hint, children }) {
+  // htmlFor/id links the label to its control (previously a bare sibling
+  // <label> with no association, so assistive tech announced an unlabelled
+  // field and `page.getByLabel(...)` couldn't find it in tests).
+  const id = useId();
+  // Most callers pass a single input/textarea, but "Default description"
+  // passes the textarea plus a trailing character-count <p> — two children,
+  // so `children` is an array there. Only the first (the actual control)
+  // gets the generated id; any extra nodes render through untouched.
+  const [control, ...rest] = Children.toArray(children);
   return (
     <div>
-      <label className={LABEL}>{label}</label>
-      {children}
+      <label htmlFor={id} className={LABEL}>
+        {label}
+      </label>
+      {isValidElement(control) ? cloneElement(control, { id }) : control}
+      {rest}
       {hint && <p className="mt-1 text-xs text-gray-400">{hint}</p>}
     </div>
   );

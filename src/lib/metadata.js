@@ -76,10 +76,37 @@ export function buildMetadata({
  * conceptually one page. Centralizing it here means editing one file can't
  * silently make the two 404s diverge.
  *
+ * Next's App Router unconditionally renders its OWN hardcoded
+ * `<meta name="robots" content="noindex">` whenever it catches the
+ * not-found error boundary — see HTTPAccessFallbackErrorBoundary in
+ * next/dist/client/components/http-access-fallback/error-boundary.js. That
+ * happens as a literal JSX sibling in the framework's error boundary, not
+ * through the Metadata API's merge/resolve pipeline, so it stacks on top of
+ * whatever generateMetadata() returns here rather than being replaced by it —
+ * there is no supported way to suppress it. Confirmed live: every notFound()
+ * render (both this file's boundary and the (marketing) one) emits it,
+ * while ordinary pages emit none.
+ *
+ * Since a second tag from Next itself is unavoidable, this deliberately
+ * drops `follow` from its own robots value (plain `{ index: false }`, i.e.
+ * "noindex" with no qualifier) instead of the usual `{ index: false, follow:
+ * false }` ("noindex, nofollow") that buildMetadata()'s sitewide `blocked`
+ * switch would otherwise produce. That makes our tag's content identical to
+ * Next's forced one, so the two tags agree instead of disagreeing — a
+ * crawler no longer has two different directives to arbitrate between, even
+ * though two <meta> elements still exist in the markup.
+ *
  * @param {object} settings Live site settings (see getSettings).
  */
 export function notFoundMetadata(settings) {
-  return buildMetadata({ title: "Page not found", path: "/404", noindex: true, settings });
+  const metadata = buildMetadata({
+    title: "Page not found",
+    path: "/404",
+    noindex: true,
+    settings,
+  });
+  metadata.robots = { index: false };
+  return metadata;
 }
 
 /**
