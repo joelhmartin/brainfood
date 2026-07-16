@@ -1,4 +1,4 @@
-import { HomePage } from "../../src/pages/marketing/Home.jsx";
+import { HomePage } from "../../src/screens/marketing/Home.jsx";
 import { getSettings } from "../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../src/lib/metadata.js";
 import { organizationSchema } from "../../src/lib/seo.js";

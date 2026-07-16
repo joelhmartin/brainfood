@@ -1,4 +1,4 @@
-import { CaseSubmissionPage } from "../../../src/pages/marketing/CaseSubmission.jsx";
+import { CaseSubmissionPage } from "../../../src/screens/marketing/CaseSubmission.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 

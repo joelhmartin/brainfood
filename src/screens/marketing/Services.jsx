@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
@@ -6,7 +8,6 @@ import { AUSTIN } from "../../config/images.js";
 import { SERVICES_CONTENT } from "../../config/services.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
-import { useSeo } from "../../lib/seo.js";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps = {}) {
@@ -177,13 +178,6 @@ function ServicesGrid() {
 
 /* ─── Page export ─── */
 export function ServicesPage() {
-  useSeo({
-    title: "Services",
-    description:
-      "Recovery coaching, mental health coaching, family coaching, and sober companion services for individuals and families in Austin, Texas.",
-    path: "/services",
-  });
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

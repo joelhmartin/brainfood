@@ -1,11 +1,11 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import gsap from "gsap";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES_CONTENT, getService } from "../../config/services.js";
 import { NotFoundPage } from "./NotFound.jsx";
-import { useSeo } from "../../lib/seo.js";
 import { BrandMotif } from "../../components/marketing/BrandMotif.jsx";
 import { TaglineCard } from "../../components/marketing/TaglineCard.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
@@ -292,22 +292,12 @@ function OtherServices({ currentSlug }) {
 }
 
 /* ─── Page export ─── */
-export function ServiceDetailPage() {
-  const { slug } = useParams();
+export function ServiceDetailPage({ slug }) {
   const service = getService(slug);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
-
-  // navLabel, not title: `title` is only half a sentence ("One-on-one coaching for")
-  // that reads as a fragment in a search result. `tagline` is the one-line summary.
-  useSeo({
-    title: service?.navLabel,
-    description: service?.tagline,
-    path: service ? `/services/${service.slug}` : undefined,
-    noindex: !service,
-  });
 
   // Services come from a static config, so unlike events/posts there is no async gap
   // here — a missing slug really is missing. Still a 404 rather than a redirect: a

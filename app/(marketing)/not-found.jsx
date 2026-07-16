@@ -1,4 +1,4 @@
-import { NotFoundPage } from "../../src/pages/marketing/NotFound.jsx";
+import { NotFoundPage } from "../../src/screens/marketing/NotFound.jsx";
 import { getSettings } from "../../src/lib/content.server.js";
 import { notFoundMetadata } from "../../src/lib/metadata.js";
 

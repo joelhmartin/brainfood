@@ -1,4 +1,4 @@
-import { AboutPage } from "../../../src/pages/marketing/About.jsx";
+import { AboutPage } from "../../../src/screens/marketing/About.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 

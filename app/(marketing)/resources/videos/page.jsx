@@ -1,4 +1,4 @@
-import { ComingSoonPage } from "../../../../src/pages/marketing/ComingSoon.jsx";
+import { ComingSoonPage } from "../../../../src/screens/marketing/ComingSoon.jsx";
 import { getSettings } from "../../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../../src/lib/metadata.js";
 

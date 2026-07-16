@@ -1,4 +1,4 @@
-import { ContactPage } from "../../../src/pages/marketing/Contact.jsx";
+import { ContactPage } from "../../../src/screens/marketing/Contact.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
 import { buildMetadata } from "../../../src/lib/metadata.js";
 

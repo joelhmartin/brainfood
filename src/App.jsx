@@ -9,32 +9,32 @@ import { RequireAuth } from "./guards/RequireAuth.jsx";
 import { AppShell } from "./components/layout/AppShell.jsx";
 
 // Auth pages. No register page: sign-up is disabled, admins arrive by invitation.
-import { LoginPage } from "./pages/auth/LoginPage.jsx";
-import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage.jsx";
-import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage.jsx";
-import { AcceptInvitePage } from "./pages/auth/AcceptInvitePage.jsx";
+import { LoginPage } from "./screens/auth/LoginPage.jsx";
+import { ForgotPasswordPage } from "./screens/auth/ForgotPasswordPage.jsx";
+import { ResetPasswordPage } from "./screens/auth/ResetPasswordPage.jsx";
+import { AcceptInvitePage } from "./screens/auth/AcceptInvitePage.jsx";
 
 // Dashboard pages
-import { DashboardPage } from "./pages/app/DashboardPage.jsx";
-import { SettingsPage } from "./pages/app/SettingsPage.jsx";
-import { MembersPage } from "./pages/app/MembersPage.jsx";
-import { EventsAdminPage } from "./pages/app/EventsAdminPage.jsx";
-import { PostsAdminPage } from "./pages/app/PostsAdminPage.jsx";
+import { DashboardPage } from "./screens/app/DashboardPage.jsx";
+import { SettingsPage } from "./screens/app/SettingsPage.jsx";
+import { MembersPage } from "./screens/app/MembersPage.jsx";
+import { EventsAdminPage } from "./screens/app/EventsAdminPage.jsx";
+import { PostsAdminPage } from "./screens/app/PostsAdminPage.jsx";
 
 // Marketing pages
-import { HomePage } from "./pages/marketing/Home.jsx";
-import { AboutPage } from "./pages/marketing/About.jsx";
-import { ProductPage } from "./pages/marketing/Product.jsx";
-import { ContactPage } from "./pages/marketing/Contact.jsx";
-import { CaseSubmissionPage } from "./pages/marketing/CaseSubmission.jsx";
-import { ComingSoonPage } from "./pages/marketing/ComingSoon.jsx";
-import { EventsPage } from "./pages/marketing/Events.jsx";
-import { EventDetailPage } from "./pages/marketing/EventDetail.jsx";
-import { BlogPage } from "./pages/marketing/Blog.jsx";
-import { BlogPostPage } from "./pages/marketing/BlogPost.jsx";
-import { ServicesPage } from "./pages/marketing/Services.jsx";
-import { ServiceDetailPage } from "./pages/marketing/ServiceDetail.jsx";
-import { NotFoundPage } from "./pages/marketing/NotFound.jsx";
+import { HomePage } from "./screens/marketing/Home.jsx";
+import { AboutPage } from "./screens/marketing/About.jsx";
+import { ProductPage } from "./screens/marketing/Product.jsx";
+import { ContactPage } from "./screens/marketing/Contact.jsx";
+import { CaseSubmissionPage } from "./screens/marketing/CaseSubmission.jsx";
+import { ComingSoonPage } from "./screens/marketing/ComingSoon.jsx";
+import { EventsPage } from "./screens/marketing/Events.jsx";
+import { EventDetailPage } from "./screens/marketing/EventDetail.jsx";
+import { BlogPage } from "./screens/marketing/Blog.jsx";
+import { BlogPostPage } from "./screens/marketing/BlogPost.jsx";
+import { ServicesPage } from "./screens/marketing/Services.jsx";
+import { ServiceDetailPage } from "./screens/marketing/ServiceDetail.jsx";
+import { NotFoundPage } from "./screens/marketing/NotFound.jsx";
 
 import { Navbar } from "./components/marketing/Navbar.jsx";
 import { Footer } from "./components/marketing/Footer.jsx";
