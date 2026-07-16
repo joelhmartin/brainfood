@@ -16,10 +16,10 @@ const STATIC_ROUTES = [
 export default async function sitemap() {
   const settings = await getSettings();
 
-  // Matches the old prerender behavior: no sitemap at all while the site is
-  // noindexed. Advertising URLs we are simultaneously telling crawlers to ignore
-  // is contradictory.
-  if (!settings.seoIndexable) return [];
+  // Matches the old prerender behavior: skip sitemap if the site is noindexed
+  // OR if siteUrl is unset. Advertising relative/empty-origin URLs to crawlers
+  // is invalid; advertising URLs we are simultaneously noindexing is contradictory.
+  if (!settings.seoIndexable || !settings.siteUrl) return [];
 
   const [posts, events] = await Promise.all([getPosts(), getEvents()]);
 

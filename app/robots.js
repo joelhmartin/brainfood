@@ -8,8 +8,15 @@ export default async function robots() {
     return { rules: [{ userAgent: "*", disallow: "/" }] };
   }
 
-  return {
+  const result = {
     rules: [{ userAgent: "*", allow: "/", disallow: ["/app/", "/auth/", "/api/"] }],
-    sitemap: absoluteUrl("/sitemap.xml", settings.siteUrl),
   };
+
+  // Include sitemap URL only if siteUrl is set; skip if unset to avoid advertising
+  // a malformed (relative/empty-origin) sitemap URL, matching the old prerender behavior.
+  if (settings.siteUrl) {
+    result.sitemap = absoluteUrl("/sitemap.xml", settings.siteUrl);
+  }
+
+  return result;
 }

@@ -28,6 +28,20 @@ describe("sitemap", () => {
     expect(getEvents).not.toHaveBeenCalled();
   });
 
+  it("returns an empty array when siteUrl is unset, even if indexable (matches old writeSeoFiles guard)", async () => {
+    getSettings.mockResolvedValue({ seoIndexable: true, siteUrl: "" });
+    // If these were called, that would be wasted work for a sitemap we're
+    // about to discard anyway, and absoluteUrl would emit relative URLs.
+    getPosts.mockResolvedValue([{ slug: "should-not-appear" }]);
+    getEvents.mockResolvedValue([{ slug: "should-not-appear" }]);
+
+    const result = await sitemap();
+
+    expect(result).toEqual([]);
+    expect(getPosts).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
+  });
+
   it("includes all static routes, service slugs, and content URLs with absolute URLs and lastModified when indexable", async () => {
     getSettings.mockResolvedValue({ seoIndexable: true, siteUrl: "https://example.com" });
     getPosts.mockResolvedValue([
