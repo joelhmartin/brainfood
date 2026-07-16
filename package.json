@@ -9,6 +9,8 @@
     "build": "vite build && node scripts/prerender.mjs",
     "build:spa": "vite build",
     "prerender": "node scripts/prerender.mjs",
+    "deploy": "vercel build && vercel deploy --prebuilt",
+    "deploy:prod": "vercel build --prod && vercel deploy --prebuilt --prod",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",

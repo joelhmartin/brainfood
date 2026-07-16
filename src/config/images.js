@@ -62,8 +62,8 @@ export const SERVICES = {
 // These are local files in /public/images/team-photos/
 
 export const TEAM = {
-  heroMain: "/images/team-photos/full team hero 2 with copy space.webp",
-  heroMobile: "/images/team-photos/full team hero mobile.webp",
+  heroMain: "/images/team-photos/charles-justin-hero.avif",
+  heroMobile: "/images/team-photos/charles-justin-hero-mobile.avif",
   heroAlt: "/images/team-photos/full team hero.webp",
   goofin: "/images/team-photos/full team goofin.webp",
   charlesJustin1: "/images/team-photos/charles-justin-1.webp",
