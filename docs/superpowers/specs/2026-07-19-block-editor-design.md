@@ -1,181 +1,161 @@
-# Block Editor for Posts & Events — Design
+# HTML Editor + Snippet Library for Posts & Events — Design
 
 **Date:** 2026-07-19
 **Status:** Approved for planning
+**Supersedes:** the block-editor design previously in this file (TipTap / ProseMirror JSON).
+That approach was scoped down at the user's direction: *"Just make it a code editor. Give me
+pre-stored HTML snippets for different components that I can choose from a dropdown. No need to
+make it an in-depth editor."*
 
 ## Why
 
-The post and event editors are bare `<textarea rows={12}>` fields
-(`src/screens/app/PostsAdminPage.jsx:161`, `src/screens/app/EventsAdminPage.jsx:136`). There is
-no formatting UI at all. Authors have to know an undocumented markup dialect by heart.
+The post and event body fields are bare `<textarea rows={12}>`
+(`src/screens/app/PostsAdminPage.jsx:164`, `src/screens/app/EventsAdminPage.jsx:139`) with no
+formatting help of any kind.
 
-That dialect is a hand-rolled "markdown-lite" parser, **duplicated** in
-`src/screens/marketing/BlogPost.jsx:25` and `src/screens/marketing/EventDetail.jsx:20`, with
-subtly different styling between the two copies (`boldify` emits `text-navy` in one and
-`text-navy/80` in the other). It supports only `## `, `### `, `- `, and `**bold**`. Anything
-else — a link, an image, a quote, emphasis — is impossible.
-
-It also renders through `dangerouslySetInnerHTML`.
-
-Separately, the user wants article content to **reuse real site components** (an FAQ accordion
-was the named example). A plain string body cannot express that.
+What they accept is a hand-rolled "markdown-lite" dialect, **duplicated** across
+`src/screens/marketing/BlogPost.jsx:26` and `src/screens/marketing/EventDetail.jsx:20`, and the
+two copies have already drifted (`boldify` emits `text-navy` in one, `text-navy/80` in the
+other). It supports exactly four things: `## `, `### `, `- `, `**bold**`. No links, images,
+quotes, ordered lists, or emphasis. Authors must know the dialect by memory.
 
 ## Scope
 
-Replace the textareas with a block editor storing structured JSON, add a source view, render it
-server-side through an allowlisted node map, and improve the surrounding authoring experience.
+Turn the body field into an **HTML code editor** with a **dropdown of pre-written component
+snippets**, and render that HTML with the site's existing article typography.
 
 ### In scope
 
-1. **Block editor** (TipTap/ProseMirror) for post and event bodies.
-2. **Source tab** — view and edit the underlying document, tabbing between visual and source.
-3. **Component blocks** — an FAQ accordion (net-new component) and a CTA card, alongside
-   image and standard text blocks.
-4. **Shared server-side renderer** replacing both copies of `RenderBody`.
-5. **Editing UX:** live preview, image insert/upload, autosave, SEO fields.
-6. **Migration** of the existing 3 posts and 3 events, with legacy fallback.
+1. Body content becomes **HTML**, stored in the existing `body` column.
+2. A **snippet library** — a dropdown that inserts ready-made component HTML at the cursor.
+3. A **code editor**: monospace, tab support, reasonable height. Not a WYSIWYG.
+4. A **shared renderer** replacing both `RenderBody` copies.
+5. **Scoped article typography** so any HTML renders on-brand.
+6. **One-time conversion** of the 3 existing posts and 3 events, with legacy fallback.
 
-### Out of scope
+### Explicitly not in scope
 
-- AI assist (draft/rewrite/SEO generation). Still queued in
-  `BACKLOG-ai-admin-and-email.md`; this spec deliberately picks a storage format that suits it.
-- Mailgun DNS cutover, the `/products` orphan page, and public-site redesign.
+- WYSIWYG / rich-text / block editing. Rejected by the user.
+- ProseMirror, TipTap, or any editor framework.
+- A schema change. `body` stays `text`.
+- Live preview, autosave, SEO fields. Dropped with the block-editor plan.
+- AI assist — still queued in `BACKLOG-ai-admin-and-email.md`.
 
 ## Storage
 
-TipTap emits a ProseMirror JSON document. Storage decision:
+**No schema change.** `body` remains `text`; its contents become HTML instead of markdown-lite.
 
-- **Add `body_json jsonb`** to `posts` and `events`. This becomes the source of truth.
-- **Keep `body text`** as a derived plain-text mirror, written on every save.
-
-Keeping `body` matters for three existing consumers: `estimateReadTime()`
-(`src/lib/mappers.js`), excerpt/search text, and — critically — **legacy fallback**. A row with
-`body_json = null` renders through the old markdown-lite path, so nothing breaks mid-migration
-and old drafts never become unreadable.
-
-`jsonb` rather than stuffing JSON into the existing text column: it is queryable, validated by
-Postgres, and self-documenting. RLS policies on both tables already gate by `published`, and
-adding a column does not change them.
+`estimateReadTime()` (`src/lib/mappers.js`) consumes `body` and counts words — HTML tags would
+inflate the count, so it needs tags stripped before counting.
 
 ## Architecture
 
 ```
-ADMIN (client)                         PUBLIC (server)
-──────────────                         ───────────────
-BlockEditor (TipTap)                   renderDocument(body_json)
-  ├─ toolbar                             ├─ allowlisted node map → JSX
-  ├─ Visual │ Source tabs                ├─ paragraph/heading/list → brand typography
-  ├─ image upload → Supabase media       ├─ faqAccordion → <FaqAccordion/>
-  ├─ FAQ / CTA block inserts             └─ ctaCard      → <CtaCard/>
-  └─ autosave                            (no TipTap in the public bundle)
-        │
-        └── body_json (jsonb) + body (derived plaintext)
+ADMIN (client)                        PUBLIC (server component)
+──────────────                        ─────────────────────────
+HtmlEditor                            <ArticleBody html={post.body} />
+  ├─ snippet dropdown ──inserts──┐      ├─ sanitize (strip script/handlers)
+  └─ <textarea> monospace, tab   │      └─ dangerouslySetInnerHTML
+                                 │           inside .article-body
+        SNIPPETS ────────────────┘           (scoped brand typography)
+     src/config/snippets.js
 ```
 
 ### Files
 
 **Created**
-- `src/components/editor/BlockEditor.jsx` — the editor shell: toolbar, tabs, autosave wiring.
-- `src/components/editor/extensions/faqAccordion.js` — custom TipTap node.
-- `src/components/editor/extensions/ctaCard.js` — custom TipTap node.
-- `src/lib/content/renderDocument.jsx` — **server-side** JSON → JSX renderer.
-- `src/lib/content/documentToText.js` — JSON → plain text (for `body`, read-time, excerpts).
-- `src/lib/content/legacyToDocument.js` — markdown-lite → TipTap JSON, for migration.
-- `src/components/marketing/FaqAccordion.jsx` — net-new; no accordion exists in the codebase.
-- `supabase/migrations/<ts>_body_json.sql`
-- Tests for the renderer, the text extractor, and the legacy converter.
+- `src/config/snippets.js` — the snippet library. Plain data, version-controlled.
+- `src/components/editor/HtmlEditor.jsx` — textarea + dropdown.
+- `src/components/marketing/ArticleBody.jsx` — the shared renderer.
+- `src/lib/content/sanitizeHtml.js` — strips `<script>` and event handlers.
+- `src/lib/content/legacyToHtml.js` — markdown-lite → HTML, for conversion + fallback.
+- Tests for the two pure modules.
 
 **Modified**
-- `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx` — editor + UX.
+- `app/globals.css` — the `.article-body` scoped typography block.
 - `src/screens/marketing/BlogPost.jsx`, `src/screens/marketing/EventDetail.jsx` — both
-  `RenderBody` copies deleted, replaced by the shared renderer.
-- `src/lib/mappers.js` — map `body_json`.
-- `src/stores/posts.store.js`, `src/stores/events.store.js` — persist `body_json`.
+  `RenderBody`/`boldify` copies deleted.
+- `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`.
+- `src/lib/mappers.js` — strip tags before counting words.
 
-### Rendering, and a security improvement
+### Typography via a scoped style block
 
-The public renderer walks the JSON and maps each node type to JSX through an **allowlist**.
-An unknown node type renders nothing rather than falling through to raw output.
+The current renderer *is* the typography: it applies `text-navy/65`, `text-[17px]`,
+`leading-[1.8]`, `font-heading` headings, brand-colored bullets. Rendering raw HTML would bypass
+all of it and published posts would come out unstyled.
 
-This **removes `dangerouslySetInnerHTML` from the article path entirely** — today's parser
-injects HTML built by regex. Node-to-component mapping is structurally safer.
+Rather than baking Tailwind classes into every snippet, `app/globals.css` gets a block scoped to
+`.article-body` (`.article-body h2 { … }`, `.article-body p { … }`, …) reproducing the current
+styles exactly. Consequences:
 
-The renderer runs in a **Server Component**. TipTap must never enter the public bundle; only the
-admin loads the editor. Typography is ported verbatim from the current `RenderBody` so published
-posts look identical.
+- Snippets stay clean and readable (`<h2>Title</h2>`, not a wall of utility classes).
+- Hand-typed HTML is styled correctly too.
+- Article typography has **one** definition instead of two drifted copies.
 
-## Blocks
+### Snippet library
 
-**Text:** paragraph, H2, H3, bullet list, ordered list, bold, italic, link, blockquote.
-Ordered lists, links, italics and quotes are all new capability — the old dialect had none.
+`src/config/snippets.js` exports an array of `{ id, label, group, html }`. It sits beside the
+other config files (`site.js`, `services.js`, `brand.js`) and follows their conventions.
 
-**Image:** reuses the existing Supabase `media` bucket and its admin-only storage RLS
-(`src/components/ui/ImageUpload.jsx`), so no new upload path or policy is introduced.
+Planned snippets: heading, subheading, paragraph, bullet list, numbered list, link, image,
+pull quote, **FAQ accordion**, CTA card, button, divider.
 
-**FAQ accordion:** the user's named example. A new `FaqAccordion` marketing component plus a
-TipTap node holding a list of question/answer pairs. Must be accessible — real
-`<button>` triggers, `aria-expanded`, keyboard operable — and server-rendered so the Q&A text is
-in the HTML for crawlers. This is a content type search engines surface well, so the answer text
-must not be JS-gated.
+**The FAQ accordion uses native `<details>`/`<summary>`** — a real accordion with **no
+JavaScript**. It server-renders, is keyboard accessible and screen-reader friendly for free, and
+its answer text is in the HTML where crawlers can read it. FAQ content is exactly what search
+engines surface, so that matters.
 
-**CTA card:** heading, body, button label, href — styled from the existing `CtaBanner`.
+Adding a snippet later is a one-line edit to this file.
 
-## Source tab
+### Sanitization
 
-Visual and Source tabs over the same document. Source shows formatted JSON, is editable, and
-round-trips back to the visual editor on valid input. Invalid JSON shows an inline error and
-**blocks the tab switch** rather than silently discarding work.
+Body HTML is rendered with `dangerouslySetInnerHTML` — as it already is today, via
+regex-built strings.
 
-The existing `src/components/ui/Tabs.jsx` is a sticky marketing layout component and is not
-suitable; the editor needs a small, plain tab control.
+Only invited admins can write content (single `admin` role, public sign-up disabled), so this is
+not an untrusted-input surface. Still, `sanitizeHtml()` strips `<script>` tags and inline event
+handlers (`onerror=`, `onclick=`, …) on render. Cheap, and it means a pasted snippet from the
+web cannot silently execute.
 
-## Editing UX
-
-- **Live preview** — renders through the same `renderDocument` the public site uses, so preview
-  and published output cannot drift.
-- **Image upload** — drag/drop and toolbar insert via the existing `media` bucket.
-- **Autosave** — debounced draft saves with a visible "saving/saved" indicator. Autosave must
-  **never publish**; `published` stays under explicit control.
-- **SEO fields** — meta description, OG image, slug, surfaced in the editor. These already feed
-  `generateMetadata` and JSON-LD; today they are not editable per post.
+Sanitizing at **render** rather than save means already-stored content is covered too.
 
 ## Migration
 
-`legacyToDocument()` converts the markdown-lite dialect (`## `, `### `, `- `, `**bold**`) to
-TipTap JSON. A one-off script backfills the 3 posts and 3 events.
+`legacyToHtml()` converts the markdown-lite dialect to HTML (`## ` → `<h2>`, `### ` → `<h3>`,
+`- ` → `<ul><li>`, `**bold**` → `<strong>`).
 
-The migration is **non-destructive**: `body` is left intact, and rows without `body_json` keep
-rendering through the legacy path. Backfill can be re-run safely.
+It serves two purposes: a one-time conversion of existing rows, and a **render-time fallback**.
+Detecting legacy content is straightforward — markdown-lite has no `<` tags. Content without
+them converts on the fly, so no row can render as raw `## Heading` text, even if conversion is
+skipped or a row is missed.
 
 ## Error handling
 
-- Malformed or missing `body_json` → fall back to legacy `body`; never a blank article.
-- Unknown node type → skipped, with a server-side warning.
-- Autosave failure → surfaced, non-destructive; the editor keeps the unsaved buffer.
-- Image upload failure → inline error; the document is not mutated.
+- Empty or null `body` → renders nothing, never a crash.
+- Legacy (non-HTML) content → converted on the fly.
+- Malformed HTML → browsers are tolerant; no parse step to fail.
+- `estimateReadTime` strips tags first, so word counts stay honest.
 
 ## Testing
 
-- **Renderer:** each node type produces the expected element and brand classes; unknown nodes are
-  skipped; malformed input falls back rather than throwing.
-- **Legacy converter:** every construct of the old dialect round-trips; the existing 3 posts
-  convert without content loss.
-- **Text extractor:** plain text matches what read-time estimation expects.
-- **FAQ accordion:** answer text present in server-rendered HTML (crawlability), and keyboard
-  operable.
-- **E2E:** create a post with mixed blocks, save, publish, confirm it renders on the public page.
-- The repo has no React Testing Library; follow the established
+- **`legacyToHtml`:** every construct of the old dialect; consecutive `- ` lines group into one
+  `<ul>`; blank line ends a list; `**bold**` works mid-sentence; the 3 real seeded posts convert
+  without text loss.
+- **`sanitizeHtml`:** strips `<script>` and `on*=` handlers; leaves legitimate markup and
+  attributes (`href`, `src`, `alt`, `class`) intact.
+- **Read time:** a body full of tags produces the same estimate as its plain-text equivalent.
+- **Rendering parity:** the seeded posts render with the same visual result as before.
+- **E2E:** insert a snippet in the admin, save, publish, confirm it renders publicly.
+- No React Testing Library in this repo — follow the established
   extract-a-pure-function-and-test-it pattern.
 
 ## Risks
 
-- **Biggest: rendering parity.** Published posts must look unchanged. Typography is ported
-  verbatim and verified by comparing rendered output for the existing posts before and after.
-- **Bundle size.** TipTap is heavy; it must be admin-only and code-split. The public route
-  bundle should not grow.
-- **Autosave vs. publish.** An autosave that writes to a published row would edit live content
-  silently. Drafts and published state must stay distinct.
-- **Scope.** This is the largest feature since the migration. It is decomposed so the editor,
-  the renderer, and the UX layer land independently.
-- **`revalidatePath` on publish** already exists and must keep working — the publish path is
-  unchanged, only the payload shape differs.
+- **Rendering parity is the main risk.** The `.article-body` block must reproduce the current
+  typography exactly; verify by comparing rendered posts before and after.
+- **Authors now write HTML.** That is the explicit ask, and the snippet dropdown is what keeps it
+  approachable — the snippet set should cover the common cases well enough that hand-writing tags
+  is rare.
+- **Broken HTML is possible** (an unclosed tag can bleed into page layout). Sanitization does not
+  fix malformed markup. Acceptable for a trusted single-admin site; a preview would mitigate it
+  later if it becomes a nuisance.

@@ -1,619 +1,395 @@
-# Block Editor Implementation Plan
+# HTML Editor + Snippet Library Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the bare-textarea post/event editors with a TipTap block editor storing ProseMirror JSON, rendered server-side through an allowlisted node map, including an FAQ accordion block and a real authoring UX.
+**Goal:** Replace the bare-textarea post/event body fields with an HTML code editor plus a dropdown of pre-written component snippets, rendered with the site's existing article typography.
 
-**Architecture:** `body_json jsonb` becomes the source of truth; `body text` is kept as a derived plaintext mirror and legacy fallback. The admin loads TipTap (client-only); the public site walks the JSON in a Server Component and maps nodes to brand-styled JSX — no TipTap in the public bundle, and no `dangerouslySetInnerHTML` in the article path.
+**Architecture:** Body content becomes HTML in the existing `body` column — no schema change. A shared `<ArticleBody>` server component sanitizes and renders it inside a `.article-body` wrapper whose scoped CSS reproduces the current brand typography. Legacy markdown-lite content converts on the fly, so nothing can render broken.
 
-**Tech Stack:** Next.js 15 App Router, React 18.3.1, JavaScript (`.jsx`/`.js`, **not** TypeScript), TipTap 3.28.0 (`@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/pm`, `@tiptap/extension-link`, `@tiptap/extension-image`), Tailwind, Supabase, Vitest, Playwright.
+**Tech Stack:** Next.js 15 App Router, React 18.3.1, JavaScript (`.jsx`/`.js`, **not** TypeScript), Tailwind, Supabase, Vitest, Playwright. **No new dependencies.**
 
 ## Global Constraints
 
 - **Language stays JavaScript** (`.jsx`/`.js`). Do not introduce TypeScript.
-- **Rendering parity is the top risk.** Published posts must look *identical* after this change. Port typography verbatim from the existing `RenderBody` implementations.
-- **TipTap must never enter the public bundle.** Editor code is admin-only and dynamically imported. Verify the public route bundle does not grow.
-- **The public renderer runs server-side** and must not use `dangerouslySetInnerHTML`. Unknown node types render nothing.
-- **Migration is non-destructive.** Never overwrite or clear `body`. Rows without `body_json` must keep rendering via the legacy path.
-- **Autosave must never publish.** `published` stays under explicit user control.
+- **No new dependencies.** No editor framework, no sanitizer library, no `@tailwindcss/typography`.
+- **Rendering parity is the top risk.** Published posts must look the same afterward. The `.article-body` CSS must reproduce the current `RenderBody` typography exactly.
+- **No schema change.** `body` stays `text`.
+- **Legacy content must never render as raw `## Heading` text.** The on-the-fly fallback is load-bearing — do not remove it.
 - **Do NOT flip `seoIndexable`** (currently `false` by design until the site is on its real domain).
 - Do not modify `src/lib/api/auth.js`, `requirePermission`, `safeRedirectPath`, `src/lib/email/*`, or `app/api/contact/route.js`.
 - **The RLS suite (`tests/rls.test.js`) is destructive** and is pinned to local Supabase via `.env.test.local`. Never point it at the hosted DB.
 - **Do not touch the human's in-flight work:** `src/config/images.js` (modified) and `public/images/candid/` (untracked). Never `git add -A` / `git add .`; never `git stash`.
-- Port numbers: 3000/3001 are occupied on this machine and `localhost` resolves `::1` first — use `127.0.0.1` with an explicit port, and check `lsof -ti :<port>` for stale servers before diagnosing config bugs.
+- Ports 3000/3001 are occupied on this machine and `localhost` resolves `::1` first — use `127.0.0.1` with an explicit port, and check `lsof -ti :<port>` for stale servers before diagnosing config bugs.
 
 ## File Structure
 
 **Created**
-- `src/lib/content/documentToText.js` — JSON → plain text
-- `src/lib/content/legacyToDocument.js` — markdown-lite → TipTap JSON
-- `src/lib/content/renderDocument.jsx` — server-side JSON → JSX (allowlisted)
-- `src/components/marketing/FaqAccordion.jsx` — net-new component
-- `src/components/editor/BlockEditor.jsx` — editor shell (client)
-- `src/components/editor/EditorTabs.jsx` — visual/source tab control
-- `src/components/editor/extensions/faqAccordion.js`
-- `src/components/editor/extensions/ctaCard.js`
-- `supabase/migrations/<timestamp>_body_json.sql`
-- `scripts/backfill-body-json.mjs`
-- Tests alongside each pure module
+- `src/lib/content/legacyToHtml.js` + test — markdown-lite → HTML
+- `src/lib/content/sanitizeHtml.js` + test — strip `<script>` and `on*=`
+- `src/config/snippets.js` — the snippet library
+- `src/components/marketing/ArticleBody.jsx` — shared renderer
+- `src/components/editor/HtmlEditor.jsx` — textarea + snippet dropdown
 
 **Modified**
-- `src/lib/mappers.js`, `src/stores/posts.store.js`, `src/stores/events.store.js`
-- `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`
+- `app/globals.css` — `.article-body` scoped typography
 - `src/screens/marketing/BlogPost.jsx`, `src/screens/marketing/EventDetail.jsx`
+- `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`
+- `src/lib/mappers.js` — strip tags before counting words
 
 ---
 
-### Task 1: Schema — `body_json` column
+### Task 1: Legacy converter + sanitizer
 
 **Files:**
-- Create: `supabase/migrations/<timestamp>_body_json.sql`
-- Modify: `src/lib/mappers.js`
-- Test: `src/lib/mappers.test.js` (exists — extend it)
+- Create: `src/lib/content/legacyToHtml.js`, `src/lib/content/legacyToHtml.test.js`, `src/lib/content/sanitizeHtml.js`, `src/lib/content/sanitizeHtml.test.js`
 
 **Interfaces:**
-- Consumes: nothing.
-- Produces: `posts.body_json jsonb null`, `events.body_json jsonb null`. `postFromRow`/`eventFromRow` expose `bodyJson`; `postToRow`/`eventToRow` persist it.
+- Produces: `legacyToHtml(text)` → HTML string; `looksLikeHtml(text)` → boolean; `sanitizeHtml(html)` → HTML string.
 
-**Context:** `body_json` is nullable **on purpose** — a null means "legacy row, render from `body`". Read `src/lib/mappers.js` first and match its existing style exactly.
+**Context:** **Read both existing parsers first** — `src/screens/marketing/BlogPost.jsx:26-88` and `src/screens/marketing/EventDetail.jsx:20-80` — and match their rules exactly. The dialect is:
 
-- [ ] **Step 1: Write the failing test**
-
-Extend `src/lib/mappers.test.js`:
-
-```js
-describe("postFromRow / postToRow — body_json", () => {
-  it("exposes body_json as bodyJson", () => {
-    const doc = { type: "doc", content: [] };
-    expect(postFromRow({ id: 1, slug: "a", body_json: doc }).bodyJson).toEqual(doc);
-  });
-
-  it("returns null bodyJson for a legacy row", () => {
-    expect(postFromRow({ id: 1, slug: "a", body: "## Hi" }).bodyJson).toBeNull();
-  });
-
-  it("persists bodyJson back to body_json", () => {
-    const doc = { type: "doc", content: [] };
-    expect(postToRow({ slug: "a", bodyJson: doc }).body_json).toEqual(doc);
-  });
-
-  it("leaves body intact alongside body_json", () => {
-    const row = postToRow({ slug: "a", body: "plain text", bodyJson: { type: "doc", content: [] } });
-    expect(row.body).toBe("plain text");
-  });
-});
-```
-
-Add the equivalent block for `eventFromRow`/`eventToRow`.
-
-- [ ] **Step 2: Run it and watch it fail**
-
-Run: `npx vitest run src/lib/mappers.test.js`
-Expected: FAIL — `bodyJson` is undefined.
-
-- [ ] **Step 3: Write the migration**
-
-Create `supabase/migrations/<timestamp>_body_json.sql` (timestamp format must match the existing two migration filenames):
-
-```sql
--- Block editor: ProseMirror JSON is the source of truth for article bodies.
--- Nullable on purpose: a null body_json means "legacy row, render from body".
--- body is retained as a derived plaintext mirror (read-time, excerpts, search)
--- and as the fallback, so no row can become unreadable mid-migration.
-alter table posts  add column if not exists body_json jsonb;
-alter table events add column if not exists body_json jsonb;
-```
-
-No RLS change: both tables' policies gate on `published`, which is unaffected by a new column.
-
-- [ ] **Step 4: Update the mappers**
-
-Add `bodyJson: row.body_json ?? null` to `postFromRow` and `eventFromRow`; add `body_json: x.bodyJson ?? null` to `postToRow` and `eventToRow`. Do not alter existing field handling.
-
-- [ ] **Step 5: Apply locally and verify**
-
-```bash
-npm run db:reset
-npx vitest run src/lib/mappers.test.js
-```
-
-Expected: reset succeeds, tests pass.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add supabase/migrations src/lib/mappers.js src/lib/mappers.test.js
-git commit -m "feat: add body_json column and map it"
-```
-
----
-
-### Task 2: Plain-text extractor
-
-**Files:**
-- Create: `src/lib/content/documentToText.js`, `src/lib/content/documentToText.test.js`
-
-**Interfaces:**
-- Consumes: nothing.
-- Produces: `documentToText(doc)` → string. Returns `""` for null/malformed input.
-
-**Context:** `estimateReadTime()` (`src/lib/mappers.js`) and excerpt/search all consume plain text. This produces the `body` mirror written on every save.
-
-- [ ] **Step 1: Write the failing test**
-
-```js
-import { describe, it, expect } from "vitest";
-import { documentToText } from "./documentToText.js";
-
-const doc = (content) => ({ type: "doc", content });
-const para = (text) => ({ type: "paragraph", content: [{ type: "text", text }] });
-
-describe("documentToText", () => {
-  it("returns empty string for null or malformed input", () => {
-    expect(documentToText(null)).toBe("");
-    expect(documentToText({})).toBe("");
-    expect(documentToText({ type: "doc" })).toBe("");
-  });
-
-  it("extracts paragraph text", () => {
-    expect(documentToText(doc([para("Hello world")]))).toContain("Hello world");
-  });
-
-  it("separates block-level nodes so words do not run together", () => {
-    const out = documentToText(doc([para("One"), para("Two")]));
-    expect(out).toMatch(/One\s+Two/);
-  });
-
-  it("extracts heading and list text", () => {
-    const d = doc([
-      { type: "heading", attrs: { level: 2 }, content: [{ type: "text", text: "Title" }] },
-      { type: "bulletList", content: [
-        { type: "listItem", content: [para("First")] },
-        { type: "listItem", content: [para("Second")] },
-      ]},
-    ]);
-    const out = documentToText(d);
-    expect(out).toContain("Title");
-    expect(out).toContain("First");
-    expect(out).toContain("Second");
-  });
-
-  it("extracts text from FAQ blocks so read time reflects the real content", () => {
-    const d = doc([{ type: "faqAccordion", attrs: { items: [
-      { question: "How long is a session?", answer: "About an hour." },
-    ]}}]);
-    const out = documentToText(d);
-    expect(out).toContain("How long is a session?");
-    expect(out).toContain("About an hour.");
-  });
-});
-```
-
-- [ ] **Step 2: Run it and watch it fail**
-
-Run: `npx vitest run src/lib/content/documentToText.test.js`
-Expected: FAIL — module not found.
-
-- [ ] **Step 3: Implement**
-
-Walk the node tree, collecting `text` from text nodes and joining block-level nodes with newlines. Handle custom node attrs (`faqAccordion` items, `ctaCard` heading/body). Return `""` on anything unexpected rather than throwing — this runs on every save.
-
-- [ ] **Step 4: Run and confirm green**
-
-Run: `npx vitest run src/lib/content/documentToText.test.js`
-Expected: PASS.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add src/lib/content/documentToText.js src/lib/content/documentToText.test.js
-git commit -m "feat: extract plain text from a document"
-```
-
----
-
-### Task 3: Legacy converter
-
-**Files:**
-- Create: `src/lib/content/legacyToDocument.js`, `src/lib/content/legacyToDocument.test.js`
-
-**Interfaces:**
-- Consumes: nothing.
-- Produces: `legacyToDocument(text)` → TipTap JSON doc.
-
-**Context:** Converts the old dialect so existing content survives. **Read both existing parsers first** — `src/screens/marketing/BlogPost.jsx:25` and `src/screens/marketing/EventDetail.jsx:20` — and match their exact rules. The full dialect is:
-
-- `## ` → heading level 2
-- `### ` → heading level 3
-- `- ` → bullet list item (consecutive lines group into one list)
-- `**bold**` → bold mark (inline, may appear mid-sentence)
+- `## ` → `<h2>`
+- `### ` → `<h3>`
+- `- ` → `<li>`, consecutive lines grouped into one `<ul>`
+- `**bold**` → `<strong>`, may appear mid-sentence
 - blank line → flush the current list
-- anything else → paragraph
+- anything else → `<p>`
 
-- [ ] **Step 1: Write the failing test**
+`looksLikeHtml()` decides whether a stored body is already HTML — markdown-lite contains no `<` tags, so that is the signal.
+
+Sanitizing happens at **render**, not save, so already-stored content is covered.
+
+- [ ] **Step 1: Write the failing tests**
+
+`src/lib/content/legacyToHtml.test.js`:
 
 ```js
 import { describe, it, expect } from "vitest";
-import { legacyToDocument } from "./legacyToDocument.js";
-import { documentToText } from "./documentToText.js";
+import { legacyToHtml, looksLikeHtml } from "./legacyToHtml.js";
 
-describe("legacyToDocument", () => {
-  it("returns an empty doc for empty input", () => {
-    expect(legacyToDocument("")).toEqual({ type: "doc", content: [] });
+describe("legacyToHtml", () => {
+  it("returns empty string for empty input", () => {
+    expect(legacyToHtml("")).toBe("");
+    expect(legacyToHtml(null)).toBe("");
   });
 
-  it("converts ## to heading level 2 and ### to level 3", () => {
-    const d = legacyToDocument("## Big\n### Small");
-    expect(d.content[0]).toMatchObject({ type: "heading", attrs: { level: 2 } });
-    expect(d.content[1]).toMatchObject({ type: "heading", attrs: { level: 3 } });
+  it("converts ## and ### to h2 and h3", () => {
+    expect(legacyToHtml("## Big")).toContain("<h2>Big</h2>");
+    expect(legacyToHtml("### Small")).toContain("<h3>Small</h3>");
   });
 
-  it("groups consecutive dash lines into ONE bullet list", () => {
-    const d = legacyToDocument("- one\n- two\n- three");
-    const lists = d.content.filter((n) => n.type === "bulletList");
-    expect(lists).toHaveLength(1);
-    expect(lists[0].content).toHaveLength(3);
+  it("groups consecutive dash lines into ONE ul", () => {
+    const html = legacyToHtml("- one\n- two\n- three");
+    expect(html.match(/<ul>/g)).toHaveLength(1);
+    expect(html.match(/<li>/g)).toHaveLength(3);
   });
 
   it("starts a new list after a blank line", () => {
-    const d = legacyToDocument("- a\n\n- b");
-    expect(d.content.filter((n) => n.type === "bulletList")).toHaveLength(2);
+    expect(legacyToHtml("- a\n\n- b").match(/<ul>/g)).toHaveLength(2);
   });
 
-  it("converts **bold** to a bold mark, including mid-sentence", () => {
-    const d = legacyToDocument("Some **strong** words");
-    const marks = JSON.stringify(d);
-    expect(marks).toContain("bold");
-    expect(marks).not.toContain("**");
+  it("converts **bold** mid-sentence and leaves no asterisks", () => {
+    const html = legacyToHtml("Some **strong** words");
+    expect(html).toContain("<strong>strong</strong>");
+    expect(html).not.toContain("**");
   });
 
-  it("treats other lines as paragraphs", () => {
-    const d = legacyToDocument("Just a line");
-    expect(d.content[0]).toMatchObject({ type: "paragraph" });
+  it("wraps other lines in paragraphs", () => {
+    expect(legacyToHtml("Just a line")).toContain("<p>Just a line</p>");
   });
 
-  it("preserves all text content through the conversion", () => {
-    const src = "## Title\nIntro **word**\n- one\n- two";
-    const out = documentToText(legacyToDocument(src));
-    for (const w of ["Title", "Intro", "word", "one", "two"]) expect(out).toContain(w);
+  it("escapes stray angle brackets in legacy text", () => {
+    expect(legacyToHtml("5 < 10")).not.toContain("< 10");
+  });
+});
+
+describe("looksLikeHtml", () => {
+  it("detects HTML", () => {
+    expect(looksLikeHtml("<p>hi</p>")).toBe(true);
+  });
+  it("treats markdown-lite as not HTML", () => {
+    expect(looksLikeHtml("## Title\n- item")).toBe(false);
+  });
+  it("handles empty input", () => {
+    expect(looksLikeHtml("")).toBe(false);
+    expect(looksLikeHtml(null)).toBe(false);
   });
 });
 ```
 
-- [ ] **Step 2: Run it and watch it fail**
+`src/lib/content/sanitizeHtml.test.js`:
 
-Run: `npx vitest run src/lib/content/legacyToDocument.test.js`
-Expected: FAIL — module not found.
+```js
+import { describe, it, expect } from "vitest";
+import { sanitizeHtml } from "./sanitizeHtml.js";
 
-- [ ] **Step 3: Implement**
+describe("sanitizeHtml", () => {
+  it("removes script tags and their contents", () => {
+    const out = sanitizeHtml('<p>ok</p><script>alert(1)</script>');
+    expect(out).not.toContain("<script");
+    expect(out).not.toContain("alert(1)");
+    expect(out).toContain("<p>ok</p>");
+  });
 
-Mirror the existing parsers' control flow (line loop, list buffer, flush on blank line).
+  it("strips inline event handlers", () => {
+    const out = sanitizeHtml('<img src="a.jpg" onerror="alert(1)">');
+    expect(out).not.toMatch(/onerror/i);
+    expect(out).toContain('src="a.jpg"');
+  });
+
+  it("strips javascript: urls", () => {
+    expect(sanitizeHtml('<a href="javascript:alert(1)">x</a>')).not.toContain("javascript:");
+  });
+
+  it("leaves legitimate markup and attributes intact", () => {
+    const html = '<h2>Title</h2><p class="lead">Text <a href="/about">link</a></p><details><summary>Q</summary><p>A</p></details>';
+    const out = sanitizeHtml(html);
+    for (const frag of ["<h2>Title</h2>", 'class="lead"', 'href="/about"', "<details>", "<summary>Q</summary>"]) {
+      expect(out).toContain(frag);
+    }
+  });
+
+  it("handles empty input", () => {
+    expect(sanitizeHtml("")).toBe("");
+    expect(sanitizeHtml(null)).toBe("");
+  });
+});
+```
+
+- [ ] **Step 2: Run them and watch them fail**
+
+Run: `npx vitest run src/lib/content/`
+Expected: FAIL — modules not found.
+
+- [ ] **Step 3: Implement both**
+
+Mirror the existing parsers' control flow for `legacyToHtml` (line loop, list buffer, flush on blank). `sanitizeHtml` is regex-based — that is sufficient here because the input is admin-authored, not untrusted user input; note that in a comment so a future reader does not mistake it for a general-purpose sanitizer.
 
 - [ ] **Step 4: Run and confirm green**
 
-Run: `npx vitest run src/lib/content/legacyToDocument.test.js`
-Expected: PASS.
+Run: `npx vitest run src/lib/content/`
 
 - [ ] **Step 5: Verify against real content**
 
-Convert the 3 seeded posts' bodies and confirm no text is lost. Use `npm run seed`'s source data (`supabase/seed-data.js`) — do not invent fixtures. Report the before/after word counts.
+Convert the 3 seeded post bodies from `supabase/seed-data.js` (do not invent fixtures) and confirm no text is lost. Report before/after word counts.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/lib/content/legacyToDocument.js src/lib/content/legacyToDocument.test.js
-git commit -m "feat: convert legacy markdown-lite bodies to documents"
+git add src/lib/content/
+git commit -m "feat: add legacy markdown-lite to HTML conversion and sanitizing"
 ```
 
 ---
 
-### Task 4: FAQ accordion component
+### Task 2: Article typography + shared renderer
 
 **Files:**
-- Create: `src/components/marketing/FaqAccordion.jsx`
+- Create: `src/components/marketing/ArticleBody.jsx`
+- Modify: `app/globals.css`
 
 **Interfaces:**
-- Consumes: nothing.
-- Produces: `<FaqAccordion items={[{ question, answer }]} />`.
+- Consumes: `sanitizeHtml`, `legacyToHtml`, `looksLikeHtml`.
+- Produces: `<ArticleBody html={string} />` — a Server Component.
 
-**Context:** No accordion exists in this codebase — this is net-new. It is the user's named example of "reuse the components we have."
+**Context — this is the highest-risk task. Published posts must look the same afterward.**
 
-**Two hard requirements:**
+Read both `RenderBody` implementations completely (`src/screens/marketing/BlogPost.jsx:26-88`, `src/screens/marketing/EventDetail.jsx:20-80`) and transcribe their Tailwind classes into equivalent CSS under `.article-body`. Every element the old renderer styled needs a rule:
 
-1. **Answers must be in the server-rendered HTML.** FAQ content is exactly what search engines surface, so answer text must not be JS-gated. Render all answers in the markup and collapse them visually; do not conditionally render them out of the DOM.
-2. **Accessible.** Real `<button>` triggers, `aria-expanded`, `aria-controls`, keyboard operable. Interactive collapse needs `"use client"`.
+| Element | Current styling (transcribe exactly) |
+| --- | --- |
+| `h2` (was `## `) | `font-heading font-bold text-2xl md:text-3xl text-navy mt-14 mb-4 tracking-tight` |
+| `h3` (was `### `) | `font-heading font-bold text-xl text-navy mt-10 mb-3 tracking-tight` |
+| `p` | `text-navy/65 text-[17px] leading-[1.8] my-4` |
+| `ul` | `space-y-2.5 my-5 ml-1` |
+| `li` | `text-navy/65 text-[17px] leading-relaxed` + the brand bullet |
+| `strong` | `font-semibold text-navy` |
 
-Match the site's visual language — read `src/components/ui/Card.jsx` and `src/components/marketing/TaglineCard.jsx` for the established styling, and use brand tokens (`brand-500`, `navy`, `surface-*`) rather than raw colors.
+**The two copies differ:** `boldify` emits `text-navy` in `BlogPost` and `text-navy/80` in `EventDetail`. Pick `text-navy` (the blog post is the primary article surface) and note the change in your report — this intentionally unifies a drift rather than preserving two definitions.
 
-- [ ] **Step 1: Build the component**
+Also style elements the old renderer never supported, consistent with the design system: `ol`, `a`, `blockquote`, `img`, `hr`, `details`/`summary`.
 
-Requirements: `items` array of `{ question, answer }`; first item may default open; smooth expand/collapse; renders nothing when `items` is empty or missing.
+The old bullet was a brand-colored dot rendered as a `<span>`; reproduce it with `li::before` or a `list-style` treatment.
 
-- [ ] **Step 2: Verify server-rendered answer text**
+`ArticleBody` must be **server-renderable** — no hooks, no browser APIs.
 
-Temporarily render it on a page, run `npm run build && npm start` on a free port, and `curl` the page. **Confirm the answer text appears in the raw HTML.** Report the actual grep output, then remove the temporary usage.
+- [ ] **Step 1: Add the `.article-body` block to `app/globals.css`**
 
-- [ ] **Step 3: Verify keyboard operation**
+Use `@apply` with the existing Tailwind tokens where possible so the values stay tied to the design system rather than being hardcoded hex.
 
-Tab to a trigger, press Enter/Space, confirm it expands and `aria-expanded` flips. Playwright is available.
+- [ ] **Step 2: Build `ArticleBody.jsx`**
+
+```jsx
+import { sanitizeHtml } from "../../lib/content/sanitizeHtml.js";
+import { legacyToHtml, looksLikeHtml } from "../../lib/content/legacyToHtml.js";
+
+/**
+ * Renders an article body. Content authored before the HTML editor is stored in a
+ * markdown-lite dialect, so anything that is not already HTML is converted on the fly —
+ * that fallback is why no post can render as raw "## Heading" text.
+ *
+ * Typography lives in the .article-body block in globals.css, so snippets stay clean
+ * HTML and hand-typed markup is styled the same way.
+ */
+export function ArticleBody({ html }) {
+  if (!html) return null;
+  const source = looksLikeHtml(html) ? html : legacyToHtml(html);
+  return (
+    <div
+      className="article-body"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(source) }}
+    />
+  );
+}
+```
+
+- [ ] **Step 3: Verify parity against the real site**
+
+Run `npm run build && npm start` on a free port. Render a seeded post through `ArticleBody` and compare against the same post on production (`https://brainfood-1eusag13u-joelhmartins-projects.vercel.app/blog/what-is-recovery-coaching`), which still uses the old renderer. Screenshot both with Playwright and compare.
+
+**Report any visual difference rather than accepting it.** Font size, line height, heading spacing, and bullet color are the things most likely to drift.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add src/components/marketing/FaqAccordion.jsx
-git commit -m "feat: add an accessible FAQ accordion"
+git add app/globals.css src/components/marketing/ArticleBody.jsx
+git commit -m "feat: add scoped article typography and a shared body renderer"
 ```
 
 ---
 
-### Task 5: Server-side document renderer
+### Task 3: Snippet library
 
 **Files:**
-- Create: `src/lib/content/renderDocument.jsx`, `src/lib/content/renderDocument.test.jsx`
+- Create: `src/config/snippets.js`
 
 **Interfaces:**
-- Consumes: `FaqAccordion`.
-- Produces: `renderDocument(doc, { variant })` → JSX. `variant` is `"post" | "event"`.
+- Produces: `SNIPPETS` — array of `{ id, label, group, html }`.
 
-**Context — this is the highest-risk task in the plan.** It replaces both `RenderBody` copies. **Published posts must look identical afterward.**
+**Context:** This is the feature the user actually asked for. It lives beside `site.js` / `services.js` / `brand.js`; read one first and match the file conventions (header comment explaining purpose, grouped sections).
 
-Read both existing implementations completely first (`src/screens/marketing/BlogPost.jsx:25-88`, `src/screens/marketing/EventDetail.jsx:20-80`) and port the Tailwind classes **verbatim**. The two copies differ (`boldify` emits `text-navy` in BlogPost, `text-navy/80` in EventDetail) — that is what `variant` exists to preserve. Do not "clean up" the difference; reproduce it.
+`group` lets the dropdown show optgroups (Text / Media / Components).
 
-**Security:** map node types through an **allowlist** to components. Unknown types render nothing. **No `dangerouslySetInnerHTML`** — its removal from the article path is a deliberate improvement.
+Snippets are **clean, readable HTML with no utility classes** — `.article-body` styles them. Keep them short enough to hand-edit after insertion, with obvious placeholder text an author will replace.
 
-**Must be server-renderable:** no hooks, no browser APIs, no TipTap import.
+Required snippets:
 
-- [ ] **Step 1: Write the failing test**
+**Text:** heading (`<h2>`), subheading (`<h3>`), paragraph, bullet list, numbered list, link, pull quote (`<blockquote>`), divider (`<hr>`)
 
-Cover: paragraph, heading 2/3, bullet list, ordered list, bold, italic, link, blockquote, image, `faqAccordion`, `ctaCard`. Plus:
+**Media:** image (`<img>` with `alt` — include the attribute so authors fill it in rather than omitting it)
 
-```js
-it("renders nothing for an unknown node type", () => {
-  const html = renderToStaticMarkup(renderDocument(doc([{ type: "wat", attrs: {} }])));
-  expect(html).toBe("");
-});
+**Components:**
+- **FAQ accordion** — native `<details>`/`<summary>`, **no JavaScript**. It server-renders, is keyboard accessible and screen-reader friendly for free, and the answer text sits in the HTML where crawlers read it. Include two Q&A pairs so the pattern for adding more is obvious.
+- **CTA card** — heading, body, link styled as a button. Match `src/components/marketing/CtaBanner.jsx`'s visual language.
 
-it("does not throw on malformed input", () => {
-  expect(() => renderDocument(null)).not.toThrow();
-  expect(() => renderDocument({})).not.toThrow();
-});
+- [ ] **Step 1: Write the file**
 
-it("escapes text rather than injecting markup", () => {
-  const html = renderToStaticMarkup(renderDocument(doc([para("<img src=x onerror=1>")])));
-  expect(html).not.toContain("<img");
-});
-```
+- [ ] **Step 2: Verify each snippet renders correctly**
 
-Use `react-dom/server`'s `renderToStaticMarkup` (already available via React 18) — this needs no new dependency.
+Paste each one through `ArticleBody` and confirm it renders on-brand and that `sanitizeHtml` does not strip anything legitimate (particularly `<details>`, `class`, `href`, `src`, `alt`). Report anything that gets mangled.
 
-- [ ] **Step 2: Run it and watch it fail**
-
-Run: `npx vitest run src/lib/content/renderDocument.test.jsx`
-Expected: FAIL — module not found.
-
-**Note:** JSX in a `.jsx` test file is required — vitest will not parse JSX in `.js`. (This bit an earlier task; that is why the file is `.jsx`.)
-
-- [ ] **Step 3: Implement**
-
-- [ ] **Step 4: Run and confirm green**
-
-- [ ] **Step 5: Prove parity against real content**
-
-Convert a real seeded post with `legacyToDocument`, render it through `renderDocument`, and compare the produced classes against the current `RenderBody` output for the same content. **Report any difference.** A class-level diff here is a regression in published appearance.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add src/lib/content/renderDocument.jsx src/lib/content/renderDocument.test.jsx
-git commit -m "feat: render documents server-side via an allowlisted node map"
+git add src/config/snippets.js
+git commit -m "feat: add the HTML snippet library"
 ```
 
 ---
 
-### Task 6: Swap the public pages onto the renderer
+### Task 4: HTML editor + wire into both admin pages
+
+**Files:**
+- Create: `src/components/editor/HtmlEditor.jsx`
+- Modify: `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`, `src/lib/mappers.js`
+
+**Interfaces:**
+- Consumes: `SNIPPETS`.
+- Produces: `<HtmlEditor value={string} onChange={(html) => …} />`.
+
+**Context:** Replaces the `<textarea>` at `PostsAdminPage.jsx:164` and `EventsAdminPage.jsx:139`.
+
+**The editor is deliberately simple** — the user said "no need to make it an in-depth editor":
+
+- A monospace `<textarea>`, taller than today (~20 rows), `spellCheck={false}`.
+- A **snippet dropdown** above it. Selecting an entry inserts that snippet's HTML **at the cursor** (not appended at the end), then resets the dropdown so the same snippet can be picked twice in a row.
+- **Tab inserts two spaces** instead of moving focus — the user explicitly asked to be able to tab. Preserve the cursor position after insertion. Note that trapping Tab has an accessibility cost (keyboard users cannot tab out of the field); provide Escape-then-Tab or a documented way out, and say what you chose in your report.
+
+Match the admin's existing form styling — read the surrounding fields in `PostsAdminPage.jsx` and reuse the same label/input classes rather than inventing new ones.
+
+**`estimateReadTime` fix:** it counts words in `body`, which now contains HTML tags that would inflate the count. Strip tags before counting. It lives in `src/lib/mappers.js`; there is an existing test file to extend.
+
+- [ ] **Step 1: Build `HtmlEditor.jsx`**
+
+- [ ] **Step 2: Fix `estimateReadTime`, test first**
+
+```js
+it("ignores HTML tags when estimating read time", () => {
+  const plain = "word ".repeat(200);
+  const html = "<p>" + "word ".repeat(200) + "</p>";
+  expect(estimateReadTime(html)).toBe(estimateReadTime(plain));
+});
+```
+
+- [ ] **Step 3: Swap the post editor.**
+- [ ] **Step 4: Swap the event editor.**
+
+- [ ] **Step 5: Verify in a browser**
+
+Log into `/app/posts` (local server on 3057 points at the hosted DB; credentials are with the user). Insert a snippet, confirm it lands at the cursor, confirm Tab inserts spaces, save, and confirm the post renders correctly on the public page. Report what you observed.
+
+- [ ] **Step 6: Run** `npm test` and `npm run build`.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/components/editor/ src/screens/app/ src/lib/mappers.js src/lib/mappers.test.js
+git commit -m "feat: add an HTML editor with a snippet dropdown"
+```
+
+---
+
+### Task 5: Swap the public pages and verify
 
 **Files:**
 - Modify: `src/screens/marketing/BlogPost.jsx`, `src/screens/marketing/EventDetail.jsx`
 
-**Interfaces:**
-- Consumes: `renderDocument`, `legacyToDocument`.
-- Produces: articles rendered from `bodyJson`, falling back to legacy `body`.
+**Context:** Delete both `RenderBody` implementations and both `boldify` helpers, replacing them with `<ArticleBody html={post.body} />`.
 
-**Context:** Delete both `RenderBody` implementations and both `boldify` helpers.
+Existing rows still hold markdown-lite; `ArticleBody` converts on the fly, so **no database migration is required**. Legacy and HTML content coexist indefinitely.
 
-The fallback is what makes migration safe:
+- [ ] **Step 1: Replace in `BlogPost.jsx`** — remove `RenderBody`/`boldify`, render `<ArticleBody html={post.body} />` where `<RenderBody text={post.body} />` was (~line 205). Leave surrounding layout untouched.
 
-```js
-const doc = post.bodyJson ?? legacyToDocument(post.body ?? "");
-```
+- [ ] **Step 2: Replace in `EventDetail.jsx`** — same.
 
-A row with no `body_json` still renders. Never blank an article.
+- [ ] **Step 3: Confirm no orphans**
 
-- [ ] **Step 1: Replace in `BlogPost.jsx`**
+Run: `grep -rn "RenderBody\|boldify" src/ app/`
+Expected: no output.
 
-Delete `RenderBody`/`boldify`; render `renderDocument(doc, { variant: "post" })` where `<RenderBody text={post.body} />` was (line ~205). Keep all surrounding layout untouched.
+- [ ] **Step 4: Full verification** — report real output for each:
+- `npm test`
+- `npm run build`
+- `npm run verify:routes` (expect 18/18)
+- `npm run test:e2e`
 
-- [ ] **Step 2: Replace in `EventDetail.jsx`**
+- [ ] **Step 5: Visual parity check**
 
-Same, with `variant: "event"`.
+Compare a real blog post and event detail page against production (which still runs the old renderer). Screenshot both with Playwright. **Report any difference.**
 
-- [ ] **Step 3: Verify parity on the real site**
-
-`npm run build && npm start` on a free port. Compare a real blog post and event detail page against production (`https://brainfood-1eusag13u-joelhmartins-projects.vercel.app`, which still runs the old renderer). Screenshot both with Playwright and compare. **Report any visual difference** rather than accepting it.
-
-- [ ] **Step 4: Run the suite**
-
-Run: `npm test` — must stay green. Then `npm run verify:routes` (expect 18/18).
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add src/screens/marketing/BlogPost.jsx src/screens/marketing/EventDetail.jsx
-git commit -m "refactor: render articles from documents with legacy fallback"
-```
-
----
-
-### Task 7: TipTap editor shell
-
-**Files:**
-- Create: `src/components/editor/BlockEditor.jsx`, `src/components/editor/EditorTabs.jsx`
-- Modify: `package.json`
-
-**Interfaces:**
-- Consumes: TipTap 3.28.0.
-- Produces: `<BlockEditor value={doc} onChange={(doc) => …} />` with Visual and Source tabs.
-
-**Context:** TipTap 3.28.0's peer deps accept React 18 (verified). Install:
-
-```bash
-npm install @tiptap/react@3.28.0 @tiptap/starter-kit@3.28.0 @tiptap/pm@3.28.0 @tiptap/extension-link@3.28.0 @tiptap/extension-image@3.28.0
-```
-
-**Toolbar:** bold, italic, H2, H3, bullet list, ordered list, link, blockquote, image. Ordered lists, links, italics and quotes are all new capability.
-
-**Source tab:** formatted JSON, editable, round-trips on valid input. Invalid JSON shows an inline error and **blocks the tab switch** — never silently discard the author's work.
-
-`src/components/ui/Tabs.jsx` is a sticky marketing layout and is **not** reusable here; `EditorTabs` is a small plain control.
-
-**Bundle discipline:** `"use client"`, and it must be imported so TipTap stays out of public route bundles.
-
-- [ ] **Step 1: Install**
-
-- [ ] **Step 2: Build `EditorTabs.jsx`**
-
-- [ ] **Step 3: Build `BlockEditor.jsx`** — toolbar, TipTap instance, tab switching, `onChange` emitting the JSON doc.
-
-- [ ] **Step 4: Verify the public bundle did not grow**
-
-Run `npm run build` and compare the First Load JS for `/blog/[slug]` against the pre-change build (~141 kB). **Report both numbers.** If it grew, TipTap is leaking into the public bundle — fix before continuing.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add package.json package-lock.json src/components/editor/
-git commit -m "feat: add the TipTap block editor shell"
-```
-
----
-
-### Task 8: FAQ and CTA blocks
-
-**Files:**
-- Create: `src/components/editor/extensions/faqAccordion.js`, `src/components/editor/extensions/ctaCard.js`
-- Modify: `src/components/editor/BlockEditor.jsx`
-
-**Interfaces:**
-- Consumes: TipTap `Node` API; `FaqAccordion`.
-- Produces: `faqAccordion` node (attrs: `items: [{question, answer}]`) and `ctaCard` node (attrs: `heading, body, buttonLabel, href`).
-
-**Context:** This is what makes "reuse our components" real. Both must round-trip through `renderDocument` (Task 5 already handles them) and `documentToText` (Task 2).
-
-- [ ] **Step 1: Build the `faqAccordion` node** — TipTap node with an editable NodeView for adding/removing/reordering Q&A pairs.
-
-- [ ] **Step 2: Build the `ctaCard` node.**
-
-- [ ] **Step 3: Add toolbar insert buttons.**
-
-- [ ] **Step 4: Verify round-trip** — insert an FAQ in the editor, save the JSON, render it via `renderDocument`, confirm the questions and answers appear. Report the output.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add src/components/editor/
-git commit -m "feat: add FAQ and CTA blocks to the editor"
-```
-
----
-
-### Task 9: Wire the editor into the admin pages
-
-**Files:**
-- Modify: `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`, `src/stores/posts.store.js`, `src/stores/events.store.js`
-
-**Interfaces:**
-- Consumes: `BlockEditor`, `documentToText`, `legacyToDocument`.
-- Produces: both editors saving `bodyJson` plus a derived `body`.
-
-**Context:** Replace the `<textarea>` at `PostsAdminPage.jsx:161` and `EventsAdminPage.jsx:136`.
-
-On save: write `bodyJson` **and** `body = documentToText(bodyJson)`. Keeping `body` current is what preserves read-time, excerpts, and the fallback.
-
-When opening a legacy row (`bodyJson` null), seed the editor with `legacyToDocument(body)` so the author sees their content.
-
-`estimateReadTime` continues to consume `body` — unchanged.
-
-- [ ] **Step 1: Swap the post editor.**
-- [ ] **Step 2: Swap the event editor.**
-- [ ] **Step 3: Update both stores** to persist `bodyJson` and the derived `body`. Preserve the existing `revalidateContent()` call and its fire-and-forget behavior.
-- [ ] **Step 4: Verify end-to-end** — create a post with headings, a list, a link, and an FAQ; save; publish; confirm it renders on the public page. Report what you observed.
-- [ ] **Step 5: Run** `npm test` and `npm run build`.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/screens/app/ src/stores/
-git commit -m "feat: use the block editor in the post and event admin"
-```
-
----
-
-### Task 10: Authoring UX — preview, upload, autosave, SEO
-
-**Files:**
-- Modify: `src/screens/app/PostsAdminPage.jsx`, `src/screens/app/EventsAdminPage.jsx`, `src/components/editor/BlockEditor.jsx`
-
-**Context:** The user asked for the editing experience, not just the editor.
-
-- **Live preview** must render through `renderDocument` — the same function the public site uses — so preview and published output cannot drift.
-- **Image upload** reuses `src/components/ui/ImageUpload.jsx` and the existing Supabase `media` bucket. No new bucket, no new storage policy.
-- **Autosave:** debounced, with a visible saving/saved indicator. **It must never change `published`.** Autosaving a published row edits live content — gate it to drafts, or make the behavior explicit and obvious in the UI. State your choice in the report.
-- **SEO fields:** meta description, OG image, slug. These already feed `generateMetadata` and JSON-LD but are not editable per post today.
-
-- [ ] **Step 1: Live preview** (side-by-side or a Preview tab, matching the admin's visual language).
-- [ ] **Step 2: Image insert/upload.**
-- [ ] **Step 3: Autosave** — respecting the publish constraint above.
-- [ ] **Step 4: SEO fields.**
-- [ ] **Step 5: Verify** each in a browser; report what you observed.
-- [ ] **Step 6: Commit**
-
-```bash
-git add src/screens/app/ src/components/editor/
-git commit -m "feat: add preview, image upload, autosave, and SEO fields"
-```
-
----
-
-### Task 11: Backfill and full verification
-
-**Files:**
-- Create: `scripts/backfill-body-json.mjs`
-- Modify: `package.json`
-
-**Context:** Converts existing rows. **Non-destructive and idempotent:** only fills rows where `body_json is null`, never touches `body`, safe to re-run.
-
-It uses the service-role key, so follow the pattern in `scripts/seed-content.mjs`/`create-admin.mjs` (they load `.env.local` themselves).
-
-**Which database:** `.env.local` currently points at the **hosted** project. Confirm the target before running and state it explicitly in your report.
-
-- [ ] **Step 1: Write the script** — dry-run by default, `--apply` to write, printing each row it would change.
-- [ ] **Step 2: Add** `"backfill:body-json": "node scripts/backfill-body-json.mjs"` to `package.json`.
-- [ ] **Step 3: Dry-run** and report the output.
-- [ ] **Step 4: Apply**, then verify the public pages still render correctly.
-- [ ] **Step 5: Full sweep** — `npm test`, `npm run build`, `npm run verify:routes` (18/18), `npm run test:e2e`. Report real output for each.
-- [ ] **Step 6: Add an e2e test** covering create → block insert → save → publish → renders publicly.
-- [ ] **Step 7: Commit**
-
-```bash
-git add scripts/backfill-body-json.mjs package.json e2e/
-git commit -m "feat: backfill legacy bodies and verify the editor end to end"
+git add src/screens/marketing/
+git commit -m "refactor: render article bodies through the shared renderer"
 ```
 
 ---
 
 ## Notes for the implementer
 
-- **Parity is the thing that matters most.** If a published post looks even slightly different afterward, that is a regression — report it rather than accepting it.
-- **The legacy fallback is load-bearing.** Never remove it in this plan; it is what makes the migration safe and re-runnable.
-- **Keep TipTap out of the public bundle.** Check the First Load JS number after every task that touches editor code.
-- The renderer replacing `dangerouslySetInnerHTML` with an allowlisted node map is a real security improvement — do not reintroduce raw HTML injection for convenience.
-- AI assist is deliberately **not** in this plan. The JSON format chosen here is what makes it tractable later; see `BACKLOG-ai-admin-and-email.md`.
+- **Parity matters most.** If a published post looks different afterward, that is a regression — report it rather than accepting it.
+- **The legacy fallback is load-bearing.** It is what allows this to ship with no data migration; do not remove it.
+- **Snippets carry no utility classes** — `.article-body` styles them. Keeping them clean is what makes them editable by hand.
+- The `<details>` FAQ is deliberate: a JS accordion would hide answer text from crawlers, and FAQ content is exactly what search engines surface.
+- AI assist is still queued in `BACKLOG-ai-admin-and-email.md`. HTML bodies suit it fine — models emit HTML readily.
