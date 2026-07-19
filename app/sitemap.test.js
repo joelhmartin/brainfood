@@ -54,7 +54,7 @@ describe("sitemap", () => {
     const urls = result.map((e) => e.url);
 
     // Static routes, all absolute.
-    for (const route of ["/", "/about", "/services", "/products", "/contact", "/submit-case", "/events", "/blog"]) {
+    for (const route of ["/", "/about", "/services", "/products", "/contact", "/events", "/blog"]) {
       const expected = route === "/" ? "https://example.com" : `https://example.com${route}`;
       expect(urls).toContain(expected);
     }

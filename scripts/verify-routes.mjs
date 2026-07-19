@@ -14,7 +14,7 @@
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3057";
 
 const ROUTES = [
-  "/", "/about", "/services", "/products", "/contact", "/submit-case",
+  "/", "/about", "/services", "/products", "/contact",
   "/events", "/blog",
   "/services/coaching", "/services/sober-companion", "/services/experiential",
   "/services/family", "/services/collaborative",
