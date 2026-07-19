@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { SITE } from "../../config/site.js";
 import { AUSTIN } from "../../config/images.js";
+import { useFormSubmit } from "../../hooks/useFormSubmit.js";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -98,15 +99,29 @@ function ContactHero() {
 
 /* ─── CONTACT FORM ─── */
 function ContactForm() {
-  const [formState, setFormState] = useState("idle");
   const [focused, setFocused] = useState({});
+  const { submit, state: formState, error, reset } = useFormSubmit({
+    endpoint: "/api/contact",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormState("sending");
-    setTimeout(() => setFormState("success"), 1500);
-    setTimeout(() => setFormState("idle"), 4000);
+    const data = new FormData(e.currentTarget);
+    submit({
+      name: data.get("name") || "",
+      email: data.get("email") || "",
+      phone: data.get("phone") || "",
+      message: data.get("message") || "",
+      company: data.get("company") || "",
+      source: "Contact page",
+    });
   };
+
+  useEffect(() => {
+    if (formState !== "success") return;
+    const timer = setTimeout(() => reset(), 4000);
+    return () => clearTimeout(timer);
+  }, [formState, reset]);
 
   const fields = [
     { name: "name", label: "Full Name", type: "text" },
@@ -116,6 +131,16 @@ function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Honeypot: hidden from real users, bots fill every field they find. */}
+      <input
+        type="text"
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="sr-only"
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {fields.map((field) => (
           <div
@@ -204,9 +229,15 @@ function ContactForm() {
         All inquiries are confidential. We typically respond within 24 hours.
       </p>
 
+      {formState === "error" && (
+        <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={formState !== "idle"}
+        disabled={formState === "sending" || formState === "success"}
         className={`btn-magnetic w-full py-4 rounded-full font-semibold text-sm transition-all duration-500 ${
           formState === "success"
             ? "bg-emerald-500 text-white"
@@ -228,6 +259,11 @@ function ContactForm() {
           {formState === "success" && (
             <>
               Message Sent <CheckCircle size={16} />
+            </>
+          )}
+          {formState === "error" && (
+            <>
+              Try Again <Send size={16} />
             </>
           )}
         </span>

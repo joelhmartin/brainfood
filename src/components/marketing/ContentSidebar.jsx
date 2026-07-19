@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import {
   Phone,
   Mail,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { SITE, SOCIALS, LOGOS, BUSINESS } from "../../config/site.js";
 import LogoFull from "../../images/logoFull.jsx";
+import { useFormSubmit } from "../../hooks/useFormSubmit.js";
 
 /**
  * Reusable sidebar for content pages (blog, events).
@@ -109,17 +110,40 @@ function ContactDetails() {
 
 /* ─── Mini contact form ─── */
 function MiniForm() {
-  const [formState, setFormState] = useState("idle");
+  const { submit, state: formState, error, reset } = useFormSubmit({
+    endpoint: "/api/contact",
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormState("sending");
-    setTimeout(() => setFormState("success"), 1200);
-    setTimeout(() => setFormState("idle"), 3500);
+    const data = new FormData(e.currentTarget);
+    submit({
+      name: data.get("name") || "",
+      email: data.get("email") || "",
+      phone: data.get("phone") || "",
+      message: data.get("message") || "",
+      company: data.get("company") || "",
+      source: "Sidebar",
+    });
   };
+
+  useEffect(() => {
+    if (formState !== "success") return;
+    const timer = setTimeout(() => reset(), 3500);
+    return () => clearTimeout(timer);
+  }, [formState, reset]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
+      {/* Honeypot: hidden from real users, bots fill every field they find. */}
+      <input
+        type="text"
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="sr-only"
+      />
       <input
         type="text"
         name="name"
@@ -146,9 +170,14 @@ function MiniForm() {
         placeholder="How can we help?"
         className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all resize-none"
       />
+      {formState === "error" && (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
-        disabled={formState !== "idle"}
+        disabled={formState === "sending" || formState === "success"}
         className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
           formState === "success"
             ? "bg-emerald-500 text-white"
@@ -164,6 +193,9 @@ function MiniForm() {
           )}
           {formState === "success" && (
             <>Sent! <CheckCircle size={13} /></>
+          )}
+          {formState === "error" && (
+            <>Try Again <Send size={13} /></>
           )}
         </span>
       </button>
