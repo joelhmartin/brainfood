@@ -171,7 +171,10 @@ function MiniForm() {
         className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all resize-none"
       />
       {formState === "error" && (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+        >
           {error}
         </p>
       )}
