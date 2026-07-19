@@ -36,3 +36,19 @@ export const inviteSchema = z.object({
 export const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
 });
+
+/**
+ * Public contact form. Used by both the /contact page and the sidebar MiniForm.
+ *
+ * `company` is a honeypot: a hidden field no human sees or fills. Bots fill every
+ * input they find, so a non-empty value here means the submission is automated.
+ * It is rejected server-side rather than in the browser, where a bot would simply
+ * skip the check.
+ */
+export const contactSchema = z.object({
+  name: z.string().trim().min(1, "Enter your name.").max(200),
+  email: z.string().trim().email("Enter a valid email address."),
+  phone: z.string().trim().max(50).optional().or(z.literal("")),
+  message: z.string().trim().min(1, "Enter a message.").max(5000, "Message is too long."),
+  company: z.literal("").optional(),
+});
