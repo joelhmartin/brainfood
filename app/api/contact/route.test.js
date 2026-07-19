@@ -6,7 +6,7 @@ vi.mock("../../../src/lib/email/mailgun.js", () => ({
 }));
 
 import { sendEmail, isMailConfigured } from "../../../src/lib/email/mailgun.js";
-import { POST } from "./route.js";
+import { POST, resetRateLimiterForTests } from "./route.js";
 
 const valid = {
   name: "Jane Doe",
@@ -17,10 +17,10 @@ const valid = {
   source: "Contact page",
 };
 
-function req(body) {
+function req(body, headers = {}) {
   return new Request("http://localhost/api/contact", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
 }
@@ -28,6 +28,11 @@ function req(body) {
 beforeEach(() => {
   vi.clearAllMocks();
   isMailConfigured.mockReturnValue(true);
+  // The rate limiter's Map is module-level state shared by every test in this
+  // file; without a reset, tests would pass or fail based on execution order
+  // and how many requests earlier tests made rather than on what each test
+  // actually verifies (see Finding I5).
+  resetRateLimiterForTests();
 });
 
 describe("POST /api/contact", () => {
@@ -70,15 +75,72 @@ describe("POST /api/contact", () => {
     expect((await res.json()).error).toBeTruthy();
   });
 
-  it("still succeeds when only the auto-reply fails", async () => {
+  it("still succeeds when only the auto-reply fails, and actually attempts both sends", async () => {
     sendEmail.mockResolvedValueOnce({ id: "admin" }).mockRejectedValueOnce(new Error("bounce"));
     const res = await POST(req(valid));
     expect(res.status).toBe(200);
+    // Finding I3: a route that sends only the admin notification and never
+    // calls the auto-reply would consume just the first mock, never touch
+    // the rejection, and still return 200 here — a green test on a broken
+    // feature. Asserting the call count and the second call's recipient
+    // forces the auto-reply send to actually happen.
+    expect(sendEmail).toHaveBeenCalledTimes(2);
+    expect(sendEmail.mock.calls[1][0].to).toBe(valid.email);
   });
 
   it("returns an error when Mailgun is not configured", async () => {
     isMailConfigured.mockReturnValue(false);
     const res = await POST(req(valid));
     expect(res.status).toBe(500);
+  });
+
+  it("does not consume rate-limit quota when Mailgun is unconfigured (Finding M2)", async () => {
+    isMailConfigured.mockReturnValue(false);
+    // One request per call so every submission lands in the same rate-limit
+    // bucket (the fixture sends no forwarded-IP header, so every request in
+    // this file resolves to the same "unknown" key).
+    for (let i = 0; i < 10; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await POST(req(valid));
+      expect(res.status).toBe(500);
+    }
+    isMailConfigured.mockReturnValue(true);
+    const res = await POST(req(valid));
+    expect(res.status).toBe(200);
+  });
+
+  it("produces a single-line subject when source contains a CR/LF (Finding Fix B, header injection)", async () => {
+    const injected = "Contact page\r\nBcc: attacker@evil.com";
+    await POST(req({ ...valid, source: injected }));
+    const call = sendEmail.mock.calls[0][0];
+    // The entire defense is that a raw CR/LF can never reach the subject
+    // line — if it did, a submitter could smuggle extra email headers
+    // (e.g. an injected Bcc:) into the outgoing message.
+    expect(call.subject).not.toMatch(/[\r\n]/);
+    expect(call.subject.split("\n")).toHaveLength(1);
+    expect(call.subject).toBe("New submission from Contact page Bcc: attacker@evil.com");
+  });
+
+  describe("rate limiting (Finding I4)", () => {
+    it("allows up to the configured maximum requests per IP", async () => {
+      for (let i = 0; i < 5; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await POST(req(valid));
+        expect(res.status).toBe(200);
+      }
+    });
+
+    it("returns 429 once the limit is exceeded, and sends nothing on that request", async () => {
+      for (let i = 0; i < 5; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await POST(req(valid));
+      }
+      sendEmail.mockClear();
+
+      const res = await POST(req(valid));
+
+      expect(res.status).toBe(429);
+      expect(sendEmail).not.toHaveBeenCalled();
+    });
   });
 });
