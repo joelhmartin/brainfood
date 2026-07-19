@@ -16,7 +16,7 @@ const FROM = process.env.MAILGUN_FROM;
 // Mailgun's EU region is a different host; assuming the US default silently fails
 // for EU accounts.
 const BASE_URL =
-  process.env.MAILGUN_REGION?.toLowerCase() === "eu"
+  process.env.MAILGUN_REGION?.trim().toLowerCase() === "eu"
     ? "https://api.eu.mailgun.net"
     : "https://api.mailgun.net";
 
