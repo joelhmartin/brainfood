@@ -24,22 +24,18 @@ const HTML_ESCAPES = {
   ">": "&gt;",
   '"': "&quot;",
   "'": "&#39;",
-  "=": "&#61;",
 };
 
 /**
  * Escapes the characters that would let a submitted value break out of HTML
  * markup or attributes. Every submission value interpolated into an email's
  * HTML MUST go through this first — a contact form is public input, and a
- * submitted `<script>` or `onerror=` must render as inert text, not markup.
- *
- * `=` is included alongside the standard `& < > " '` set so that an event
- * handler like `onerror="..."` doesn't survive as literal text either — the
- * tag delimiters are gone, but leaving `onerror=` intact would still hand an
- * attacker recognizable, copy-pasteable attack markup in the email body.
+ * submitted `<script>` or `onerror="..."` must render as inert text, not
+ * markup: escaping `<`, `>`, and `"` removes the tag and attribute delimiters
+ * that would make it live.
  */
 export function escapeHtml(value) {
-  return String(value).replace(/[&<>"'=]/g, (char) => HTML_ESCAPES[char]);
+  return String(value).replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 }
 
 // ── Shared layout ────────────────────────────────────────────────────────────

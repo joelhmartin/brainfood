@@ -35,7 +35,30 @@ describe("adminNotification", () => {
 
   it("escapes submitted HTML rather than rendering it", () => {
     const evil = { ...submission, message: `<img src=x onerror="alert(1)">` };
-    expect(adminNotification(evil).html).not.toContain("onerror=");
+    const { html } = adminNotification(evil);
+    // A coincidental substring check (e.g. `not.toContain("onerror=")`) would
+    // pass even if `<` were left unescaped, since the input never contains a
+    // literal "onerror=" once encoded some other way — it proves nothing. The
+    // real safety property is that no *live* tag delimiter survives: neither
+    // an unescaped `<img` nor an unescaped `<script` can appear in the output,
+    // because that's what would let a browser parse it as markup rather than
+    // render it as inert text.
+    expect(html).not.toContain("<img");
+    expect(html).not.toContain("<script");
+    // And the escaped form is actually present, proving the value made it
+    // through `escapeHtml` rather than being dropped entirely.
+    expect(html).toContain("&lt;img");
+  });
+
+  it("leaves a legitimate `=` in submitted content unmangled", () => {
+    const withEquals = {
+      ...submission,
+      message: "See https://example.com/?a=1 — also 2+2=4.",
+    };
+    const { html, text } = adminNotification(withEquals);
+    expect(html).toContain("https://example.com/?a=1");
+    expect(html).toContain("2+2=4");
+    expect(text).toContain("https://example.com/?a=1");
   });
 
   it("returns a subject, html, and text", () => {
