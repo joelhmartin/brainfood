@@ -280,6 +280,54 @@
   .article-body .cta-button {
     @apply inline-flex mt-6 px-8 py-3.5 rounded-full bg-white text-brand-600 font-semibold no-underline hover:bg-brand-50 transition-colors duration-300;
   }
+
+  /* Event body variant. ArticleBody's `variant="event"` prop (used by
+     EventDetail.jsx) adds this modifier class alongside `.article-body`.
+     EventDetail's retired inline RenderBody used deliberately smaller,
+     tighter typography than BlogPost's — events are short supporting copy,
+     not long-form articles — so this reproduces its original values rather
+     than inheriting BlogPost's. `boldify`'s color unification (both now
+     text-navy, see the note above) is the one deliberate exception to
+     "reproduce the original exactly".
+
+     These selectors have the same specificity as the base rules above
+     (one class + the same descendant chain), so each one that overrides a
+     base rule is placed after it and re-declares every property the base
+     rule set for that selector — nothing here relies on cascade omission. */
+
+  .article-body--event h2 {
+    @apply font-heading font-bold text-xl md:text-2xl text-navy mt-10 mb-4 tracking-normal;
+  }
+
+  .article-body--event h3 {
+    @apply font-heading font-bold text-lg text-navy mt-8 mb-3 tracking-normal;
+  }
+
+  .article-body--event p {
+    @apply text-navy/65 text-base leading-relaxed my-3;
+  }
+
+  .article-body--event ul {
+    @apply space-y-2 my-4 ml-0;
+  }
+
+  .article-body--event ul > li {
+    @apply relative text-navy/65 text-base leading-relaxed pl-4;
+  }
+
+  /* The old event bullet (RenderBody's `<span className="text-brand-500
+     mt-1.5">•</span>`) was a bullet *character* sitting next to the copy in
+     a flex row — not BlogPost's filled dot. The absolute-positioned
+     `::before` approach above (kept here for the same reason: raw HTML
+     `<li>` content mixes text nodes and inline elements, which breaks under
+     `flex`) can't reproduce a baseline-aligned inline glyph pixel-for-pixel;
+     this is as close as that approach gets — a real "•" character, brand
+     colored, nudged to sit against the top of the smaller text-base /
+     leading-relaxed line where `mt-1.5` placed it in the old flex row. */
+  .article-body--event ul > li::before {
+    content: "•";
+    @apply absolute left-0 top-0 w-auto h-auto rounded-none bg-transparent text-brand-500 leading-relaxed;
+  }
 }
 
 @layer utilities {

@@ -76,7 +76,7 @@ export function EventDetailPage({ event }) {
 
             {/* Body */}
             <article className="max-w-none">
-              <ArticleBody html={event.body} />
+              <ArticleBody html={event.body} variant="event" />
             </article>
 
             {/* Back link */}

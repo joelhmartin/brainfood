@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:e2e": "playwright test",
     "verify:routes": "node scripts/verify-routes.mjs",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
@@ -35,7 +34,6 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1",
     "@types/three": "^0.183.1",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",

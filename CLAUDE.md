@@ -53,7 +53,6 @@ npm run dev              # Next dev server
 npm run build            # production build
 npm start                # serve the production build
 npm test                 # Vitest, whole suite
-npm run test:e2e         # Playwright
 npm run verify:routes    # asserts every route serves real HTML (needs a running server)
 npm run db:start         # local Supabase
 npm run db:reset         # reset local DB + reseed
@@ -66,7 +65,6 @@ Single test file / single test:
 ```bash
 npx vitest run src/lib/content.server.test.js
 npx vitest run src/lib/seo.test.js -t "omits a blank phone"
-npx playwright test e2e/contact.spec.js
 ```
 
 **Port note for this machine:** 3000/3001 are usually occupied by other projects, and
@@ -89,8 +87,10 @@ the static HTML.
 
 It was migrated to Next.js, which renders server-side natively. Consequences worth knowing:
 
-- **No browser is involved in the build.** If you ever see Playwright or Chromium in build
-  output, something has regressed. Playwright remains only as a **test** tool (`e2e/`).
+- **No browser is involved anywhere.** Playwright has been removed from this repo entirely —
+  build, tests, and tooling. If you ever see Playwright or Chromium in build output,
+  something has regressed. Coverage comes from Vitest plus `npm run verify:routes`, which
+  asserts every route serves populated HTML with correct per-route metadata.
 - Marketing routes are Server Components using **ISR** (`export const revalidate = 3600`)
   with `generateStaticParams`.
 - Publishing calls `revalidatePath` through `POST /api/revalidate` — **not** a rebuild. The
