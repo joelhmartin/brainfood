@@ -32,6 +32,12 @@ describe("estimateReadTime", () => {
   it("counts roughly 200 words per minute", () => {
     expect(estimateReadTime(Array(600).fill("word").join(" "))).toBe(3);
   });
+
+  it("ignores HTML tags when estimating read time", () => {
+    const plain = "word ".repeat(200);
+    const html = "<p>" + "word ".repeat(200) + "</p>";
+    expect(estimateReadTime(html)).toBe(estimateReadTime(plain));
+  });
 });
 
 describe("normalizeTags", () => {

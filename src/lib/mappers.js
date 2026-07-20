@@ -14,9 +14,10 @@ export function slugify(input) {
     .replace(/^-|-$/g, "");
 }
 
-/** ~200 words per minute, floor of 1. */
+/** ~200 words per minute, floor of 1. Strips HTML tags first so markup doesn't inflate the count. */
 export function estimateReadTime(body) {
   const words = String(body ?? "")
+    .replace(/<[^>]*>/g, " ")
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;

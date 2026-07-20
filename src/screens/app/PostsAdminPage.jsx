@@ -16,6 +16,7 @@ import { useToast } from "../../components/ui/Toast.jsx";
 import { Spinner } from "../../components/ui/Spinner.jsx";
 import { ImageUpload } from "../../components/ui/ImageUpload.jsx";
 import { FormField } from "../../components/ui/FormField.jsx";
+import { HtmlEditor } from "../../components/editor/HtmlEditor.jsx";
 import { estimateReadTime } from "../../lib/mappers.js";
 
 function formatDate(dateStr) {
@@ -151,19 +152,14 @@ function PostFormModal({ post, onClose, onSave }) {
           <FormField
             label={
               <>
-                Full Content (Markdown)
+                Full Content (HTML)
                 <span className="ml-2 font-normal normal-case tracking-normal text-navy/30">
                   ~{readTime} min read
                 </span>
               </>
             }
           >
-            <textarea
-              value={form.body}
-              onChange={(e) => set("body", e.target.value)}
-              rows={12}
-              className={`${FIELD} font-mono resize-none`}
-            />
+            <HtmlEditor value={form.body} onChange={(html) => set("body", html)} />
           </FormField>
 
           <div className="flex items-center gap-6 pt-2">

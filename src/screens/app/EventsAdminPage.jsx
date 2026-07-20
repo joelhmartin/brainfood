@@ -7,6 +7,7 @@ import { useToast } from "../../components/ui/Toast.jsx";
 import { Spinner } from "../../components/ui/Spinner.jsx";
 import { ImageUpload } from "../../components/ui/ImageUpload.jsx";
 import { FormField } from "../../components/ui/FormField.jsx";
+import { HtmlEditor } from "../../components/editor/HtmlEditor.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -132,13 +133,8 @@ function EventFormModal({ event, onClose, onSave }) {
             />
           </FormField>
 
-          <FormField label="Full Content (Markdown)">
-            <textarea
-              value={form.body}
-              onChange={(e) => set("body", e.target.value)}
-              rows={10}
-              className={`${FIELD} font-mono resize-none`}
-            />
+          <FormField label="Full Content (HTML)">
+            <HtmlEditor value={form.body} onChange={(html) => set("body", html)} />
           </FormField>
 
           <div className="flex items-center gap-3 pt-2">
