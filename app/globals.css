@@ -260,6 +260,26 @@
   .article-body details[open] summary {
     @apply mb-3;
   }
+
+  /* CTA card snippet (src/config/snippets.js: "cta-card"). .article-body has
+     no bare-tag rule for a card container or a button-styled link, so this
+     is a small, explicitly-scoped addition — mirrors CtaBanner.jsx's solid
+     brand-500 panel with a white heading/body and a white pill button. */
+  .article-body .cta-card {
+    @apply my-8 rounded-3xl bg-brand-500 px-8 py-10 text-center;
+  }
+
+  .article-body .cta-card h3 {
+    @apply mt-0 mb-3 text-white;
+  }
+
+  .article-body .cta-card p {
+    @apply my-0 text-white/85;
+  }
+
+  .article-body .cta-button {
+    @apply inline-flex mt-6 px-8 py-3.5 rounded-full bg-white text-brand-600 font-semibold no-underline hover:bg-brand-50 transition-colors duration-300;
+  }
 }
 
 @layer utilities {
