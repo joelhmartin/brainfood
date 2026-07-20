@@ -4,12 +4,18 @@ import formData from "form-data";
 import Mailgun from "mailgun.js";
 
 /**
- * Mailgun transport. Holds MAILGUN_API_KEY, so this module is server-only —
+ * Mailgun transport. Holds a Mailgun credential, so this module is server-only —
  * `import "server-only"` turns any accidental client import into a build error
  * rather than a silently shipped credential.
+ *
+ * Prefers MAILGUN_SENDING_KEY over MAILGUN_API_KEY. Mailgun issues a dedicated
+ * sending key alongside the account API key; using it here means the sending
+ * credential can be rotated without disturbing anything that talks to the admin
+ * API, and it is the key Mailgun intends for this job. MAILGUN_API_KEY remains a
+ * fallback so an existing setup keeps working.
  */
 
-const API_KEY = process.env.MAILGUN_API_KEY;
+const API_KEY = process.env.MAILGUN_SENDING_KEY || process.env.MAILGUN_API_KEY;
 const DOMAIN = process.env.MAILGUN_DOMAIN;
 const FROM = process.env.MAILGUN_FROM;
 

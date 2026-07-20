@@ -89,3 +89,53 @@ describe("Mailgun region selection (Finding I4, Fix A)", () => {
     );
   });
 });
+
+describe("credential selection", () => {
+  async function loadWithKeys({ sendingKey, apiKey }) {
+    if (sendingKey === undefined) delete process.env.MAILGUN_SENDING_KEY;
+    else process.env.MAILGUN_SENDING_KEY = sendingKey;
+    if (apiKey === undefined) delete process.env.MAILGUN_API_KEY;
+    else process.env.MAILGUN_API_KEY = apiKey;
+
+    process.env.MAILGUN_DOMAIN = "example.com";
+    process.env.MAILGUN_FROM = "noreply@example.com";
+    delete process.env.MAILGUN_REGION;
+
+    const clientSpy = vi.fn(() => ({
+      messages: { create: vi.fn().mockResolvedValue({ id: "test" }) },
+    }));
+    vi.doMock("mailgun.js", () => ({
+      default: class Mailgun {
+        client(opts) {
+          return clientSpy(opts);
+        }
+      },
+    }));
+    vi.doMock("form-data", () => ({ default: class FormData {} }));
+
+    const mod = await import("./mailgun.js");
+    return { mod, clientSpy };
+  }
+
+  it("prefers MAILGUN_SENDING_KEY when both are set", async () => {
+    const { mod, clientSpy } = await loadWithKeys({ sendingKey: "sending", apiKey: "api" });
+    await mod.sendEmail({ to: "a@b.com", subject: "s", html: "<p>h</p>", text: "t" });
+    expect(clientSpy.mock.calls[0][0].key).toBe("sending");
+  });
+
+  it("falls back to MAILGUN_API_KEY when no sending key is set", async () => {
+    const { mod, clientSpy } = await loadWithKeys({ sendingKey: undefined, apiKey: "api" });
+    await mod.sendEmail({ to: "a@b.com", subject: "s", html: "<p>h</p>", text: "t" });
+    expect(clientSpy.mock.calls[0][0].key).toBe("api");
+  });
+
+  it("is configured when only a sending key is present", async () => {
+    const { mod } = await loadWithKeys({ sendingKey: "sending", apiKey: undefined });
+    expect(mod.isMailConfigured()).toBe(true);
+  });
+
+  it("is not configured when neither key is present", async () => {
+    const { mod } = await loadWithKeys({ sendingKey: undefined, apiKey: undefined });
+    expect(mod.isMailConfigured()).toBe(false);
+  });
+});
