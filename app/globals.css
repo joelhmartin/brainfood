@@ -162,6 +162,106 @@
   }
 }
 
+@layer components {
+  /* Article typography — shared by ArticleBody (blog posts + events).
+     Transcribed from the two now-retired RenderBody implementations
+     (BlogPost.jsx / EventDetail.jsx) so published content keeps its
+     exact look after the switch to raw HTML. `boldify` used to emit
+     `text-navy` in BlogPost and `text-navy/80` in EventDetail — this
+     unifies that drift on `text-navy`, the primary article surface.
+
+     Elements below the divider (`ol`, `a`, `blockquote`, `img`, `hr`,
+     `details`/`summary`) were never supported by the old renderer;
+     they're styled fresh, consistent with the rest of this table. */
+
+  .article-body h2 {
+    @apply font-heading font-bold text-2xl md:text-3xl text-navy mt-14 mb-4 tracking-tight;
+  }
+
+  .article-body h3 {
+    @apply font-heading font-bold text-xl text-navy mt-10 mb-3 tracking-tight;
+  }
+
+  .article-body p {
+    @apply text-navy/65 text-[17px] leading-[1.8] my-4;
+  }
+
+  .article-body strong {
+    @apply font-semibold text-navy;
+  }
+
+  .article-body ul {
+    @apply space-y-2.5 my-5 ml-1 list-none pl-0;
+  }
+
+  /* Reproduces the old <span className="... w-1.5 h-1.5 rounded-full
+     bg-brand-400 ..." /> bullet with an absolutely-positioned ::before.
+     NOTE: an earlier version of this rule used `flex items-start gap-3`
+     on the <li> (mirroring the old renderer's flex row) — that broke
+     text wrapping for real HTML, because raw <li> content is a mix of
+     text nodes and inline elements like <strong> directly on the <li>
+     (unlike the old renderer, which wrapped each item's whole text in
+     one <span>). With display:flex, each of those inline children
+     becomes its own flex item and wraps independently, splitting a
+     line like "Recovery coaching focuses on..." across two misaligned
+     columns. Positioning the bullet out of flow avoids that entirely,
+     regardless of what inline markup a snippet puts inside the <li>. */
+  .article-body ul > li {
+    @apply relative text-navy/65 text-[17px] leading-relaxed pl-[1.125rem];
+  }
+
+  .article-body ul > li::before {
+    content: "";
+    @apply absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-brand-400;
+  }
+
+  /* --- new elements, not present in the old renderers --- */
+
+  .article-body ol {
+    @apply space-y-2.5 my-5 ml-1 pl-4 list-decimal list-outside text-navy/65 text-[17px] leading-relaxed;
+  }
+
+  .article-body ol > li {
+    @apply pl-1.5;
+  }
+
+  .article-body ol > li::marker {
+    @apply text-brand-500 font-semibold;
+  }
+
+  .article-body a {
+    @apply text-brand-600 font-semibold underline decoration-brand-300 decoration-2 underline-offset-2 transition-colors;
+  }
+
+  .article-body a:hover {
+    @apply text-brand-700 decoration-brand-500;
+  }
+
+  .article-body blockquote {
+    @apply my-6 pl-5 border-l-4 border-brand-300 text-navy/70 text-[17px] leading-[1.8] italic;
+  }
+
+  .article-body img {
+    @apply w-full rounded-2xl my-6;
+  }
+
+  .article-body hr {
+    @apply my-10 border-t border-surface-300;
+  }
+
+  .article-body details {
+    @apply my-5 rounded-2xl border border-surface-300 bg-surface-100 px-5 py-4;
+  }
+
+  .article-body summary {
+    @apply font-heading font-semibold text-navy cursor-pointer select-none;
+  }
+
+  .article-body details[open] summary {
+    @apply mb-3;
+  }
+}
+
 @layer utilities {
   /* Drifting brand motif — slow ambient float for decorative logo marks */
   .brand-float {
