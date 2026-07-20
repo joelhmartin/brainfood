@@ -12,6 +12,7 @@ import {
 import { CONTENT, blogUrl } from "../../config/site.js";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
+import { ArticleBody } from "../../components/marketing/ArticleBody.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -20,71 +21,6 @@ function formatDate(dateStr) {
     day: "numeric",
     year: "numeric",
   });
-}
-
-/** Markdown-lite renderer */
-function RenderBody({ text }) {
-  const lines = text.split("\n");
-  const elements = [];
-  let listBuffer = [];
-
-  const flushList = () => {
-    if (listBuffer.length) {
-      elements.push(
-        <ul key={`ul-${elements.length}`} className="space-y-2.5 my-5 ml-1">
-          {listBuffer.map((li, i) => (
-            <li key={i} className="flex items-start gap-3 text-navy/65 text-[17px] leading-relaxed">
-              <span className="text-brand-500 mt-2 w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0" />
-              <span dangerouslySetInnerHTML={{ __html: boldify(li) }} />
-            </li>
-          ))}
-        </ul>
-      );
-      listBuffer = [];
-    }
-  };
-
-  const boldify = (s) =>
-    s.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-navy'>$1</strong>");
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    if (!line) {
-      flushList();
-      continue;
-    }
-
-    if (line.startsWith("### ")) {
-      flushList();
-      elements.push(
-        <h4 key={i} className="font-heading font-bold text-xl text-navy mt-10 mb-3 tracking-tight">
-          {line.slice(4)}
-        </h4>
-      );
-    } else if (line.startsWith("## ")) {
-      flushList();
-      elements.push(
-        <h3 key={i} className="font-heading font-bold text-2xl md:text-3xl text-navy mt-14 mb-4 tracking-tight">
-          {line.slice(3)}
-        </h3>
-      );
-    } else if (line.startsWith("- ")) {
-      listBuffer.push(line.slice(2));
-    } else {
-      flushList();
-      elements.push(
-        <p
-          key={i}
-          className="text-navy/65 text-[17px] leading-[1.8] my-4"
-          dangerouslySetInnerHTML={{ __html: boldify(line) }}
-        />
-      );
-    }
-  }
-
-  flushList();
-  return <>{elements}</>;
 }
 
 /* ─── RELATED POSTS ─── */
@@ -202,7 +138,7 @@ export function BlogPostPage({ post, posts = [] }) {
 
             {/* Body */}
             <article>
-              <RenderBody text={post.body} />
+              <ArticleBody html={post.body} />
             </article>
 
             {/* Tags */}

@@ -2,6 +2,13 @@ import { defineConfig, loadEnv } from "vite";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig(({ mode }) => ({
+  // Match Next.js's SWC transform: JSX source files here (e.g.
+  // ArticleBody.jsx) use the automatic runtime and never import React
+  // themselves. Without this, esbuild's default classic transform emits
+  // bare React.createElement calls and throws "React is not defined".
+  esbuild: {
+    jsx: "automatic",
+  },
   resolve: {
     alias: {
       // The real "server-only" package (imported by src/lib/api/auth.js) throws on

@@ -6,6 +6,7 @@ import { CONTENT } from "../../config/site.js";
 import { CalendarDays, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { ContentSidebar } from "../../components/marketing/ContentSidebar.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
+import { ArticleBody } from "../../components/marketing/ArticleBody.jsx";
 
 function formatDate(dateStr) {
   return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
@@ -14,70 +15,6 @@ function formatDate(dateStr) {
     day: "numeric",
     year: "numeric",
   });
-}
-
-/** Minimal markdown-ish renderer: ##, ###, -, ** */
-function RenderBody({ text }) {
-  const lines = text.split("\n");
-  const elements = [];
-  let listBuffer = [];
-
-  const flushList = () => {
-    if (listBuffer.length) {
-      elements.push(
-        <ul key={`ul-${elements.length}`} className="space-y-2 my-4">
-          {listBuffer.map((li, i) => (
-            <li key={i} className="flex items-start gap-2 text-navy/65 text-base leading-relaxed">
-              <span className="text-brand-500 mt-1.5">•</span>
-              <span dangerouslySetInnerHTML={{ __html: boldify(li) }} />
-            </li>
-          ))}
-        </ul>
-      );
-      listBuffer = [];
-    }
-  };
-
-  const boldify = (s) => s.replace(/\*\*(.+?)\*\*/g, "<strong class='font-semibold text-navy/80'>$1</strong>");
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    if (!line) {
-      flushList();
-      continue;
-    }
-
-    if (line.startsWith("### ")) {
-      flushList();
-      elements.push(
-        <h4 key={i} className="font-heading font-bold text-lg text-navy mt-8 mb-3">
-          {line.slice(4)}
-        </h4>
-      );
-    } else if (line.startsWith("## ")) {
-      flushList();
-      elements.push(
-        <h3 key={i} className="font-heading font-bold text-xl md:text-2xl text-navy mt-10 mb-4">
-          {line.slice(3)}
-        </h3>
-      );
-    } else if (line.startsWith("- ")) {
-      listBuffer.push(line.slice(2));
-    } else {
-      flushList();
-      elements.push(
-        <p
-          key={i}
-          className="text-navy/65 text-base leading-relaxed my-3"
-          dangerouslySetInnerHTML={{ __html: boldify(line) }}
-        />
-      );
-    }
-  }
-
-  flushList();
-  return <>{elements}</>;
 }
 
 export function EventDetailPage({ event }) {
@@ -139,7 +76,7 @@ export function EventDetailPage({ event }) {
 
             {/* Body */}
             <article className="max-w-none">
-              <RenderBody text={event.body} />
+              <ArticleBody html={event.body} />
             </article>
 
             {/* Back link */}
