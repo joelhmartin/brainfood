@@ -20,7 +20,6 @@ import {
 import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
-import { Responsive } from "../../hooks/useBreakpoint.jsx";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
 
 /* ── Scroll reveal helper ─────────────────────
@@ -105,13 +104,33 @@ function Hero() {
       {/* Background */}
       <div className="absolute inset-0">
 
-        <Responsive>{(bp) =>
+        {/*
+          Art direction via <picture>, NOT the breakpoint hook. useBreakpoint's
+          server snapshot is hard-coded to desktop, so `bp.isMobile ? mobile : main`
+          put the 1600x900 desktop crop into the server-rendered HTML on every
+          device. Phones started downloading that file immediately and only swapped
+          to the 514x900 portrait crop after hydration — so the wrong image was what
+          you actually saw, and both files were fetched.
+
+          <source media> is resolved by the browser's preload scanner before any JS
+          runs, so the correct crop is the only one requested, on the first paint.
+          The 767px cutoff matches useBreakpoint's `isMobile: !md` (Tailwind md = 768px).
+        */}
+        <picture className="block w-full h-full">
+          <source media="(max-width: 767px)" srcSet={TEAM.heroMobile} />
+          {/*
+            object-top below md, not object-center: both faces sit in the upper
+            third of the 514x900 portrait crop. Any viewport wider than that
+            crop's 0.57:1 ratio — a phone in landscape, a short window — crops
+            vertically, and centering it lands on torsos with the heads cut off.
+            The 1600x900 desktop crop is framed centrally, so md+ keeps center.
+          */}
           <img
-            src={bp.isMobile ? TEAM.heroMobile : TEAM.heroMain}
+            src={TEAM.heroMain}
             alt="Brain Food Recovery Services team"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-top md:object-center"
           />
-        }</Responsive>
+        </picture>
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
