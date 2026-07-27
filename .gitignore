@@ -16,3 +16,6 @@ dist/
 # Next.js
 .next/
 next-env.d.ts
+
+# Rollback copy written by scripts/migrate-legacy-bodies.mjs --apply
+.legacy-bodies-backup.json

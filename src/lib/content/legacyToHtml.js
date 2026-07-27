@@ -17,6 +17,12 @@
  *   "**bold**" -> <strong>, may appear mid-sentence
  *   blank line -> flush the current list
  *   anything else -> <p>
+ *
+ * The `pretty` option produces the same markup with block-level newlines and
+ * indented <li>s. Render-time conversion does not need it (the browser does not
+ * care), but `scripts/migrate-legacy-bodies.mjs` writes its output back into the
+ * `body` column, where a human then edits it in a monospace textarea — one
+ * 2,000-character line would be unusable there.
  */
 
 function escapeHtml(str) {
@@ -27,7 +33,7 @@ function boldify(str) {
   return str.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
 }
 
-export function legacyToHtml(text) {
+export function legacyToHtml(text, { pretty = false } = {}) {
   if (!text) return "";
 
   const lines = text.split("\n");
@@ -36,8 +42,12 @@ export function legacyToHtml(text) {
 
   const flushList = () => {
     if (listBuffer.length) {
-      const items = listBuffer.map((li) => `<li>${boldify(li)}</li>`).join("");
-      htmlParts.push(`<ul>${items}</ul>`);
+      const items = listBuffer.map((li) => `<li>${boldify(li)}</li>`);
+      htmlParts.push(
+        pretty
+          ? `<ul>\n${items.map((li) => `  ${li}`).join("\n")}\n</ul>`
+          : `<ul>${items.join("")}</ul>`,
+      );
       listBuffer = [];
     }
   };
@@ -66,7 +76,7 @@ export function legacyToHtml(text) {
 
   flushList();
 
-  return htmlParts.join("");
+  return htmlParts.join(pretty ? "\n\n" : "");
 }
 
 /**

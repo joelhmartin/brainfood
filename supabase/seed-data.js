@@ -21,28 +21,32 @@ export const EVENTS = [
       "Join us for a community recovery run through Zilker Park. All paces welcome — walk, jog, or run. Followed by coffee and connection.",
     category: "Community",
     published: true,
-    body: `## About This Event
+    body: `<h2>About This Event</h2>
 
-Join Brain Food Recovery Services for a community recovery run through one of Austin's most beautiful parks. Whether you walk, jog, or run — everyone is welcome.
+<p>Join Brain Food Recovery Services for a community recovery run through one of Austin's most beautiful parks. Whether you walk, jog, or run — everyone is welcome.</p>
 
-### What to Expect
+<h3>What to Expect</h3>
 
-- **8:00 AM** — Meet at the Zilker Park trailhead (near Barton Springs Rd entrance)
-- **8:15 AM** — Group warm-up and introductions
-- **8:30 AM** — Run/walk begins (3-mile loop, go at your own pace)
-- **9:30 AM** — Post-run coffee, snacks, and connection at the pavilion
+<ul>
+  <li><strong>8:00 AM</strong> — Meet at the Zilker Park trailhead (near Barton Springs Rd entrance)</li>
+  <li><strong>8:15 AM</strong> — Group warm-up and introductions</li>
+  <li><strong>8:30 AM</strong> — Run/walk begins (3-mile loop, go at your own pace)</li>
+  <li><strong>9:30 AM</strong> — Post-run coffee, snacks, and connection at the pavilion</li>
+</ul>
 
-### Who Should Attend
+<h3>Who Should Attend</h3>
 
-This event is open to anyone in recovery, anyone supporting someone in recovery, or anyone curious about the recovery community. No experience necessary — just show up.
+<p>This event is open to anyone in recovery, anyone supporting someone in recovery, or anyone curious about the recovery community. No experience necessary — just show up.</p>
 
-### What to Bring
+<h3>What to Bring</h3>
 
-- Comfortable shoes and clothes
-- Water bottle
-- A friend (optional but encouraged)
+<ul>
+  <li>Comfortable shoes and clothes</li>
+  <li>Water bottle</li>
+  <li>A friend (optional but encouraged)</li>
+</ul>
 
-This event is free and open to the public. No registration required.`,
+<p>This event is free and open to the public. No registration required.</p>`,
   },
   {
     slug: "family-workshop-boundaries",
@@ -56,29 +60,33 @@ This event is free and open to the public. No registration required.`,
       "A hands-on workshop for families navigating recovery. Learn practical tools for communication, boundary-setting, and self-care.",
     category: "Workshop",
     published: true,
-    body: `## About This Event
+    body: `<h2>About This Event</h2>
 
-Substance use and mental health challenges affect the entire family system. This workshop is designed to help families move from confusion and fear to clarity and confidence.
+<p>Substance use and mental health challenges affect the entire family system. This workshop is designed to help families move from confusion and fear to clarity and confidence.</p>
 
-### Topics Covered
+<h3>Topics Covered</h3>
 
-- Understanding substance use disorder and mental health
-- Healthy communication patterns
-- Setting boundaries without guilt
-- Reducing burnout and emotional overwhelm
-- How to support recovery without enabling
+<ul>
+  <li>Understanding substance use disorder and mental health</li>
+  <li>Healthy communication patterns</li>
+  <li>Setting boundaries without guilt</li>
+  <li>Reducing burnout and emotional overwhelm</li>
+  <li>How to support recovery without enabling</li>
+</ul>
 
-### Format
+<h3>Format</h3>
 
-This is an interactive, small-group workshop led by the Brain Food coaching team. We keep groups small so everyone has space to ask questions and share.
+<p>This is an interactive, small-group workshop led by the Brain Food coaching team. We keep groups small so everyone has space to ask questions and share.</p>
 
-### Details
+<h3>Details</h3>
 
-- **Date:** April 19, 2026
-- **Time:** 10:00 AM – 12:00 PM
-- **Location:** Brain Food Office, Austin TX
-- **Cost:** Free
-- **RSVP:** Email info@brainfoodrecovery.com to reserve your spot (limited to 15 families)`,
+<ul>
+  <li><strong>Date:</strong> April 19, 2026</li>
+  <li><strong>Time:</strong> 10:00 AM – 12:00 PM</li>
+  <li><strong>Location:</strong> Brain Food Office, Austin TX</li>
+  <li><strong>Cost:</strong> Free</li>
+  <li><strong>RSVP:</strong> Email info@brainfoodrecovery.com to reserve your spot (limited to 15 families)</li>
+</ul>`,
   },
   {
     slug: "live-music-recovery-night",
@@ -92,30 +100,34 @@ This is an interactive, small-group workshop led by the Brain Food coaching team
       "An evening of live music, connection, and sober fun. Proving that recovery can be exciting, social, and full of life.",
     category: "Social",
     published: true,
-    body: `## About This Event
+    body: `<h2>About This Event</h2>
 
-Recovery is about building a life worth living — and that includes having fun. Join us for an evening of live local music at one of Austin's most iconic venues.
+<p>Recovery is about building a life worth living — and that includes having fun. Join us for an evening of live local music at one of Austin's most iconic venues.</p>
 
-### Why This Matters
+<h3>Why This Matters</h3>
 
-One of the biggest challenges in early recovery is learning how to enjoy social events without substances. This event is a chance to practice exactly that — in a supportive, judgment-free environment.
+<p>One of the biggest challenges in early recovery is learning how to enjoy social events without substances. This event is a chance to practice exactly that — in a supportive, judgment-free environment.</p>
 
-### Details
+<h3>Details</h3>
 
-- **Date:** May 3, 2026
-- **Doors:** 7:00 PM
-- **Music:** 8:00 PM – 10:30 PM
-- **Location:** The Mohawk, Austin TX
-- **Cost:** Free for Brain Food clients, $10 suggested donation for others
+<ul>
+  <li><strong>Date:</strong> May 3, 2026</li>
+  <li><strong>Doors:</strong> 7:00 PM</li>
+  <li><strong>Music:</strong> 8:00 PM – 10:30 PM</li>
+  <li><strong>Location:</strong> The Mohawk, Austin TX</li>
+  <li><strong>Cost:</strong> Free for Brain Food clients, $10 suggested donation for others</li>
+</ul>
 
-### What to Expect
+<h3>What to Expect</h3>
 
-- Live performances from local Austin artists
-- Non-alcoholic drinks available
-- Brain Food team members present for support
-- A genuinely good time
+<ul>
+  <li>Live performances from local Austin artists</li>
+  <li>Non-alcoholic drinks available</li>
+  <li>Brain Food team members present for support</li>
+  <li>A genuinely good time</li>
+</ul>
 
-Open to anyone in recovery or supportive of recovery. Bring friends.`,
+<p>Open to anyone in recovery or supportive of recovery. Bring friends.</p>`,
   },
 ];
 
@@ -134,42 +146,48 @@ export const POSTS = [
     read_time: 4,
     published: true,
     featured: true,
-    body: `## What Is Recovery Coaching?
+    body: `<h2>What Is Recovery Coaching?</h2>
 
-Recovery coaching is a structured, relationship-based support service designed to help individuals build and sustain recovery from substance use disorder and mental health challenges. Unlike therapy, which focuses primarily on clinical diagnosis and treatment, recovery coaching focuses on practical application — translating insight into daily action.
+<p>Recovery coaching is a structured, relationship-based support service designed to help individuals build and sustain recovery from substance use disorder and mental health challenges. Unlike therapy, which focuses primarily on clinical diagnosis and treatment, recovery coaching focuses on practical application — translating insight into daily action.</p>
 
-### How It's Different from Therapy
+<h3>How It's Different from Therapy</h3>
 
-Therapy and recovery coaching serve different but complementary roles:
+<p>Therapy and recovery coaching serve different but complementary roles:</p>
 
-- **Therapy** addresses clinical diagnosis, trauma processing, and psychological treatment
-- **Recovery coaching** focuses on daily structure, accountability, goal-setting, and real-world skill building
-- **Together** they create a comprehensive support system that covers both the clinical and practical sides of recovery
+<ul>
+  <li><strong>Therapy</strong> addresses clinical diagnosis, trauma processing, and psychological treatment</li>
+  <li><strong>Recovery coaching</strong> focuses on daily structure, accountability, goal-setting, and real-world skill building</li>
+  <li><strong>Together</strong> they create a comprehensive support system that covers both the clinical and practical sides of recovery</li>
+</ul>
 
-### What Does a Recovery Coaching Session Look Like?
+<h3>What Does a Recovery Coaching Session Look Like?</h3>
 
-A typical session might include:
+<p>A typical session might include:</p>
 
-- Reviewing the past week — wins, challenges, and patterns
-- Setting short-term, achievable goals for the coming week
-- Working through specific life skills — budgeting, time management, job searching
-- Processing real-life situations and developing healthier responses
-- Building daily routines that support stability
+<ul>
+  <li>Reviewing the past week — wins, challenges, and patterns</li>
+  <li>Setting short-term, achievable goals for the coming week</li>
+  <li>Working through specific life skills — budgeting, time management, job searching</li>
+  <li>Processing real-life situations and developing healthier responses</li>
+  <li>Building daily routines that support stability</li>
+</ul>
 
-### Who Is Recovery Coaching For?
+<h3>Who Is Recovery Coaching For?</h3>
 
-Recovery coaching works well for:
+<p>Recovery coaching works well for:</p>
 
-- Individuals transitioning out of treatment or institutional settings
-- People in early recovery who need structure and accountability
-- Anyone navigating substance use disorder or mental health challenges who wants hands-on, real-world support
-- Families who want guidance on how to support their loved one
+<ul>
+  <li>Individuals transitioning out of treatment or institutional settings</li>
+  <li>People in early recovery who need structure and accountability</li>
+  <li>Anyone navigating substance use disorder or mental health challenges who wants hands-on, real-world support</li>
+  <li>Families who want guidance on how to support their loved one</li>
+</ul>
 
-### The Brain Food Approach
+<h3>The Brain Food Approach</h3>
 
-At Brain Food Recovery Services, our coaching is grounded in lived experience. Our coaches have walked this path themselves, which allows them to connect authentically and deliver support that is both compassionate and honest.
+<p>At Brain Food Recovery Services, our coaching is grounded in lived experience. Our coaches have walked this path themselves, which allows them to connect authentically and deliver support that is both compassionate and honest.</p>
 
-We believe recovery is built through practical skills, supportive relationships, and consistent real-world application — not just insight alone.`,
+<p>We believe recovery is built through practical skills, supportive relationships, and consistent real-world application — not just insight alone.</p>`,
   },
   {
     slug: "5-daily-habits-that-support-recovery",
@@ -185,66 +203,74 @@ We believe recovery is built through practical skills, supportive relationships,
     read_time: 5,
     published: true,
     featured: false,
-    body: `## Why Daily Habits Matter in Recovery
+    body: `<h2>Why Daily Habits Matter in Recovery</h2>
 
-Recovery is built in the small moments — the morning routine, the afternoon walk, the evening reflection. The big decisions matter, but it's the daily habits that create the foundation everything else stands on.
+<p>Recovery is built in the small moments — the morning routine, the afternoon walk, the evening reflection. The big decisions matter, but it's the daily habits that create the foundation everything else stands on.</p>
 
-Here are five habits that we see make a real, measurable difference in our clients' lives.
+<p>Here are five habits that we see make a real, measurable difference in our clients' lives.</p>
 
-### 1. Move Your Body Every Day
+<h3>1. Move Your Body Every Day</h3>
 
-This doesn't mean you need to train for a marathon. A 20-minute walk, a trip to the gym, or even stretching in your living room counts. Physical movement:
+<p>This doesn't mean you need to train for a marathon. A 20-minute walk, a trip to the gym, or even stretching in your living room counts. Physical movement:</p>
 
-- Reduces anxiety and depression symptoms
-- Improves sleep quality
-- Builds confidence and self-esteem
-- Provides healthy dopamine
+<ul>
+  <li>Reduces anxiety and depression symptoms</li>
+  <li>Improves sleep quality</li>
+  <li>Builds confidence and self-esteem</li>
+  <li>Provides healthy dopamine</li>
+</ul>
 
-The key is consistency, not intensity.
+<p>The key is consistency, not intensity.</p>
 
-### 2. Build a Morning Routine
+<h3>2. Build a Morning Routine</h3>
 
-How you start your day sets the tone for everything that follows. A simple morning routine might include:
+<p>How you start your day sets the tone for everything that follows. A simple morning routine might include:</p>
 
-- Waking up at the same time each day
-- Making your bed
-- Eating breakfast
-- 10 minutes of reading, journaling, or meditation
-- Reviewing your goals for the day
+<ul>
+  <li>Waking up at the same time each day</li>
+  <li>Making your bed</li>
+  <li>Eating breakfast</li>
+  <li>10 minutes of reading, journaling, or meditation</li>
+  <li>Reviewing your goals for the day</li>
+</ul>
 
-The routine itself matters less than the consistency. Structure creates safety.
+<p>The routine itself matters less than the consistency. Structure creates safety.</p>
 
-### 3. Stay Connected to Your Support Network
+<h3>3. Stay Connected to Your Support Network</h3>
 
-Isolation is one of the biggest risk factors in recovery. Make it a daily practice to connect with at least one person in your support network — a coach, a sponsor, a friend in recovery, or a family member.
+<p>Isolation is one of the biggest risk factors in recovery. Make it a daily practice to connect with at least one person in your support network — a coach, a sponsor, a friend in recovery, or a family member.</p>
 
-This doesn't have to be a deep conversation. A text, a phone call, or a quick coffee counts.
+<p>This doesn't have to be a deep conversation. A text, a phone call, or a quick coffee counts.</p>
 
-### 4. Practice Financial Awareness
+<h3>4. Practice Financial Awareness</h3>
 
-Money stress is a major trigger. Even simple financial habits make a difference:
+<p>Money stress is a major trigger. Even simple financial habits make a difference:</p>
 
-- Check your bank balance daily
-- Track your spending (even roughly)
-- Avoid impulsive purchases — give yourself a 24-hour rule
-- Build a small emergency fund, even if it's $5 at a time
+<ul>
+  <li>Check your bank balance daily</li>
+  <li>Track your spending (even roughly)</li>
+  <li>Avoid impulsive purchases — give yourself a 24-hour rule</li>
+  <li>Build a small emergency fund, even if it's $5 at a time</li>
+</ul>
 
-Financial stability creates emotional stability.
+<p>Financial stability creates emotional stability.</p>
 
-### 5. End Your Day with Reflection
+<h3>5. End Your Day with Reflection</h3>
 
-Before bed, take five minutes to reflect:
+<p>Before bed, take five minutes to reflect:</p>
 
-- What went well today?
-- What was challenging?
-- What am I grateful for?
-- What's one thing I want to do differently tomorrow?
+<ul>
+  <li>What went well today?</li>
+  <li>What was challenging?</li>
+  <li>What am I grateful for?</li>
+  <li>What's one thing I want to do differently tomorrow?</li>
+</ul>
 
-This isn't about being perfect. It's about building awareness and momentum.
+<p>This isn't about being perfect. It's about building awareness and momentum.</p>
 
-## The Bigger Picture
+<h2>The Bigger Picture</h2>
 
-None of these habits are complicated. But done consistently, they create the kind of structure and stability that makes long-term recovery possible. Start with one. Build from there.`,
+<p>None of these habits are complicated. But done consistently, they create the kind of structure and stability that makes long-term recovery possible. Start with one. Build from there.</p>`,
   },
   {
     slug: "supporting-a-loved-one-in-recovery",
@@ -260,51 +286,55 @@ None of these habits are complicated. But done consistently, they create the kin
     read_time: 5,
     published: true,
     featured: false,
-    body: `## The Support vs. Enabling Question
+    body: `<h2>The Support vs. Enabling Question</h2>
 
-This is the question every family member asks: "Am I helping, or am I making it worse?"
+<p>This is the question every family member asks: "Am I helping, or am I making it worse?"</p>
 
-The truth is, the line between support and enabling isn't always obvious. But there are clear principles that can guide you.
+<p>The truth is, the line between support and enabling isn't always obvious. But there are clear principles that can guide you.</p>
 
-### What Enabling Looks Like
+<h3>What Enabling Looks Like</h3>
 
-Enabling is any action that protects someone from the natural consequences of their choices. Common examples:
+<p>Enabling is any action that protects someone from the natural consequences of their choices. Common examples:</p>
 
-- Paying bills they should be paying themselves
-- Making excuses for their behavior to others
-- Avoiding difficult conversations to "keep the peace"
-- Repeatedly bailing them out of situations they created
-- Walking on eggshells around their emotions
+<ul>
+  <li>Paying bills they should be paying themselves</li>
+  <li>Making excuses for their behavior to others</li>
+  <li>Avoiding difficult conversations to "keep the peace"</li>
+  <li>Repeatedly bailing them out of situations they created</li>
+  <li>Walking on eggshells around their emotions</li>
+</ul>
 
-Enabling comes from love. But it prevents growth.
+<p>Enabling comes from love. But it prevents growth.</p>
 
-### What Healthy Support Looks Like
+<h3>What Healthy Support Looks Like</h3>
 
-Healthy support respects both your boundaries and their autonomy:
+<p>Healthy support respects both your boundaries and their autonomy:</p>
 
-- Being honest about what you see — with compassion, not judgment
-- Letting them experience natural consequences (while staying emotionally available)
-- Setting clear boundaries and following through consistently
-- Educating yourself about substance use disorder and mental health
-- Taking care of your own mental health and wellbeing
+<ul>
+  <li>Being honest about what you see — with compassion, not judgment</li>
+  <li>Letting them experience natural consequences (while staying emotionally available)</li>
+  <li>Setting clear boundaries and following through consistently</li>
+  <li>Educating yourself about substance use disorder and mental health</li>
+  <li>Taking care of your own mental health and wellbeing</li>
+</ul>
 
-### Practical Steps for Families
+<h3>Practical Steps for Families</h3>
 
-**Start with yourself.** You cannot pour from an empty cup. Get your own support — whether that's therapy, a family support group, or working with a family coach.
+<p><strong>Start with yourself.</strong> You cannot pour from an empty cup. Get your own support — whether that's therapy, a family support group, or working with a family coach.</p>
 
-**Set boundaries in advance.** Don't wait for a crisis. Decide what you will and won't accept, communicate it clearly, and stick to it.
+<p><strong>Set boundaries in advance.</strong> Don't wait for a crisis. Decide what you will and won't accept, communicate it clearly, and stick to it.</p>
 
-**Separate the person from the disease.** Your loved one is not their addiction. Holding that distinction helps you stay connected without condoning harmful behavior.
+<p><strong>Separate the person from the disease.</strong> Your loved one is not their addiction. Holding that distinction helps you stay connected without condoning harmful behavior.</p>
 
-**Celebrate progress, not perfection.** Recovery is not linear. Acknowledge the steps forward, even when they're small.
+<p><strong>Celebrate progress, not perfection.</strong> Recovery is not linear. Acknowledge the steps forward, even when they're small.</p>
 
-**Ask for help.** You don't have to figure this out alone. Family coaching exists specifically to help you navigate these situations with confidence.
+<p><strong>Ask for help.</strong> You don't have to figure this out alone. Family coaching exists specifically to help you navigate these situations with confidence.</p>
 
-## You're Not Alone
+<h2>You're Not Alone</h2>
 
-At Brain Food Recovery Services, we work with families every day. The confusion, the fear, the guilt — we understand it. And we can help you move from reactive to proactive, from overwhelmed to empowered.
+<p>At Brain Food Recovery Services, we work with families every day. The confusion, the fear, the guilt — we understand it. And we can help you move from reactive to proactive, from overwhelmed to empowered.</p>
 
-Reach out anytime. The conversation is always confidential.`,
+<p>Reach out anytime. The conversation is always confidential.</p>`,
   },
 ];
 

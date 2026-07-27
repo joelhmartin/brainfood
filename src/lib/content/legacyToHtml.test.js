@@ -37,6 +37,26 @@ describe("legacyToHtml", () => {
   });
 });
 
+describe("legacyToHtml pretty mode", () => {
+  it("separates blocks with a blank line and indents list items", () => {
+    expect(legacyToHtml("## Title\n\n- a\n- b", { pretty: true })).toBe(
+      "<h2>Title</h2>\n\n<ul>\n  <li>a</li>\n  <li>b</li>\n</ul>",
+    );
+  });
+
+  it("produces the same markup as compact mode once whitespace is collapsed", () => {
+    const source = "## Title\n\nA **bold** line.\n\n- one\n- two\n\n### Sub\n\nTail.";
+    const collapse = (html) => html.replace(/>\s+</g, "><").trim();
+    expect(collapse(legacyToHtml(source, { pretty: true }))).toBe(
+      collapse(legacyToHtml(source)),
+    );
+  });
+
+  it("still reads as HTML to the render-time detector", () => {
+    expect(looksLikeHtml(legacyToHtml("## Title", { pretty: true }))).toBe(true);
+  });
+});
+
 describe("looksLikeHtml", () => {
   it("detects HTML", () => {
     expect(looksLikeHtml("<p>hi</p>")).toBe(true);

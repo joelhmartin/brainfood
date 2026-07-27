@@ -124,6 +124,19 @@ will try to route it, breaking the build. Do not rename it back.
   consume. **Always map rows through it** — spreading a raw row over a camelCase default
   silently drops every field.
 
+### Article bodies
+
+`posts.body` / `events.body` store **HTML** — what the dashboard's `HtmlEditor` edits and what
+its snippet dropdown inserts. Bodies were originally authored in a "markdown-lite" dialect
+(`## `, `### `, `- `, `**bold**`); every row and every seed body was converted to HTML by
+`scripts/migrate-legacy-bodies.mjs`, which is idempotent and safe to re-run.
+
+`ArticleBody` still falls back to `legacyToHtml()` when a body contains no tag, so any
+markdown-lite that reappears keeps rendering. **Do not rely on that fallback for new content.**
+It picks one path for the *whole* body, so a legacy body that gains a single tag — one snippet
+insert — silently drops back to literal `## ` and `- ` text for everything else. Anything that
+writes bodies (a seed, an import, a fixture) must write HTML.
+
 ### SEO
 
 `src/lib/metadata.js` builds Next `Metadata` objects; `src/lib/seo.js` holds pure JSON-LD
