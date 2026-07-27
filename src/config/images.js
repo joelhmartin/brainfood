@@ -52,7 +52,7 @@ export const SERVICES = {
   hiking: PX(1365425),
 
   /** Family in conversation — family coaching */
-  family: PX(1620760),
+  family: '/images/candid/Family Values Hero.avif',
 
   /** Professionals collaborating at a table — collaborative care */
   collaborative: PX(3182812),

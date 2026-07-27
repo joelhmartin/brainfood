@@ -28,8 +28,8 @@ export const BUSINESS = {
 export const CONTACT = {
   phone:       "(512) 555-0192",
   phoneHref:   "tel:+15125550192",
-  email:       "info@brainfoodrecovery.com",
-  emailHref:   "mailto:info@brainfoodrecovery.com",
+  email:       "info@bfrecovery.com",
+  emailHref:   "mailto:info@bfrecovery.com",
   hours:       "Mon–Fri, 9:00 AM – 5:00 PM CST",
 };
 
