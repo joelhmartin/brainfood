@@ -85,7 +85,7 @@ export const EVENTS = [
   <li><strong>Time:</strong> 10:00 AM – 12:00 PM</li>
   <li><strong>Location:</strong> Brain Food Office, Austin TX</li>
   <li><strong>Cost:</strong> Free</li>
-  <li><strong>RSVP:</strong> Email info@brainfoodrecovery.com to reserve your spot (limited to 15 families)</li>
+  <li><strong>RSVP:</strong> Email info@bfrecovery.com to reserve your spot (limited to 15 families)</li>
 </ul>`,
   },
   {
@@ -339,12 +339,12 @@ export const POSTS = [
 ];
 
 /**
- * NOTE: `phone` and `google_review` below are placeholders carried over from
- * src/config/site.js. (512) 555-0192 is not a real number — 555 numbers are
- * reserved for fiction. Structured data omits blank fields, so these are left
- * EMPTY rather than seeded with fake values: publishing a fake phone number in
- * LocalBusiness schema creates NAP inconsistency and hurts local search ranking.
- * Fill them in from the dashboard Settings page.
+ * NOTE: `google_review` below is still a placeholder. Structured data omits blank
+ * fields, so it is left EMPTY rather than seeded with a fake value: publishing
+ * fake data in LocalBusiness schema creates NAP inconsistency and hurts local
+ * search ranking. Fill it in from the dashboard Settings page.
+ *
+ * `phone` is the real business line and is safe to publish in structured data.
  */
 export const SITE_SETTINGS = {
   id: 1,
@@ -358,8 +358,8 @@ export const SITE_SETTINGS = {
   address: "",
   founded: 2023,
 
-  phone: "",
-  email: "info@brainfoodrecovery.com",
+  phone: "(785) 691-6433",
+  email: "info@bfrecovery.com",
   hours: "Mon–Fri, 9:00 AM – 5:00 PM CST",
 
   google_maps: "https://maps.google.com/?q=Austin+TX",
@@ -373,7 +373,7 @@ export const SITE_SETTINGS = {
     { label: "Instagram", href: "https://www.instagram.com/brainfoodrecovery/" },
   ],
 
-  site_url: "",
+  site_url: "https://www.bfrecovery.com",
   title_template: "%s | Brain Food Recovery Services",
   default_title: "Brain Food Recovery Services — Recovery Coaching in Austin, TX",
   default_desc:

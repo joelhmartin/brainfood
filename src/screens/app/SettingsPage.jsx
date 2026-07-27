@@ -299,7 +299,7 @@ export function SettingsPage() {
               className={FIELD}
               value={form.phone ?? ""}
               onChange={(e) => set("phone", e.target.value)}
-              placeholder="(512) 555-0192 is NOT a real number"
+              placeholder="(785) 691-6433"
               disabled={readOnly}
             />
           </Field>

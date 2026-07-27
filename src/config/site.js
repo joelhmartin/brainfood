@@ -26,8 +26,8 @@ export const BUSINESS = {
 // ── Contact ──────────────────────────────────────────────────────────────────
 
 export const CONTACT = {
-  phone:       "(512) 555-0192",
-  phoneHref:   "tel:+15125550192",
+  phone:       "(785) 691-6433",
+  phoneHref:   "tel:+17856916433",
   email:       "info@bfrecovery.com",
   emailHref:   "mailto:info@bfrecovery.com",
   hours:       "Mon–Fri, 9:00 AM – 5:00 PM CST",
@@ -130,12 +130,14 @@ export const SEO = {
 // the database is unreachable. Without it, the prerendered HTML would bake in a
 // blank <title> and an empty footer.
 //
-// Values left EMPTY here are empty on purpose. The phone number in CONTACT above
-// is a 555 placeholder (reserved for fiction), and the Google review link is "#".
-// Structured data omits blank fields, so publishing nothing is correct; publishing
-// a fake phone number in LocalBusiness schema would create NAP inconsistency and
-// actively hurt local search. Fill these in from Settings → the dashboard writes
-// the real values to the database.
+// Values left EMPTY here are empty on purpose. Structured data omits blank fields,
+// so publishing nothing is correct; publishing a fake value in LocalBusiness schema
+// would create NAP inconsistency and actively hurt local search. Fill these in from
+// Settings → the dashboard writes the real values to the database.
+//
+// `phone` is now the real business line, so it is safe in structured data and is no
+// longer blanked here. The live value still comes from `site_settings`; this is only
+// the fallback for first paint, prerender, and an unreachable database.
 
 export const FALLBACK_SETTINGS = {
   name:        BUSINESS.name,
@@ -147,7 +149,7 @@ export const FALLBACK_SETTINGS = {
   address:     "",
   founded:     BUSINESS.founded,
 
-  phone: "",
+  phone: CONTACT.phone,
   email: CONTACT.email,
   hours: CONTACT.hours,
 
