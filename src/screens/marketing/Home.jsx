@@ -131,9 +131,15 @@ function Hero() {
             className="w-full h-full object-cover object-top md:object-center"
           />
         </picture>
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
+        {/*
+          Gradient overlays — md+ only. The mobile crop ships with its own
+          gradients baked into the asset, so painting these on top of it
+          double-darkens the image. The desktop crop is clean and still needs
+          them for text contrast. NoiseOverlay stays on both: it is grain, not
+          a gradient, and is not part of what the mobile asset bakes in.
+        */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-navy via-navy/70 to-transparent" />
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent" />
         <NoiseOverlay />
       </div>
 
