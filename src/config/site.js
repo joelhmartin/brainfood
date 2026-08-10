@@ -118,8 +118,17 @@ export const SEO = {
   titleTemplate: "%s | Brain Food Recovery Services",
   defaultTitle:  "Brain Food Recovery Services — Recovery Coaching in Austin, TX",
   defaultDesc:   BUSINESS.description,
-  url:           "https://brainfoodrecovery.com",
-  ogImage:       null, // TODO: Add OG image path
+  // The real domain, matching CONTACT.email (info@bfrecovery.com). This was
+  // "brainfoodrecovery.com" — a domain the business does not own — which is
+  // harmless today only because nothing reads SEO.url: the live canonical comes
+  // from `site_settings.siteUrl`, edited in the dashboard, and FALLBACK_SETTINGS
+  // deliberately leaves siteUrl empty until go-live. Fixed so it stops being a
+  // wrong answer waiting for someone to wire it up.
+  url:           "https://bfrecovery.com",
+  // Left null on purpose. The site-wide social card is generated at
+  // app/opengraph-image.js rather than served from a static file, so there is
+  // no path to point at; setting one here would override the generated card.
+  ogImage:       null,
 };
 
 // ── Live settings fallback ───────────────────────────────────────────────────

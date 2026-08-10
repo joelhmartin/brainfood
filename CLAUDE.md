@@ -6,43 +6,57 @@ Brain Food Recovery Services — a marketing site plus an admin dashboard. Next.
 
 ---
 
-## ⛔ PRE-DEPLOY / DOMAIN CUTOVER — READ BEFORE ANY PRODUCTION DEPLOY
+## ⛔ THE SITE IS LIVE AND INDEXED — READ BEFORE CHANGING URLS OR SEO SETTINGS
 
-The site is currently wired to **temporary values** so it can be tested before DNS is ready.
-**Every item below must be changed at domain cutover.** Do not deploy to a real domain with
-these in place, and do not "fix" one in isolation — they go together.
+**Cutover is done.** This section used to describe a pre-launch site wired to temporary
+sandbox values; that is no longer true, and treating it as true leads to exactly the wrong
+call (assuming nothing is indexed yet, so URL churn is free). Verified live on 2026-08-10:
 
-Change in **BOTH** `.env.local` **and** Vercel (`vercel env add <NAME> production` and
-`preview` — Vercel is per-environment, and updating one does not update the other):
+| Thing | Live value |
+| --- | --- |
+| `siteUrl` (`site_settings`) | `https://www.bfrecovery.com` |
+| `seoIndexable` | **`true`** — pages serve `index, follow, max-image-preview:large` |
+| `/sitemap.xml` | populated (not `[]`) |
+| `MAILGUN_DOMAIN` | `mg.bfrecovery.com` (real, DNS-verified — not the old sandbox) |
+| `CONTACT_RECIPIENT` | `webforms@bfrecovery.com` |
 
-| Variable | Temporary value now | Must become |
-| --- | --- | --- |
-| `MAILGUN_DOMAIN` | `sandbox9089e0ff...mailgun.org` | the real, DNS-verified sending domain |
-| `MAILGUN_FROM` | `... <postmaster@sandbox…>` | `Brain Food Recovery Services <noreply@REAL-DOMAIN>` |
-| `CONTACT_RECIPIENT` | `iamjoelhuntermartin@gmail.com` (testing) | `brainfoodrs@gmail.com` |
+Check the live values rather than trusting this table if something looks off — they live in
+the `site_settings` row and in Vercel's per-environment env, not in code. `.env.local` and
+Vercel are separate: updating one does not update the other.
 
-Why these are temporary: Mailgun put the account on a **sandbox** domain because DNS is not
-verified. Sandbox delivers **only to authorized recipients** and caps around 300/day. Sending
-from an unverified domain, or putting a visitor's address in `From`, fails SPF and lands mail
-in spam — `From` must always be the business, with the visitor in `Reply-To`.
+What this means for day-to-day work:
 
-Also required at cutover, in this order:
+- **URLs are load-bearing for real now.** Changing or deleting a public path forfeits accrued
+  ranking and produces live 404s. Treat it as a product decision, not a refactor.
+- **`seoIndexable` is the master switch and it is ON.** Turning it off blanks the sitemap,
+  emits `noindex, nofollow` sitewide, and suppresses all JSON-LD. Never flip it as a side
+  effect of other work.
+- **`siteUrl` must stay set.** `app/sitemap.js` skips the sitemap when either it or
+  `seoIndexable` is missing, so a half-configured site never publishes empty-origin URLs.
+- **Supabase Auth redirect URLs** must keep including the live domain, or password-reset and
+  invite links point at the wrong host.
+- Mail: `From` is always the business, with the visitor in `Reply-To` — a visitor address in
+  `From` fails SPF and lands in spam.
 
-1. **DNS:** add Mailgun's SPF + DKIM records and confirm the domain shows verified in Mailgun.
-2. **`seoIndexable`** — currently `false` **on purpose**. The whole site emits
-   `noindex, nofollow` and `app/sitemap.js` returns `[]` until it is flipped. Indexing a
-   staging domain splits ranking signals and is painful to unwind. **Never flip it as a side
-   effect of other work** — it is a deliberate go-live step, done only once on the real domain,
-   from the dashboard (Settings → it lives in the `site_settings` row, not in code).
-3. **`siteUrl`** must be set before `seoIndexable` is flipped. `app/sitemap.js` skips the
-   sitemap when either is missing, precisely so a half-configured site never publishes
-   empty-origin URLs.
-4. **Vercel Deployment Protection** — currently ON, so production returns 302/401 to the
-   public. Turn it off (or restrict it to preview) or the live site is invisible to visitors.
-5. **Supabase Auth redirect URLs** must include the real domain, or password-reset and
-   invite links will point at the wrong host.
+`README-ADMIN.md` has the longer-form runbook; parts of it describe the same pre-launch state
+this section used to and are stale in the same way.
 
-`README-ADMIN.md` has the longer-form runbook for the same cutover.
+### Public routes come from a registry, not from hand-written lists
+
+`src/config/routes.js` is the single source of truth for every public URL. Three things
+consume it and must agree: `app/sitemap.js` (XML), `app/(marketing)/sitemap` (the HTML
+sitemap), and `scripts/verify-routes.mjs`. `src/config/routes.test.js` walks the real `app/`
+directory and **fails the build if the registry and the filesystem disagree in either
+direction** — an unregistered route, or a registered route with no page.
+
+So: **adding a public route means adding it to `src/config/routes.js`.** The test will tell
+you if you forget. Do not weaken that assertion to make a build pass. (The same file also
+holds the `ROUTES` constants for the private dashboard/auth paths — those are asserted to
+stay *out* of the public set.)
+
+A filesystem scan at runtime is not an option and was rejected deliberately: Next traces only
+the modules a route imports into the serverless bundle, so `app/` source is absent in
+production. A scan would return an empty sitemap on Vercel while looking correct in dev.
 
 ---
 
@@ -98,8 +112,11 @@ It was migrated to Next.js, which renders server-side natively. Consequences wor
 
 ### Route groups (`app/`)
 
-- `(marketing)` — public, server-rendered, ISR. Home, about, services, products, contact,
-  blog + events (each with `/page/[page]` pagination and `/[slug]` detail).
+- `(marketing)` — public, server-rendered, ISR. Home, about, services (+ `/[slug]`), contact,
+  sitemap, blog + events (each with `/page/[page]` pagination and `/[slug]` detail).
+  There is no `/products`, `/about/team`, or `/resources/*`: those were leftovers from a
+  different project's build (a dental-orthotics catalog, wrong company name in the copy,
+  referencing images and 3D models that are not in `public/`) and were deleted.
 - `(auth)` — login, forgot/reset password, accept invite. Client-rendered, `noindex` set on
   the group layout.
 - `app/app/*` — the dashboard. Client-rendered behind `RequireAuth`, `noindex`.
@@ -203,6 +220,11 @@ placeholder. Structured data omits empty fields, and publishing a fake phone num
 - **`npm run verify:routes`** asserts every route serves populated HTML with real per-route
   metadata — the guarantee the deleted prerender script used to provide. Run it against a
   production build (`npm run build && npm start`), not dev.
+  It builds its route list from the registry plus the links on the live `/sitemap` page, so
+  content published since the last edit is covered without touching the script. It does not
+  hardcode whether the site should be indexable: it reads the homepage's robots directive and
+  asserts every other route **agrees** with it, because a half-indexable site is the actual
+  bug worth catching.
 - The repo has **no React Testing Library**. The established pattern for testable UI logic is to
   extract a pure function and unit-test that — see `paginateEvents` (`src/screens/marketing/Events.jsx`),
   `safeRedirectPath`, and `buildLoginRedirectUrl` (`src/guards/RequireAuth.jsx`).

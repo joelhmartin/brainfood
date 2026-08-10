@@ -106,6 +106,15 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Brain Food Recovery Services. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-white/30 text-xs">
+            {/* A sitemap that nothing links to is a sitemap crawlers reach late
+                and users never reach at all. This is the one internal link into
+                /sitemap, so it is a real <Link>, not the placeholder <span>s
+                beside it. */}
+            <Link href="/sitemap" className="hover:text-white/60 transition-colors">
+              Sitemap
+            </Link>
+            {/* TODO: these two are not links yet — no /privacy or /terms page
+                exists. Left as inert text rather than hrefs that would 404. */}
             <span className="hover:text-white/60 transition-colors cursor-pointer">
               Privacy Policy
             </span>

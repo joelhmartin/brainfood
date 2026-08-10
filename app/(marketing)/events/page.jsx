@@ -1,6 +1,8 @@
 import { EventsPage } from "../../../src/screens/marketing/Events.jsx";
 import { getEvents, getSettings } from "../../../src/lib/content.server.js";
-import { buildMetadata } from "../../../src/lib/metadata.js";
+import { buildMetadata, JsonLd } from "../../../src/lib/metadata.js";
+import { breadcrumbSchema } from "../../../src/lib/seo.js";
+import { CONTENT } from "../../../src/config/site.js";
 
 export const revalidate = 3600;
 
@@ -16,6 +18,16 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
-  const events = await getEvents();
-  return <EventsPage events={events} page={1} />;
+  const [events, settings] = await Promise.all([getEvents(), getSettings()]);
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: CONTENT.events.label, path: CONTENT.events.listPath },
+  ];
+
+  return (
+    <>
+      {settings.seoIndexable && <JsonLd data={breadcrumbSchema(crumbs, settings)} />}
+      <EventsPage events={events} page={1} />
+    </>
+  );
 }

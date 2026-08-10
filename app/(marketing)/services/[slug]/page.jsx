@@ -3,7 +3,7 @@ import { ServiceDetailPage } from "../../../../src/screens/marketing/ServiceDeta
 import { SERVICES_CONTENT, getService } from "../../../../src/config/services.js";
 import { getSettings } from "../../../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../../../src/lib/metadata.js";
-import { breadcrumbSchema } from "../../../../src/lib/seo.js";
+import { breadcrumbSchema, serviceSchema } from "../../../../src/lib/seo.js";
 
 export function generateStaticParams() {
   return SERVICES_CONTENT.map((s) => ({ slug: s.slug }));
@@ -39,7 +39,12 @@ export default async function Page({ params }) {
 
   return (
     <>
-      {settings.seoIndexable && <JsonLd data={breadcrumbSchema(crumbs, settings)} />}
+      {settings.seoIndexable && (
+        <>
+          <JsonLd data={serviceSchema(service, settings)} />
+          <JsonLd data={breadcrumbSchema(crumbs, settings)} />
+        </>
+      )}
       <ServiceDetailPage slug={slug} />
     </>
   );

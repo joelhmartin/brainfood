@@ -112,6 +112,79 @@ export function blogPostingSchema(post, settings) {
   });
 }
 
+/**
+ * `Service` for a service detail page.
+ *
+ * `navLabel` is the name, not `title` — `title` is only half a sentence
+ * ("One-on-one coaching for") that the page completes with `accent`, and a
+ * fragment reads as broken in a rich result. This matches the same choice
+ * already made in the route's generateMetadata.
+ *
+ * `provider` is intentionally a nested Organization rather than a `@id`
+ * reference: the pages that render this do not also render organizationSchema
+ * (only the homepage does), so there would be nothing on the page for an @id
+ * to point at.
+ */
+export function serviceSchema(service, settings) {
+  return pruneEmpty({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.navLabel,
+    description: service.tagline,
+    serviceType: service.navLabel,
+    url: absoluteUrl(`/services/${service.slug}`, settings.siteUrl),
+    image: service.image || undefined,
+    provider: pruneEmpty({
+      "@type": "ProfessionalService",
+      name: settings.name,
+      url: settings.siteUrl || undefined,
+      telephone: settings.phone || undefined,
+      areaServed: settings.city || undefined,
+    }),
+    areaServed: settings.city || undefined,
+    audience: service.whoFor?.length
+      ? { "@type": "Audience", audienceType: service.whoFor.join("; ") }
+      : undefined,
+    // `lookLike` is the page's "what this actually looks like" list — the
+    // closest thing the content has to an itemized description of the service.
+    hasOfferCatalog: service.lookLike?.length
+      ? {
+          "@type": "OfferCatalog",
+          name: `${service.navLabel} — what's included`,
+          itemListElement: service.lookLike.map((item) => ({
+            "@type": "Offer",
+            itemOffered: { "@type": "Service", name: item },
+          })),
+        }
+      : undefined,
+  });
+}
+
+/**
+ * `WebSite` for the homepage. Small but load-bearing: it is what lets search
+ * engines associate the domain with a site name (rather than guessing one from
+ * the <title>), and it is where a sitelinks search box would be declared if the
+ * site ever grows an internal search — it does not have one today, so no
+ * potentialAction is emitted. Declaring a SearchAction that points at a URL
+ * template the site cannot serve is worse than declaring none.
+ */
+export function websiteSchema(settings) {
+  return pruneEmpty({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: settings.name,
+    alternateName: settings.shortName || undefined,
+    description: settings.description,
+    url: settings.siteUrl || undefined,
+    inLanguage: "en-US",
+    publisher: pruneEmpty({
+      "@type": "Organization",
+      name: settings.name,
+      url: settings.siteUrl || undefined,
+    }),
+  });
+}
+
 export function breadcrumbSchema(trail, settings) {
   const items = (trail ?? []).filter((c) => c.name && c.path);
   if (!items.length) return undefined;

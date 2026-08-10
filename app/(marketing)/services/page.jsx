@@ -1,6 +1,7 @@
 import { ServicesPage } from "../../../src/screens/marketing/Services.jsx";
 import { getSettings } from "../../../src/lib/content.server.js";
-import { buildMetadata } from "../../../src/lib/metadata.js";
+import { buildMetadata, JsonLd } from "../../../src/lib/metadata.js";
+import { breadcrumbSchema } from "../../../src/lib/seo.js";
 
 export async function generateMetadata() {
   const settings = await getSettings();
@@ -13,6 +14,17 @@ export async function generateMetadata() {
   });
 }
 
-export default function Page() {
-  return <ServicesPage />;
+export default async function Page() {
+  const settings = await getSettings();
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+  ];
+
+  return (
+    <>
+      {settings.seoIndexable && <JsonLd data={breadcrumbSchema(crumbs, settings)} />}
+      <ServicesPage />
+    </>
+  );
 }

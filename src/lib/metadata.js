@@ -29,7 +29,25 @@ export function buildMetadata({
   const fullTitle = formatTitle(title, settings);
   const desc = description || settings.defaultDesc;
   const canonical = absoluteUrl(path, settings.siteUrl);
-  const ogImage = image || settings.ogImage;
+  // Page's own art, then the dashboard's configured image, then the generated
+  // card served by app/opengraph-image.js.
+  //
+  // That last fallback is referenced by URL rather than left to Next's
+  // `opengraph-image` file convention. The convention only fills in
+  // `openGraph.images` for a route whose resolved metadata did not define an
+  // `openGraph` object — and buildMetadata always defines one, for og:url and
+  // og:site_name. The observable result was every page except blog posts and
+  // events shipping with no og:image at all, which is what a social scraper
+  // uses to decide whether a shared link gets a preview.
+  //
+  // Requires an origin: a relative og:image is invalid per the Open Graph spec,
+  // and before go-live `siteUrl` is deliberately empty. metadataBase would
+  // normally absolutize it, but it is undefined in exactly that same case, so
+  // the fallback is simply skipped until there is an origin to build on.
+  const generatedCard = settings.siteUrl
+    ? absoluteUrl("/opengraph-image", settings.siteUrl)
+    : undefined;
+  const ogImage = image || settings.ogImage || generatedCard;
 
   // Without this, Next's default is `null`, and with an empty siteUrl (today's
   // pre-launch state) every og:url ships as a bare relative path (e.g. "/about")
@@ -63,15 +81,27 @@ export function buildMetadata({
       description: desc,
       url: canonical,
       siteName: settings.name,
-      images: ogImage ? [ogImage] : undefined,
     },
     twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
+      // Always the large card: when this page has no image of its own, the
+      // generated fallback below is 1200×630, which is the large-card size.
+      card: "summary_large_image",
       title: fullTitle,
       description: desc,
-      images: ogImage ? [ogImage] : undefined,
     },
   };
+
+  // The `images` keys are ADDED only when there is an image, never set to
+  // undefined. This is not cosmetic: Next merges the file-convention social
+  // card (app/opengraph-image.js) into metadata only when the author has not
+  // specified `openGraph.images` — and a key present with the value `undefined`
+  // counts as specified. Writing `images: ogImage ? [ogImage] : undefined`
+  // therefore SUPPRESSED the generated card on every page without its own
+  // image, which was every page except blog posts and events with cover art.
+  if (ogImage) {
+    metadata.openGraph.images = [ogImage];
+    metadata.twitter.images = [ogImage];
+  }
 
   // A canonical pointing at a noindexed page is contradictory; omit it entirely.
   if (!blocked) metadata.alternates = { canonical };

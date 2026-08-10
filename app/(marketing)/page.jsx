@@ -1,7 +1,7 @@
 import { HomePage } from "../../src/screens/marketing/Home.jsx";
 import { getSettings } from "../../src/lib/content.server.js";
 import { buildMetadata, JsonLd } from "../../src/lib/metadata.js";
-import { organizationSchema } from "../../src/lib/seo.js";
+import { organizationSchema, websiteSchema } from "../../src/lib/seo.js";
 
 export async function generateMetadata() {
   const settings = await getSettings();
@@ -18,7 +18,12 @@ export default async function Page() {
   const blocked = !settings.seoIndexable;
   return (
     <>
-      {!blocked && <JsonLd data={organizationSchema(settings)} />}
+      {!blocked && (
+        <>
+          <JsonLd data={organizationSchema(settings)} />
+          <JsonLd data={websiteSchema(settings)} />
+        </>
+      )}
       <HomePage />
     </>
   );

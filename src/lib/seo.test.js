@@ -7,6 +7,8 @@ import {
   eventSchema,
   blogPostingSchema,
   breadcrumbSchema,
+  serviceSchema,
+  websiteSchema,
 } from "./seo.js";
 
 const SETTINGS = {
@@ -151,5 +153,78 @@ describe("breadcrumbSchema", () => {
 
   it("returns undefined for an empty trail", () => {
     expect(breadcrumbSchema([], SETTINGS)).toBeUndefined();
+  });
+});
+
+describe("serviceSchema", () => {
+  const SERVICE = {
+    slug: "coaching",
+    navLabel: "Recovery & Mental Health Coaching",
+    // Deliberately a sentence fragment, as the real content is — the schema must
+    // not use it as the name.
+    title: "One-on-one coaching for",
+    tagline: "Personalized coaching that turns insight into daily action.",
+    whoFor: ["People early in recovery", "Anyone rebuilding after treatment"],
+    lookLike: ["Regular one-on-one sessions", "Practical skill-building"],
+    image: "/images/coaching.webp",
+  };
+
+  it("names the service from navLabel, never the fragment in `title`", () => {
+    const schema = serviceSchema(SERVICE, SETTINGS);
+    expect(schema.name).toBe("Recovery & Mental Health Coaching");
+    expect(schema.name).not.toBe(SERVICE.title);
+  });
+
+  it("uses an absolute URL for the service page", () => {
+    expect(serviceSchema(SERVICE, SETTINGS).url).toBe(
+      "https://brainfoodrecovery.com/services/coaching",
+    );
+  });
+
+  it("nests the provider with the business name", () => {
+    const schema = serviceSchema(SERVICE, SETTINGS);
+    expect(schema.provider["@type"]).toBe("ProfessionalService");
+    expect(schema.provider.name).toBe("Brain Food Recovery Services");
+  });
+
+  it("turns lookLike into an offer catalog", () => {
+    const catalog = serviceSchema(SERVICE, SETTINGS).hasOfferCatalog;
+    expect(catalog.itemListElement).toHaveLength(2);
+    expect(catalog.itemListElement[0].itemOffered.name).toBe("Regular one-on-one sessions");
+  });
+
+  it("omits audience and catalog when the service has neither", () => {
+    const schema = serviceSchema({ slug: "x", navLabel: "X", tagline: "t" }, SETTINGS);
+    expect(schema.hasOfferCatalog).toBeUndefined();
+    expect(schema.audience).toBeUndefined();
+  });
+
+  it("omits the blank phone rather than publishing an empty telephone", () => {
+    // SETTINGS.phone is "" — an empty telephone in structured data is worse
+    // than no telephone at all.
+    expect(serviceSchema(SERVICE, SETTINGS).provider.telephone).toBeUndefined();
+  });
+});
+
+describe("websiteSchema", () => {
+  it("describes the site with an absolute url and publisher", () => {
+    const schema = websiteSchema(SETTINGS);
+    expect(schema["@type"]).toBe("WebSite");
+    expect(schema.name).toBe("Brain Food Recovery Services");
+    expect(schema.url).toBe("https://brainfoodrecovery.com");
+    expect(schema.publisher.name).toBe("Brain Food Recovery Services");
+    expect(schema.inLanguage).toBe("en-US");
+  });
+
+  it("declares no SearchAction, because the site has no search endpoint", () => {
+    // A potentialAction pointing at a URL template the site cannot serve is
+    // worse than declaring none.
+    expect(websiteSchema(SETTINGS).potentialAction).toBeUndefined();
+  });
+
+  it("omits url entirely when siteUrl is unset, rather than emitting an empty string", () => {
+    const schema = websiteSchema({ ...SETTINGS, siteUrl: "" });
+    expect(schema.url).toBeUndefined();
+    expect(schema.publisher.url).toBeUndefined();
   });
 });

@@ -39,11 +39,41 @@ describe("buildMetadata", () => {
     expect(m.robots.index).toBe(false);
   });
 
-  it("uses summary_large_image only when an image exists", () => {
+  it("always requests the large twitter card", () => {
+    // Every page has a 1200×630 image now: its own, or the generated fallback
+    // from app/opengraph-image.js. "summary" would render that at thumbnail
+    // size for no reason.
     const plain = buildMetadata({ title: "A", path: "/a", settings });
-    expect(plain.twitter.card).toBe("summary");
+    expect(plain.twitter.card).toBe("summary_large_image");
     const withImg = buildMetadata({ title: "A", path: "/a", image: "/og.jpg", settings });
     expect(withImg.twitter.card).toBe("summary_large_image");
+  });
+
+  it("sets an explicit image when the page has one", () => {
+    const m = buildMetadata({ title: "A", path: "/a", image: "/og.jpg", settings });
+    expect(m.openGraph.images).toEqual(["/og.jpg"]);
+    expect(m.twitter.images).toEqual(["/og.jpg"]);
+  });
+
+  it("falls back to the generated social card when the page has no image of its own", () => {
+    // Without this every page but a blog post shipped with no og:image, so
+    // shared links rendered as a bare text row with no preview.
+    const m = buildMetadata({ title: "A", path: "/a", settings });
+    expect(m.openGraph.images).toEqual(["https://brainfoodrecovery.com/opengraph-image"]);
+    expect(m.twitter.images).toEqual(["https://brainfoodrecovery.com/opengraph-image"]);
+  });
+
+  it("prefers the page's own image over the generated card", () => {
+    const m = buildMetadata({ title: "A", path: "/a", image: "/og.jpg", settings });
+    expect(m.openGraph.images).toEqual(["/og.jpg"]);
+  });
+
+  it("omits images entirely when there is no siteUrl to build an absolute URL from", () => {
+    // A relative og:image is invalid per the Open Graph spec, and siteUrl is
+    // deliberately empty until go-live — better no image than an invalid one.
+    const m = buildMetadata({ title: "A", path: "/a", settings: { ...settings, siteUrl: "" } });
+    expect("images" in m.openGraph).toBe(false);
+    expect("images" in m.twitter).toBe(false);
   });
 
   it("sets metadataBase from a valid siteUrl, so og:url never ships relative", () => {

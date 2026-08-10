@@ -1,6 +1,8 @@
 import { BlogPage } from "../../../src/screens/marketing/Blog.jsx";
 import { getPosts, getSettings } from "../../../src/lib/content.server.js";
-import { buildMetadata } from "../../../src/lib/metadata.js";
+import { buildMetadata, JsonLd } from "../../../src/lib/metadata.js";
+import { breadcrumbSchema } from "../../../src/lib/seo.js";
+import { CONTENT } from "../../../src/config/site.js";
 
 export const revalidate = 3600;
 
@@ -16,6 +18,16 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
-  const posts = await getPosts();
-  return <BlogPage posts={posts} page={1} />;
+  const [posts, settings] = await Promise.all([getPosts(), getSettings()]);
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: CONTENT.blog.label, path: CONTENT.blog.listPath },
+  ];
+
+  return (
+    <>
+      {settings.seoIndexable && <JsonLd data={breadcrumbSchema(crumbs, settings)} />}
+      <BlogPage posts={posts} page={1} />
+    </>
+  );
 }
