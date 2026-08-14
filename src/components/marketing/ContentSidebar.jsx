@@ -10,9 +10,14 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SITE, SOCIALS, LOGOS, BUSINESS } from "../../config/site.js";
+import { contactSchema } from "../../config/schemas.js";
+import { RECAPTCHA_ACTIONS } from "../../config/recaptcha.js";
 import LogoFull from "../../images/logoFull.jsx";
 import { useFormSubmit } from "../../hooks/useFormSubmit.js";
+import { useRecaptcha } from "../../hooks/useRecaptcha.js";
 
 /**
  * Reusable sidebar for content pages (blog, events).
@@ -109,67 +114,120 @@ function ContactDetails() {
 }
 
 /* ─── Mini contact form ─── */
+
+// Same geometry in both states so an appearing error never shifts the layout.
+const MINI_CONTROL_BASE =
+  "w-full px-4 py-2.5 rounded-xl bg-surface-100 border text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:ring-2 transition-all";
+
+function miniControlClass(hasError, extra = "") {
+  const state = hasError
+    ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+    : "border-surface-300/50 focus:border-brand-500 focus:ring-brand-500/10";
+  return `${MINI_CONTROL_BASE} ${state} ${extra}`.trim();
+}
+
 function MiniForm() {
-  const { submit, state: formState, error, reset } = useFormSubmit({
-    endpoint: "/api/contact",
+  const {
+    submit,
+    state: formState,
+    error,
+    reset: resetStatus,
+  } = useFormSubmit({ endpoint: "/api/contact" });
+  const getRecaptchaToken = useRecaptcha(RECAPTCHA_ACTIONS.sidebar);
+
+  const {
+    register,
+    handleSubmit,
+    reset: resetFields,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    // The shared base schema, not contactPageSchema: this form has no
+    // "reaching out about" select, and inquiry is optional in the base.
+    resolver: zodResolver(contactSchema),
+    mode: "onBlur",
+    reValidateMode: "onChange",
+    defaultValues: { name: "", email: "", phone: "", message: "", company: "" },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    submit({
-      name: data.get("name") || "",
-      email: data.get("email") || "",
-      phone: data.get("phone") || "",
-      message: data.get("message") || "",
-      company: data.get("company") || "",
-      source: "Sidebar",
-    });
+  const busy = isSubmitting || formState === "sending";
+
+  const onSubmit = async (data) => {
+    const recaptchaToken = await getRecaptchaToken();
+    const ok = await submit({ ...data, recaptchaToken, source: "Sidebar" });
+    if (ok) resetFields();
   };
 
   useEffect(() => {
     if (formState !== "success") return;
-    const timer = setTimeout(() => reset(), 3500);
+    const timer = setTimeout(() => resetStatus(), 3500);
     return () => clearTimeout(timer);
-  }, [formState, reset]);
+  }, [formState, resetStatus]);
+
+  const fields = [
+    { name: "name", type: "text", placeholder: "Your name", autoComplete: "name" },
+    { name: "email", type: "email", placeholder: "Email address", autoComplete: "email" },
+    { name: "phone", type: "tel", placeholder: "Phone (optional)", autoComplete: "tel" },
+  ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    // `noValidate`: Zod owns validation, so the browser's native bubbles must
+    // not fire alongside our inline messages.
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-3">
       {/* Honeypot: hidden from real users, bots fill every field they find. */}
       <input
         type="text"
-        name="company"
         tabIndex={-1}
         autoComplete="off"
         aria-hidden="true"
         className="sr-only"
+        {...register("company")}
       />
-      <input
-        type="text"
-        name="name"
-        placeholder="Your name"
-        required
-        className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all"
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Email address"
-        required
-        className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all"
-      />
-      <input
-        type="tel"
-        name="phone"
-        placeholder="Phone (optional)"
-        className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all"
-      />
-      <textarea
-        name="message"
-        rows={3}
-        placeholder="How can we help?"
-        className="w-full px-4 py-2.5 rounded-xl bg-surface-100 border border-surface-300/50 text-navy text-sm placeholder:text-navy/30 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all resize-none"
-      />
+
+      {fields.map((field) => (
+        <div key={field.name}>
+          <input
+            type={field.type}
+            placeholder={field.placeholder}
+            autoComplete={field.autoComplete}
+            aria-label={field.placeholder}
+            aria-invalid={errors[field.name] ? "true" : undefined}
+            aria-describedby={errors[field.name] ? `mini-${field.name}-error` : undefined}
+            className={miniControlClass(Boolean(errors[field.name]))}
+            {...register(field.name)}
+          />
+          {errors[field.name] && (
+            <p
+              id={`mini-${field.name}-error`}
+              role="alert"
+              className="mt-1 px-1 text-[11px] font-medium text-red-600"
+            >
+              {errors[field.name].message}
+            </p>
+          )}
+        </div>
+      ))}
+
+      <div>
+        <textarea
+          rows={3}
+          placeholder="How can we help?"
+          aria-label="How can we help?"
+          aria-invalid={errors.message ? "true" : undefined}
+          aria-describedby={errors.message ? "mini-message-error" : undefined}
+          className={miniControlClass(Boolean(errors.message), "resize-none")}
+          {...register("message")}
+        />
+        {errors.message && (
+          <p
+            id="mini-message-error"
+            role="alert"
+            className="mt-1 px-1 text-[11px] font-medium text-red-600"
+          >
+            {errors.message.message}
+          </p>
+        )}
+      </div>
+
       {formState === "error" && (
         <p
           role="alert"
@@ -180,30 +238,50 @@ function MiniForm() {
       )}
       <button
         type="submit"
-        disabled={formState === "sending" || formState === "success"}
-        className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
+        disabled={busy || formState === "success"}
+        className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-80 ${
           formState === "success"
             ? "bg-emerald-500 text-white"
             : "bg-brand-500 text-white hover:bg-brand-600"
         }`}
       >
         <span className="flex items-center justify-center gap-2">
-          {formState === "idle" && (
-            <>Send Message <Send size={13} /></>
-          )}
-          {formState === "sending" && (
+          {busy ? (
             <>Sending <Loader2 size={13} className="animate-spin" /></>
-          )}
-          {formState === "success" && (
+          ) : formState === "success" ? (
             <>Sent! <CheckCircle size={13} /></>
-          )}
-          {formState === "error" && (
+          ) : formState === "error" ? (
             <>Try Again <Send size={13} /></>
+          ) : (
+            <>Send Message <Send size={13} /></>
           )}
         </span>
       </button>
       <p className="text-navy/30 text-[11px] text-center">
         All inquiries are confidential.
+      </p>
+      {/* Google's terms require the badge or this disclosure wherever the
+          widget runs. */}
+      <p className="text-navy/25 text-[10px] leading-relaxed text-center">
+        Protected by reCAPTCHA —{" "}
+        <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-brand-500 transition-colors"
+        >
+          Privacy
+        </a>{" "}
+        &amp;{" "}
+        <a
+          href="https://policies.google.com/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-brand-500 transition-colors"
+        >
+          Terms
+        </a>
+        .
       </p>
     </form>
   );

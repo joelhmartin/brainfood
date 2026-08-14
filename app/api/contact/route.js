@@ -1,6 +1,9 @@
 import { contactSchema } from "../../../src/config/schemas.js";
+import { RECAPTCHA_ACTIONS } from "../../../src/config/recaptcha.js";
 import { adminNotification, autoReply } from "../../../src/lib/email/templates.js";
 import { sendEmail, isMailConfigured } from "../../../src/lib/email/mailgun.js";
+import { verifyRecaptcha } from "../../../src/lib/recaptcha.js";
+import { formatPhone } from "../../../src/lib/phone.js";
 
 /**
  * Public, unauthenticated endpoint that sends real email — used by every public
@@ -125,6 +128,22 @@ function sanitizeSource(value) {
   return cleaned.slice(0, MAX_SOURCE_LENGTH) || DEFAULT_SOURCE;
 }
 
+// ── reCAPTCHA action ─────────────────────────────────────────────────────────
+//
+// Each form mints its token under its own action name, and the assessment
+// asserts that the token really was raised for that action — otherwise a token
+// minted anywhere else on the site could be replayed here.
+//
+// The lookup is by `source`, which is client-supplied and therefore only a
+// hint. An unrecognised source drops the action assertion rather than failing
+// the submission: a new form whose source is not yet listed here should reach
+// the inbox, not vanish. The risk score is still enforced either way, which is
+// the check that actually stops bots.
+const ACTION_BY_SOURCE = {
+  "Contact page": RECAPTCHA_ACTIONS.contactPage,
+  Sidebar: RECAPTCHA_ACTIONS.sidebar,
+};
+
 export async function POST(request) {
   const body = await request.json().catch(() => ({}));
 
@@ -158,8 +177,42 @@ export async function POST(request) {
     );
   }
 
-  const { name, email, phone, message } = result.data;
-  const submission = { name, email, phone, message, source: sanitizeSource(body?.source) };
+  const source = sanitizeSource(body?.source);
+
+  // Scored AFTER the rate limit so a flood is capped locally before it can burn
+  // Google API quota, and after schema validation so obviously-malformed
+  // submissions never cost an assessment call at all.
+  //
+  // `verifyRecaptcha` fails open when reCAPTCHA is unconfigured or Google is
+  // unreachable, and fails closed on a missing, invalid, replayed, or
+  // low-scoring token — see the policy note in src/lib/recaptcha.js.
+  const assessment = await verifyRecaptcha({
+    token: result.data.recaptchaToken,
+    expectedAction: ACTION_BY_SOURCE[source],
+  });
+
+  if (!assessment.ok) {
+    console.warn(`[contact] rejected by reCAPTCHA: ${assessment.reason} (score: ${assessment.score})`);
+    return Response.json(
+      {
+        error:
+          "We couldn't verify this submission. Please reload the page and try again, or call us directly.",
+      },
+      { status: 403 },
+    );
+  }
+
+  const { name, email, phone, message, inquiry } = result.data;
+  const submission = {
+    name,
+    email,
+    // Normalised once, here, so the inbox always shows "(512) 555-0100"
+    // regardless of how it was typed.
+    phone: phone ? formatPhone(phone) : "",
+    message,
+    inquiry,
+    source,
+  };
 
   try {
     const { subject, html, text } = adminNotification(submission);

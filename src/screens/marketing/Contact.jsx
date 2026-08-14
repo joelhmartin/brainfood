@@ -11,9 +11,14 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SITE } from "../../config/site.js";
 import { AUSTIN } from "../../config/images.js";
+import { contactPageSchema, CONTACT_INQUIRY_OPTIONS } from "../../config/schemas.js";
+import { RECAPTCHA_ACTIONS } from "../../config/recaptcha.js";
 import { useFormSubmit } from "../../hooks/useFormSubmit.js";
+import { useRecaptcha } from "../../hooks/useRecaptcha.js";
 
 /* ── Scroll reveal helper ── */
 function useScrollReveal(ref, selector, animProps) {
@@ -98,132 +103,224 @@ function ContactHero() {
 }
 
 /* ─── CONTACT FORM ─── */
+
+// The floating label sits on top of the control, so the control carries the
+// padding that keeps the two from colliding. Error state only swaps the border
+// and ring colours — the geometry stays identical so nothing shifts when a
+// message appears.
+const CONTROL_BASE =
+  "w-full pt-6 pb-2 px-4 rounded-2xl bg-surface-100 border text-navy text-sm focus:outline-none focus:ring-2 transition-all duration-300";
+
+function controlClass(hasError, extra = "") {
+  const state = hasError
+    ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+    : "border-surface-300/50 focus:border-brand-500 focus:ring-brand-500/10";
+  return `${CONTROL_BASE} ${state} ${extra}`.trim();
+}
+
+/** One inline error message, wired to its control by `aria-describedby`. */
+function FieldError({ id, error }) {
+  if (!error) return null;
+  return (
+    <p id={id} role="alert" className="mt-1.5 px-4 text-xs font-medium text-red-600">
+      {error.message}
+    </p>
+  );
+}
+
 function ContactForm() {
   const [focused, setFocused] = useState({});
-  const { submit, state: formState, error, reset } = useFormSubmit({
-    endpoint: "/api/contact",
+  const {
+    submit,
+    state: formState,
+    error,
+    reset: resetStatus,
+  } = useFormSubmit({ endpoint: "/api/contact" });
+  const getRecaptchaToken = useRecaptcha(RECAPTCHA_ACTIONS.contactPage);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset: resetFields,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    // The same schema the API route enforces, so the browser and the server
+    // agree on what a valid submission is instead of drifting apart.
+    resolver: zodResolver(contactPageSchema),
+    // Validate a field when the visitor leaves it, then correct live once it
+    // already has an error. Validating on every keystroke from the start would
+    // flag "j" as an invalid email while someone is still typing it.
+    mode: "onBlur",
+    reValidateMode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      inquiry: "",
+      message: "",
+      company: "",
+    },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    submit({
-      name: data.get("name") || "",
-      email: data.get("email") || "",
-      phone: data.get("phone") || "",
-      message: data.get("message") || "",
-      company: data.get("company") || "",
-      source: "Contact page",
-    });
+  const values = watch();
+  // `isSubmitting` covers the reCAPTCHA round-trip, which happens before the
+  // POST and so before useFormSubmit reports "sending".
+  const busy = isSubmitting || formState === "sending";
+
+  const onSubmit = async (data) => {
+    const recaptchaToken = await getRecaptchaToken();
+    const ok = await submit({ ...data, recaptchaToken, source: "Contact page" });
+    if (ok) {
+      resetFields();
+      setFocused({});
+    }
   };
 
   useEffect(() => {
     if (formState !== "success") return;
-    const timer = setTimeout(() => reset(), 4000);
+    const timer = setTimeout(() => resetStatus(), 4000);
     return () => clearTimeout(timer);
-  }, [formState, reset]);
+  }, [formState, resetStatus]);
 
   const fields = [
-    { name: "name", label: "Full Name", type: "text" },
-    { name: "email", label: "Email Address", type: "email" },
-    { name: "phone", label: "Phone Number", type: "tel" },
+    { name: "name", label: "Full Name", type: "text", autoComplete: "name", required: true },
+    { name: "email", label: "Email Address", type: "email", autoComplete: "email", required: true },
+    { name: "phone", label: "Phone Number", type: "tel", autoComplete: "tel", required: false },
   ];
 
+  const labelClass = (floating, hasError) =>
+    `absolute left-4 transition-all duration-300 pointer-events-none ${
+      floating
+        ? `top-2 text-[10px] font-semibold ${hasError ? "text-red-500" : "text-brand-500"}`
+        : "top-4 text-sm text-navy/40"
+    }`;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    // `noValidate` hands validation to Zod alone. Without it the browser's own
+    // bubbles fire first, in a different voice and a different position, and
+    // the visitor sees two competing error systems.
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
       {/* Honeypot: hidden from real users, bots fill every field they find. */}
       <input
         type="text"
-        name="company"
         tabIndex={-1}
         autoComplete="off"
         aria-hidden="true"
         className="sr-only"
+        {...register("company")}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {fields.map((field) => (
-          <div
-            key={field.name}
-            className={field.name === "name" ? "sm:col-span-2" : ""}
-          >
+        {fields.map((field) => {
+          const fieldError = errors[field.name];
+          const floating = focused[field.name] || Boolean(values[field.name]);
+          const errorId = `${field.name}-error`;
+          // Registration supplies onChange/onBlur/ref; the handlers below wrap
+          // rather than replace them, or react-hook-form stops seeing the field.
+          const registration = register(field.name);
+
+          return (
+            <div key={field.name} className={field.name === "name" ? "sm:col-span-2" : ""}>
+              <div className="relative">
+                <label htmlFor={field.name} className={labelClass(floating, Boolean(fieldError))}>
+                  {field.label}
+                  {!field.required && <span className="font-normal"> (optional)</span>}
+                </label>
+                <input
+                  id={field.name}
+                  type={field.type}
+                  autoComplete={field.autoComplete}
+                  aria-invalid={fieldError ? "true" : undefined}
+                  aria-describedby={fieldError ? errorId : undefined}
+                  className={controlClass(Boolean(fieldError))}
+                  {...registration}
+                  onFocus={() => setFocused((prev) => ({ ...prev, [field.name]: true }))}
+                  onBlur={(event) => {
+                    registration.onBlur(event);
+                    if (!event.target.value) {
+                      setFocused((prev) => ({ ...prev, [field.name]: false }));
+                    }
+                  }}
+                />
+              </div>
+              <FieldError id={errorId} error={fieldError} />
+            </div>
+          );
+        })}
+      </div>
+
+      {(() => {
+        const fieldError = errors.inquiry;
+        const floating = focused.inquiry || Boolean(values.inquiry);
+        const registration = register("inquiry");
+
+        return (
+          <div>
             <div className="relative">
-              <label
-                className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                  focused[field.name]
-                    ? "top-2 text-[10px] text-brand-500 font-semibold"
-                    : "top-4 text-sm text-navy/40"
-                }`}
-              >
-                {field.label}
+              <label htmlFor="inquiry" className={labelClass(floating, Boolean(fieldError))}>
+                I&apos;m reaching out about...
               </label>
-              <input
-                type={field.type}
-                name={field.name}
-                className="w-full pt-6 pb-2 px-4 rounded-2xl bg-surface-100 border border-surface-300/50 text-navy text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all duration-300"
-                onFocus={() =>
-                  setFocused((prev) => ({ ...prev, [field.name]: true }))
-                }
-                onBlur={(e) => {
-                  if (!e.target.value)
-                    setFocused((prev) => ({ ...prev, [field.name]: false }));
+              <select
+                id="inquiry"
+                aria-invalid={fieldError ? "true" : undefined}
+                aria-describedby={fieldError ? "inquiry-error" : undefined}
+                className={controlClass(Boolean(fieldError), "appearance-none cursor-pointer")}
+                {...registration}
+                onFocus={() => setFocused((prev) => ({ ...prev, inquiry: true }))}
+                onBlur={(event) => {
+                  registration.onBlur(event);
+                  if (!event.target.value) {
+                    setFocused((prev) => ({ ...prev, inquiry: false }));
+                  }
+                }}
+              >
+                <option value="" disabled></option>
+                {/* Rendered from the schema's own list, so the options and the
+                    values the server accepts can never drift apart. */}
+                {CONTACT_INQUIRY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <FieldError id="inquiry-error" error={fieldError} />
+          </div>
+        );
+      })()}
+
+      {(() => {
+        const fieldError = errors.message;
+        const floating = focused.message || Boolean(values.message);
+        const registration = register("message");
+
+        return (
+          <div>
+            <div className="relative">
+              <label htmlFor="message" className={labelClass(floating, Boolean(fieldError))}>
+                Tell us a little about your situation
+              </label>
+              <textarea
+                id="message"
+                rows={5}
+                aria-invalid={fieldError ? "true" : undefined}
+                aria-describedby={fieldError ? "message-error" : undefined}
+                className={controlClass(Boolean(fieldError), "resize-none")}
+                {...registration}
+                onFocus={() => setFocused((prev) => ({ ...prev, message: true }))}
+                onBlur={(event) => {
+                  registration.onBlur(event);
+                  if (!event.target.value) {
+                    setFocused((prev) => ({ ...prev, message: false }));
+                  }
                 }}
               />
             </div>
+            <FieldError id="message-error" error={fieldError} />
           </div>
-        ))}
-      </div>
-
-      <div className="relative">
-        <label
-          className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-            focused.inquiry
-              ? "top-2 text-[10px] text-brand-500 font-semibold"
-              : "top-4 text-sm text-navy/40"
-          }`}
-        >
-          I&apos;m reaching out about...
-        </label>
-        <select
-          name="inquiry"
-          className="w-full pt-6 pb-2 px-4 rounded-2xl bg-surface-100 border border-surface-300/50 text-navy text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all duration-300 appearance-none cursor-pointer"
-          onFocus={() => setFocused((prev) => ({ ...prev, inquiry: true }))}
-          onBlur={(e) => {
-            if (!e.target.value)
-              setFocused((prev) => ({ ...prev, inquiry: false }));
-          }}
-          defaultValue=""
-        >
-          <option value="" disabled></option>
-          <option>Recovery Coaching for Myself</option>
-          <option>Recovery Coaching for a Loved One</option>
-          <option>Sober Companion Services</option>
-          <option>Family Coaching & Support</option>
-          <option>General Question</option>
-        </select>
-      </div>
-
-      <div className="relative">
-        <label
-          className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-            focused.message
-              ? "top-2 text-[10px] text-brand-500 font-semibold"
-              : "top-4 text-sm text-navy/40"
-          }`}
-        >
-          Tell us a little about your situation
-        </label>
-        <textarea
-          name="message"
-          rows={5}
-          className="w-full pt-6 pb-2 px-4 rounded-2xl bg-surface-100 border border-surface-300/50 text-navy text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all duration-300 resize-none"
-          onFocus={() => setFocused((prev) => ({ ...prev, message: true }))}
-          onBlur={(e) => {
-            if (!e.target.value)
-              setFocused((prev) => ({ ...prev, message: false }));
-          }}
-        />
-      </div>
+        );
+      })()}
 
       <p className="text-navy/35 text-xs leading-relaxed">
         All inquiries are confidential. We typically respond within 24 hours.
@@ -240,38 +337,65 @@ function ContactForm() {
 
       <button
         type="submit"
-        disabled={formState === "sending" || formState === "success"}
-        className={`btn-magnetic w-full py-4 rounded-full font-semibold text-sm transition-all duration-500 ${
-          formState === "success"
-            ? "bg-emerald-500 text-white"
-            : "bg-brand-500 text-white"
+        disabled={busy || formState === "success"}
+        className={`btn-magnetic w-full py-4 rounded-full font-semibold text-sm transition-all duration-500 disabled:opacity-80 ${
+          formState === "success" ? "bg-emerald-500 text-white" : "bg-brand-500 text-white"
         }`}
       >
         <span className="btn-bg bg-brand-600 rounded-full" />
         <span className="relative z-10 flex items-center justify-center gap-2">
-          {formState === "idle" && (
+          {busy ? (
+            <>
+              Sending <Loader2 size={16} className="animate-spin" />
+            </>
+          ) : formState === "success" ? (
+            <>
+              Message Sent <CheckCircle size={16} />
+            </>
+          ) : formState === "error" ? (
+            <>
+              Try Again <Send size={16} />
+            </>
+          ) : (
             <>
               Send Message <Send size={16} />
             </>
           )}
-          {formState === "sending" && (
-            <>
-              Sending <Loader2 size={16} className="animate-spin" />
-            </>
-          )}
-          {formState === "success" && (
-            <>
-              Message Sent <CheckCircle size={16} />
-            </>
-          )}
-          {formState === "error" && (
-            <>
-              Try Again <Send size={16} />
-            </>
-          )}
         </span>
       </button>
+
+      <RecaptchaNotice />
     </form>
+  );
+}
+
+/**
+ * Google's terms require either the reCAPTCHA badge or this disclosure to be
+ * visible wherever the widget runs.
+ */
+function RecaptchaNotice() {
+  return (
+    <p className="text-navy/30 text-[11px] leading-relaxed">
+      Protected by reCAPTCHA. Google&apos;s{" "}
+      <a
+        href="https://policies.google.com/privacy"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-brand-500 transition-colors"
+      >
+        Privacy Policy
+      </a>{" "}
+      and{" "}
+      <a
+        href="https://policies.google.com/terms"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-brand-500 transition-colors"
+      >
+        Terms of Service
+      </a>{" "}
+      apply.
+    </p>
   );
 }
 

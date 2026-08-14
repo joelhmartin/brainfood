@@ -114,12 +114,13 @@ function fieldRow(label, value) {
  * what was said and where to find the context (e.g. "Contact page").
  */
 export function adminNotification(submission) {
-  const { name, email, phone, message, source } = submission;
+  const { name, email, phone, message, inquiry, source } = submission;
 
   const bodyHtml = [
     fieldRow("Name", name),
     fieldRow("Email", email),
     phone ? fieldRow("Phone", phone) : "",
+    inquiry ? fieldRow("Enquiry", inquiry) : "",
     fieldRow("Source", source),
     `
                 <p style="margin:16px 0 0; font-size:14px; color:${TEXT_COLOR}; white-space:pre-wrap;">
@@ -138,6 +139,7 @@ export function adminNotification(submission) {
     `Name: ${name}`,
     `Email: ${email}`,
     phone ? `Phone: ${phone}` : null,
+    inquiry ? `Enquiry: ${inquiry}` : null,
     `Source: ${source}`,
     "",
     `Message:\n${message}`,
