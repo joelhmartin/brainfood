@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { verifyRecaptcha, isRecaptchaConfigured } from "./recaptcha.js";
 import { RECAPTCHA_SITE_KEY } from "../config/recaptcha.js";
 
-const ENV_KEYS = ["RECAPTCHA_PROJECT_ID", "RECAPTCHA_API_KEY", "RECAPTCHA_MIN_SCORE"];
+const ENV_KEYS = [
+  "RECAPTCHA_PROJECT_ID",
+  "RECAPTCHA_API_KEY",
+  "RECAPTCHA_SECRET_KEY",
+  "RECAPTCHA_MIN_SCORE",
+];
 
 const original = {};
 
@@ -46,14 +51,19 @@ afterEach(() => {
 });
 
 describe("isRecaptchaConfigured", () => {
-  // The project and site key have compiled-in defaults, so the API key is the
-  // piece that actually decides whether verification can happen.
-  it("is false without the secret API key", () => {
+  // The project and site key have compiled-in defaults, so a credential for one
+  // of the two backends is the piece that decides whether verification happens.
+  it("is false with no credential for either backend", () => {
     expect(isRecaptchaConfigured()).toBe(false);
   });
 
-  it("is true once the API key is present", () => {
+  it("is true with an Enterprise API key", () => {
     configure();
+    expect(isRecaptchaConfigured()).toBe(true);
+  });
+
+  it("is true with a classic secret key", () => {
+    process.env.RECAPTCHA_SECRET_KEY = "test-secret";
     expect(isRecaptchaConfigured()).toBe(true);
   });
 });
@@ -196,6 +206,8 @@ describe("verifyRecaptcha", () => {
     expect(result.reason).toBe("verification-unavailable");
   });
 
+  // The token itself verified; only the score is absent, so there is nothing
+  // left to weigh and the submission goes through.
   it("allows the submission when the assessment carries no score", async () => {
     configure();
     vi.stubGlobal("fetch", mockAssessment({ tokenProperties: { valid: true, action: "contact_submit" } }));
@@ -203,7 +215,120 @@ describe("verifyRecaptcha", () => {
     const result = await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
 
     expect(result.ok).toBe(true);
-    expect(result.reason).toBe("verification-unavailable");
+    expect(result.reason).toBe("no-score");
+  });
+
+  // ── Classic siteverify backend ────────────────────────────────────────────
+  //
+  // What this site is actually configured with: a 40-character secret key
+  // issued next to the site key, verified at /recaptcha/api/siteverify. The
+  // Enterprise assessment endpoint takes a Cloud API key instead and rejects
+  // this credential outright.
+
+  describe("classic secret key", () => {
+    function configureClassic(overrides = {}) {
+      process.env.RECAPTCHA_SECRET_KEY = "test-secret";
+      for (const [key, value] of Object.entries(overrides)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+
+    it("posts form-encoded credentials to siteverify", async () => {
+      configureClassic();
+      const fetchMock = mockAssessment({ success: true, action: "contact_submit", score: 0.9 });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const result = await verifyRecaptcha({ token: "abc123", expectedAction: "contact_submit" });
+
+      const [url, init] = fetchMock.mock.calls[0];
+      expect(url).toBe("https://www.google.com/recaptcha/api/siteverify");
+      expect(init.headers["Content-Type"]).toBe("application/x-www-form-urlencoded");
+      expect(Object.fromEntries(new URLSearchParams(init.body))).toEqual({
+        secret: "test-secret",
+        response: "abc123",
+      });
+      expect(result).toEqual({ ok: true, reason: "ok", score: 0.9 });
+    });
+
+    it("prefers the Enterprise backend when both credentials are present", async () => {
+      configure();
+      configureClassic();
+      const fetchMock = mockAssessment(good);
+      vi.stubGlobal("fetch", fetchMock);
+
+      await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(fetchMock.mock.calls[0][0]).toContain("recaptchaenterprise.googleapis.com");
+    });
+
+    it("rejects an unsuccessful verification and reports Google's error codes", async () => {
+      configureClassic();
+      vi.stubGlobal(
+        "fetch",
+        mockAssessment({ success: false, "error-codes": ["timeout-or-duplicate"] }),
+      );
+
+      const result = await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(result.ok).toBe(false);
+      expect(result.reason).toBe("timeout-or-duplicate");
+    });
+
+    it("rejects a low score", async () => {
+      configureClassic();
+      vi.stubGlobal(
+        "fetch",
+        mockAssessment({ success: true, action: "contact_submit", score: 0.2 }),
+      );
+
+      expect((await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" })).ok).toBe(
+        false,
+      );
+    });
+
+    it("rejects a token raised for a different action", async () => {
+      configureClassic();
+      vi.stubGlobal(
+        "fetch",
+        mockAssessment({ success: true, action: "newsletter_signup", score: 0.9 }),
+      );
+
+      const result = await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(result.ok).toBe(false);
+      expect(result.reason).toBe("action-mismatch");
+    });
+
+    // A v2 key reports no score at all; `success` is the whole verdict, so
+    // treating a missing score as a failure would reject every human.
+    it("accepts a scoreless v2-style success", async () => {
+      configureClassic();
+      vi.stubGlobal("fetch", mockAssessment({ success: true }));
+
+      const result = await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(result).toEqual({ ok: true, reason: "no-score", score: null });
+    });
+
+    it("fails open when siteverify is unreachable", async () => {
+      configureClassic();
+      vi.stubGlobal("fetch", vi.fn(() => Promise.reject(new Error("ECONNRESET"))));
+
+      const result = await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(result.ok).toBe(true);
+      expect(result.reason).toBe("verification-unavailable");
+    });
+
+    it("never logs the secret", async () => {
+      configureClassic();
+      vi.stubGlobal("fetch", mockAssessment({}, { status: 500 }));
+
+      await verifyRecaptcha({ token: "t", expectedAction: "contact_submit" });
+
+      expect(console.error.mock.calls.flat().join(" ")).not.toContain("test-secret");
+    });
   });
 
   it("never logs the token or the API key", async () => {
