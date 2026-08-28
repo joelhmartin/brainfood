@@ -21,41 +21,8 @@ import Lottie from "lottie-react";
 import { Tabs } from "../../components/ui/Tabs.jsx";
 import { AUSTIN, SERVICES, TEAM } from "../../config/images.js";
 import { CtaBanner } from "../../components/marketing/CtaBanner.jsx";
-
-/* ── Scroll reveal helper ─────────────────────
-   Uses IntersectionObserver instead of GSAP
-   ScrollTrigger to avoid layout-shift issues
-   with externally loaded images.
-──────────────────────────────────────────── */
-function useScrollReveal(ref, selector, animProps) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const targets = el.querySelectorAll(selector);
-    if (!targets.length) return;
-
-    // Keep targets invisible until observer fires
-    gsap.set(targets, { opacity: 0, y: animProps.y ?? 24 });
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          gsap.to(targets, {
-            opacity: 1,
-            y: 0,
-            duration: animProps.duration ?? 0.8,
-            stagger: animProps.stagger ?? 0.08,
-            ease: animProps.ease ?? "power3.out",
-          });
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-}
+import { FacebookFeed } from "../../components/marketing/FacebookFeed.jsx";
+import { useScrollReveal } from "../../hooks/useScrollReveal.js";
 
 /* ─────────────────────────────────────────────
    NOISE OVERLAY
@@ -701,11 +668,19 @@ function CTA() {
 /* ─────────────────────────────────────────────
    PAGE EXPORT
 ───────────────────────────────────────────── */
-export function HomePage() {
+/**
+ * @param {{ facebook?: { page: object, posts: Array<object> }|null }} props
+ *   `facebook` is fetched server-side in app/(marketing)/page.jsx and is null
+ *   whenever the feed is unavailable, in which case the section self-removes.
+ */
+export function HomePage({ facebook = null }) {
   return (
     <>
       <Hero />
       <Mission />
+      {/* Sits directly under the mission copy: the section says what the work
+          is, and this shows it actually happening. */}
+      <FacebookFeed feed={facebook} />
       <Services />
       <WhoWeServe />
       <WhyBrainFood />
