@@ -2,6 +2,7 @@ import "./globals.css";
 import { Providers } from "./providers.jsx";
 import { getSettings } from "../src/lib/content.server.js";
 import { buildMetadata } from "../src/lib/metadata.js";
+import { TrustindexBadge } from "../src/components/TrustindexBadge.jsx";
 
 export async function generateMetadata() {
   const settings = await getSettings();
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <Providers>{children}</Providers>
+        <TrustindexBadge />
       </body>
     </html>
   );
