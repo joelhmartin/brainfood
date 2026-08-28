@@ -19,36 +19,7 @@ import { contactPageSchema, CONTACT_INQUIRY_OPTIONS } from "../../config/schemas
 import { RECAPTCHA_ACTIONS } from "../../config/recaptcha.js";
 import { useFormSubmit } from "../../hooks/useFormSubmit.js";
 import { useRecaptcha } from "../../hooks/useRecaptcha.js";
-
-/* ── Scroll reveal helper ── */
-function useScrollReveal(ref, selector, animProps) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const targets = el.querySelectorAll(selector);
-    if (!targets.length) return;
-
-    gsap.set(targets, { opacity: 0, y: animProps.y ?? 24 });
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          gsap.to(targets, {
-            opacity: 1,
-            y: 0,
-            duration: animProps.duration ?? 0.8,
-            stagger: animProps.stagger ?? 0.08,
-            ease: animProps.ease ?? "power3.out",
-          });
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-}
+import { useScrollReveal } from "../../hooks/useScrollReveal.js";
 
 /* ─── HERO ─── */
 function ContactHero() {
