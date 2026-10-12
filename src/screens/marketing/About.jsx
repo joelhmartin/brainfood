@@ -418,6 +418,21 @@ Justin got sober in 2014 and lives the recovery lifestyle himself, which allows 
 What Damian loves most is the individual connection—sitting across from a man who feels completely alone, saying "I've been there," and meaning it. His greatest blessing is his family; since he got sober, his parents and younger brother have found sobriety too. Before recovery he traveled with a circus and spent eighteen years as a union stunt rigger in film. Today he is a husband and father who has run ultramarathons and loves the simple life.`,
     quote: `"In the beginning, I got sober just to escape the pain. Now I stay sober because I want to see how good life can get."`,
   },
+  {
+    id: "jeff",
+    name: "Jeff Korn",
+    role: "Sober Companion",
+    photo: TEAM.jeffKorn,
+    bio: `Jeff struggled with addiction issues throughout his early teens. He achieved sobriety in his early 20's with the help of a treatment center and regular attendance in a fellowship and has maintained his sobriety for over 35 years. Jeff is very passionate about his sobriety and has utilized his insight and personal journey to help hundreds of individuals on their personal path to recovery.
+
+Through his personal recovery journey, Jeff has learned the tools and skills necessary to enjoy a sober and fulfilling life with family, friends and professional associates, as well as having an active life which includes being able to enjoy outings with family and friends to restaurants, social gatherings, sporting events, concerts, hiking and fishing while maintaining his sobriety on a daily basis.
+
+Health and wellness are an essential part of his recovery and he has learned the importance of eating a healthy diet and a regular exercise routine, which all contribute to his overall physical and emotional well-being.
+
+As a sober companion, Jeff works with, encourages and supports his clients to celebrate and embrace their recovery and to maintain a clean lifestyle. He passionately strives to help them gain a positive perspective on life and equips clients with the tools to navigate daily life without turning to harmful substances.
+
+Through compassionate interactions with clients, Jeff models the necessary tools and skills required to lead a sober, productive and fulfilling daily life.`,
+  },
 ];
 
 function TeamBios() {
